@@ -29,7 +29,7 @@ function cc_isactive()
 end
 
 function cc_load()
-    cc_thread = love.thread.newThread("crowdcontrol.lua")
+    cc_thread = love.thread.newThread("crowdcontrol_thread.lua")
 	cc_thread:start()
 end
 

@@ -579,9 +579,21 @@ function menu_draw()
 			if i == 9 then if mouseonselecthold and mouseonselect == 4 then love.graphics.setColor(188, 188, 188) else love.graphics.setColor(255, 255, 255) end end
 			properprintfunc(TEXT["options"], (143-(math.ceil(utf8.len(TEXT["options"])/2)*8))*scale, 186*scale)
 			
-			if i == 9 then love.graphics.setColor(255, 255, 255) end
+			if i == 9 then
+				local cc_text
+				if cc_isactive() then
+					love.graphics.setColor(35, 255, 35)
+					cc_text = TEXT["crowd control on"]
+				else
+					love.graphics.setColor(255, 35, 35)
+					cc_text = TEXT["crowd control off"]
+				end
+				properprintFbackground(cc_text, (width*16-#cc_text*8-7)*scale, 190*scale)
+				cc_text = TEXT["crowd control tip"]
+				properprintFbackground(cc_text, (width*16-#cc_text*8-7)*scale, 198*scale)
+			end
 
-			-- TODO: CC status text
+			if i == 9 then love.graphics.setColor(255, 255, 255) end
 			
 			--if not (not disabletips and menutipoffset > -width*16) then
 				if not (custombackground or customforeground) or hudoutline then

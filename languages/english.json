@@ -6,6 +6,9 @@
 	"select mappack": "select mappack",
 	"options": "options",
 	"select world": "select world",
+	"crowd control on": "crowd control is active",
+	"crowd control off": "crowd control is inactive",
+	"crowd control tip": "press f9 to reload",
 
 "^_Settings":"",
 	"^_Controls":"",
