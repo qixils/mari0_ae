@@ -1191,7 +1191,7 @@ function love.run() -- from https://love2d.org/wiki/love.run
 	-- Main loop time.
 	while true do
 		---- Update Crowd Control request queue ----
-		local old_requests = cc_requests
+		old_requests = cc_requests
 		cc_requests = {}
 		-- Check for timed effects and requests that were not acknowledged
 		-- (Do this first to ensure certain timed effects are not overwritten)

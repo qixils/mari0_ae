@@ -1,5 +1,6 @@
 cc_request_channel = love.thread.getChannel("cc_requests")
 cc_requests = {}
+old_requests = {}
 local outgoing = love.thread.getChannel("cc_outgoing")
 
 function cc_send(msg)
@@ -55,6 +56,17 @@ function cc_ackunless(effect, unless, success_response)
                     return false
                 end
             end
+        end
+    end
+    return false
+end
+
+-- Returns true if the effect was active on the last frame.
+-- Used for cleaning up effects that are no longer active.
+function cc_wasactive(effect)
+    for i, request in ipairs(old_requests) do
+        if request.code == effect then
+            return true
         end
     end
     return false
