@@ -580,6 +580,8 @@ function menu_draw()
 			properprintfunc(TEXT["options"], (143-(math.ceil(utf8.len(TEXT["options"])/2)*8))*scale, 186*scale)
 			
 			if i == 9 then love.graphics.setColor(255, 255, 255) end
+
+			-- TODO: CC status text
 			
 			--if not (not disabletips and menutipoffset > -width*16) then
 				if not (custombackground or customforeground) or hudoutline then

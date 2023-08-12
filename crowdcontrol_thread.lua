@@ -18,6 +18,10 @@ while true do
     -- handle outgoing
     while outgoing:peek() do
         local msg = outgoing:pop()
+        if msg == "close" then
+            crowdcontrol:close()
+            return
+        end
         crowdcontrol:send(msg)
     end
 
@@ -39,6 +43,6 @@ while true do
         timer.sleep(0.01)
     elseif err == "closed" then
         crowdcontrol:close()
-        break
+        return
     end
 end

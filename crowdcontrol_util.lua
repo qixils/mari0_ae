@@ -32,3 +32,11 @@ function cc_load()
     cc_thread = love.thread.newThread("crowdcontrol.lua")
 	cc_thread:start()
 end
+
+function cc_reload()
+    if cc_isactive() then
+        cc_request_channel:push("close")
+        cc_thread:wait()
+    end
+    cc_load()
+end

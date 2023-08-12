@@ -2030,6 +2030,8 @@ function love.keypressed(key, scancode, isrepeat, textinput)
 	
 	if key == "0" and HITBOXDEBUG then
 		HITBOXDEBUGANIMS = not HITBOXDEBUGANIMS
+	elseif key == "f9" then
+		cc_reload()
 	elseif key == "f10" then
 		if android then
 			--hide ui
