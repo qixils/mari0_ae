@@ -1191,14 +1191,10 @@ function love.run() -- from https://love2d.org/wiki/love.run
 	-- Main loop time.
 	while true do
 		---- Update Crowd Control request queue ----
-		-- Get new effects
 		local old_requests = cc_requests
 		cc_requests = {}
-		while cc_request_channel:peek() do
-			local request = cc_request_channel:demand()
-			table.insert(cc_requests, request)
-		end
 		-- Check for timed effects and requests that were not acknowledged
+		-- (Do this first to ensure certain timed effects are not overwritten)
 		for i, request in ipairs(old_requests) do
 			if not request.started then
 				cc_send({id = request.id, type = 0, status = 3}) --retry
@@ -1225,6 +1221,11 @@ function love.run() -- from https://love2d.org/wiki/love.run
 				end
 				request.responded = true
 			end
+		end
+		-- Get new requests
+		while cc_request_channel:peek() do
+			local request = cc_request_channel:demand()
+			table.insert(cc_requests, request)
 		end
 
 		-- Process events.
