@@ -1198,14 +1198,14 @@ function love.run() -- from https://love2d.org/wiki/love.run
 		cc_requests = {}
 		while cc_request_channel:peek() do
 			local request = cc_request_channel:demand()
-			request.started = love.timer.getTime()
 			table.insert(cc_requests, request)
 		end
 		-- Check for timed effects and requests that were not acknowledged
+		-- TODO: also check for acknowledged effects and just send the response here
 		for i, request in ipairs(old_requests) do
 			-- If request was not acknowledged then it was ignored last game tick
 			-- So we must inform the client that it was ignored
-			if not request.acknowledged then
+			if not request.started then
 				cc_send({id = request.id, type = 0, status = 3})
 			
 			-- Else, if request was a timed effect...

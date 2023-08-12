@@ -11,10 +11,13 @@ end
 
 -- Portmaneau of "check" and "acknowledge", this returns true if the effect is
 -- active and marks the effect as acknowledged.
-function cc_chack(effect)
+function cc_chack(effect, response)
     for i, request in ipairs(cc_requests) do
-        if request.code == effect and not request.acknowledged then
-            request.acknowledged = true
+        if request.code == effect then
+            request.started = love.timer.getTime()
+            if response then
+                request.response = response
+            end
             return true
         end
     end
