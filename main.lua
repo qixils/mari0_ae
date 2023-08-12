@@ -1037,9 +1037,7 @@ function love.load()
 		set_language(CurrentLanguage)
 	end
 
-	--Crowd Control
-	cc_thread = love.thread.newThread("crowdcontrol.lua")
-	cc_thread:start()
+	cc_load()
 
 	loadingbardraw(1)
 	
@@ -1201,22 +1199,31 @@ function love.run() -- from https://love2d.org/wiki/love.run
 			table.insert(cc_requests, request)
 		end
 		-- Check for timed effects and requests that were not acknowledged
-		-- TODO: also check for acknowledged effects and just send the response here
 		for i, request in ipairs(old_requests) do
-			-- If request was not acknowledged then it was ignored last game tick
-			-- So we must inform the client that it was ignored
 			if not request.started then
-				cc_send({id = request.id, type = 0, status = 3})
-			
-			-- Else, if request was a timed effect...
-			elseif request.duration then
-				-- Check if it has finished so we can inform the client
-				if (love.timer.getTime() - request.started) > (request.duration / 1000) then
-					cc_send({id = request.id, type = 0, status = 8, timeRemaining = 0})
-				else
-					-- Else, persist it
-					table.insert(cc_requests, request)
+				cc_send({id = request.id, type = 0, status = 3}) --retry
+			else
+				if request.duration then
+					-- Check if it has finished so we can inform the client
+					if (love.timer.getTime() - request.started) > (request.duration / 1000) then
+						cc_send({id = request.id, type = 0, status = 8, timeRemaining = 0}) --finished
+					else
+						-- Else, persist it
+						table.insert(cc_requests, request)
+					end
 				end
+				if request.response then
+					-- Send custom response
+					local response = request.response
+					request.response = nil
+					if not response.id then response.id = request.id end
+					if not response.type then response.type = 0 end
+					cc_send(response)
+				elseif not request.responded then
+					-- Send generic response
+					cc_send({id = request.id, type = 0, status = 0}) --success
+				end
+				request.responded = true
 			end
 		end
 

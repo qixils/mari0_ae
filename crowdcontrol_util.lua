@@ -9,9 +9,9 @@ function cc_send(msg)
     outgoing:push(msg .. "\0")
 end
 
--- Portmaneau of "check" and "acknowledge", this returns true if the effect is
--- active and marks the effect as acknowledged.
-function cc_chack(effect, response)
+-- Returns true if the effect is currently active and marks the effect as acknowledged.
+-- Optionally saves a response to be sent back to the server.
+function cc_ack(effect, response)
     for i, request in ipairs(cc_requests) do
         if request.code == effect then
             request.started = love.timer.getTime()
@@ -22,4 +22,13 @@ function cc_chack(effect, response)
         end
     end
     return false
+end
+
+function cc_isactive()
+    return cc_thread and cc_thread:isRunning()
+end
+
+function cc_load()
+    cc_thread = love.thread.newThread("crowdcontrol.lua")
+	cc_thread:start()
 end
