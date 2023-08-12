@@ -24,6 +24,42 @@ function cc_ack(effect, response)
     return false
 end
 
+-- Returns true if the first supplied effect is active and the second is not.
+-- Optionally may provide a list of effects to check.
+-- Optionally saves a response to be sent back to the server upon success.
+function cc_ackunless(effect, unless, success_response)
+    -- convert to table if necessary, else copy table
+    if type(unless) == "string" then
+        unless = {unless}
+    else
+        unless = unless and {unpack(unless)} or {}
+    end
+    -- remove `effect` from `unless` if present
+    for i, e in ipairs(unless) do
+        if e == effect then
+            table.remove(unless, i)
+            break
+        end
+    end
+    -- check if `effect` is active and `unless` is not
+    for i, request in ipairs(cc_requests) do
+        if request.code == effect then
+            request.started = love.timer.getTime()
+            if success_response then
+                request.response = success_response
+            end
+            return true
+        else
+            for j, e in ipairs(unless) do
+                if request.code == e then
+                    return false
+                end
+            end
+        end
+    end
+    return false
+end
+
 function cc_isactive()
     return cc_thread and cc_thread:isRunning()
 end
