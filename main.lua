@@ -272,6 +272,7 @@ function love.load()
 	JSON = require "JSON"
 	require "notice"
 	require "languages"
+	require "crowdcontrol_util"
 	
 	local luas = {"intro", "menu", "levelscreen", "game", "editor", "physics", "online", "quad", "animatedquad", "entity", "dailychallenge",
 				"portalwall", "tile", "mario", "mushroom", "hatconfigs", "flower", "star", "coinblockanimation",
@@ -1036,6 +1037,10 @@ function love.load()
 		set_language(CurrentLanguage)
 	end
 
+	--Crowd Control
+	cc_thread = love.thread.newThread("crowdcontrol.lua")
+	cc_thread:start()
+
 	loadingbardraw(1)
 	
 	intro_load()
@@ -1171,6 +1176,76 @@ function love.draw()
 		fpsGraph:draw()
 		memGraph:draw()
 		drawGraph:draw()
+	end
+end
+
+function love.run() -- from https://love2d.org/wiki/love.run
+
+	love.math.setRandomSeed(os.time())
+
+	love.load(arg)
+
+	-- We don't want the first frame's dt to include time taken by love.load.
+	love.timer.step()
+
+	local dt = 0
+
+	-- Main loop time.
+	while true do
+		---- Update Crowd Control request queue ----
+		-- Get new effects
+		local old_requests = cc_requests
+		cc_requests = {}
+		while cc_request_channel:peek() do
+			local request = cc_request_channel:demand()
+			request.started = love.timer.getTime()
+			table.insert(cc_requests, request)
+		end
+		-- Check for timed effects and requests that were not acknowledged
+		for i, request in ipairs(old_requests) do
+			-- If request was not acknowledged then it was ignored last game tick
+			-- So we must inform the client that it was ignored
+			if not request.acknowledged then
+				cc_send({id = request.id, type = 0, status = 3})
+			
+			-- Else, if request was a timed effect...
+			elseif request.duration then
+				-- Check if it has finished so we can inform the client
+				if (love.timer.getTime() - request.started) > (request.duration / 1000) then
+					cc_send({id = request.id, type = 0, status = 8, timeRemaining = 0})
+				else
+					-- Else, persist it
+					table.insert(cc_requests, request)
+				end
+			end
+		end
+
+		-- Process events.
+		love.event.pump()
+		for name, a,b,c,d,e,f in love.event.poll() do
+			if name == "quit" then
+				if not love.quit() then
+					return a
+				end
+			end
+			love.handlers[name](a,b,c,d,e,f)
+		end
+
+		-- Update dt, as we'll be passing it to update
+		love.timer.step()
+		dt = love.timer.getDelta()
+
+		-- Call update and draw
+		love.update(dt)
+
+		if love.graphics.isActive() then
+			love.graphics.clear(love.graphics.getBackgroundColor())
+			love.graphics.origin()
+			love.draw()
+			love.graphics.present()
+		end
+
+		love.timer.sleep(0.001)
 	end
 end
 
