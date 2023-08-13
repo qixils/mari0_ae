@@ -307,6 +307,19 @@ function game_update(dt)
 				notime = true
 			end
 		end
+
+		-- CC: (Un)Invert Controls
+		if cc_ack("invert_wasd") ~= controls_inverted then
+			controls_inverted = not controls_inverted
+			for i = 1, players do
+				local left = controls[i]["left"]
+				controls[i]["left"] = controls[i]["right"]
+				controls[i]["right"] = left
+				local up = controls[i]["up"]
+				controls[i]["up"] = controls[i]["down"]
+				controls[i]["down"] = up
+			end
+		end
 		
 		if (notime == false or breakoutmode) and infinitetime == false and mariotime ~= 0 then
 			if realtime then --mario maker time
