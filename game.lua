@@ -372,7 +372,7 @@ function game_update(dt)
 				table.remove(mariohats[i])
 			end
 			-- add random hats
-			if math.random() < 0.8 then
+			if math.random() < 0.9 then
 				table.insert(mariohats[i], math.random(1, hatcount))
 				while math.random() < 0.5 do
 					table.insert(mariohats[i], math.random(1, hatcount))
