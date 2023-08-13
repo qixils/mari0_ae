@@ -7,6 +7,8 @@ local outgoing = love.thread.getChannel("cc_outgoing")
 wasd_inverted = false
 buttons_inverted = false
 
+--- Sends a message to the Crowd Control server.
+---@param msg string|table The message to send. If a table is provided, it will be encoded as JSON.
 function cc_send(msg)
     if type(msg) == "table" then
         msg = JSON:encode(msg)
@@ -14,8 +16,11 @@ function cc_send(msg)
     outgoing:push(msg .. "\0")
 end
 
--- Returns true if the effect is currently active and marks the effect as acknowledged.
--- Optionally saves a response to be sent back to the server.
+--- Checks if the effect is currently active and marks the effect as acknowledged.
+--- Make sure that the effect can actually be applied before calling this method.
+---@param effect string The effect to check.
+---@param response? string|table Optional response to send back to the server if the effect is active.
+---@return boolean
 function cc_ack(effect, response)
     for i, request in ipairs(cc_requests) do
         if request.code == effect then
@@ -31,9 +36,11 @@ function cc_ack(effect, response)
     return false
 end
 
--- Returns true if the first supplied effect is active and the second is not.
--- Optionally may provide a list of effects to check.
--- Optionally saves a response to be sent back to the server upon success.
+--- Checks if the first supplied effect is active and the second is not.
+---@param effect string The effect to check.
+---@param unless string|string[] The effect(s) to check against.
+---@param success_response? string|table Optional response to send back to the server if this check succeeds.
+---@return boolean
 function cc_ackunless(effect, unless, success_response)
     -- convert to table if necessary, else copy table
     if type(unless) == "string" then
@@ -67,8 +74,10 @@ function cc_ackunless(effect, unless, success_response)
     return false
 end
 
--- Returns true if the effect was active on the last frame.
--- Used for cleaning up effects that are no longer active.
+--- Checks if the effect was active on the last frame.
+--- Used for cleaning up effects that are no longer active.
+---@param effect string The effect to check.
+---@return boolean
 function cc_wasactive(effect)
     for i, request in ipairs(old_requests) do
         if request.code == effect then
@@ -78,15 +87,19 @@ function cc_wasactive(effect)
     return false
 end
 
+--- Checks if the Crowd Control server is currently active.
+---@return boolean
 function cc_isactive()
     return cc_thread and cc_thread:isRunning()
 end
 
+--- Initializes the Crowd Control server.
 function cc_load()
     cc_thread = love.thread.newThread("crowdcontrol_thread.lua")
 	cc_thread:start()
 end
 
+--- Reloads the Crowd Control server.
 function cc_reload()
     if cc_isactive() then
         outgoing:push("close")

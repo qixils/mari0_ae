@@ -1,47 +1,31 @@
-<p align="center"><img src="https://i.imgur.com/U5xzR1h.png"></p>
-<p align="center">This is the repository for my mod Mari0: Alesan99's Entities</p>
+# Mari0: AE Crowd Control
 
-## 👷 Contributions
-Bug fixes and quality of life improvements are welcome!
-This includes stuff like custom enemy properties and new animations.
+This is the [Crowd Control](https://crowdcontrol.live/) mod for [Mari0: AE](https://github.com/alesan99/mari0_ae)
+(which itself is a mod of [Mari0](https://github.com/Stabyourself/mari0)).
 
-Avoid major additions that will potentially cause bugs or complicate the game/code (Stuff like powerups).
-I appreciate the help, but the goal is to continue the mod while I am busy. Major changes will only increase my workload and make the mod even buggier.
+## Contributing
 
-## 📥 Downloads
-[**Downloads are available here.**](https://forum.stabyourself.net/viewtopic.php?f=13&t=3636)
+To test effects, you'll want to download the [Crowd Control SDK](https://developer.crowdcontrol.live/sdk/). In the SDK,
+click Load Pack Source, select Mari0.cs, click Connect, then open the game or press F9. You will now be able to use the
+SDK to send effects! Also check out Effects -> Autopilot to send random effects every second (though note this feature
+is pretty buggy).
 
-Development builds are available [here](https://github.com/alesan99/mari0_ae/actions).
+To create a new effect, you'll want to use the function `cc_ack(effect: string) -> boolean` to check if an effect is
+active. Note that this method will mark the requested effects as having succeeded and thus will consume the purchaser's
+coins, so **please be careful** to only call this method when you're certain the effect can be applied.
+To use an effect, it needs to be defined in the game pack (Mari0.cs) file, namely in the Effects variable. A typical
+effect looks something like:
 
-## 💡 About
-**Alesan99's Entities** adds many entities to [Mari0](https://stabyourself.net/mari0)! From Enemies to power ups you'll never run out of entities to make levels now!
+```cs
+new("Display Name", "code_name") { Price = 50, Duration = 15, Category = "Player", Description = "Does a thing!" },
+```
 
-It even has bonus features like online multiplayer, custom characters, custom enemies/powerups, animated tiles, infinite levels and music, vertical scrolling, tile properties, and more!
+Note that the price and duration fields are just defaults that streamers can change.
+Also note that the category is anoptional field for narrowing down the list of effects. It can be whatever you want,
+even `new("Multiple", "Categories")`!
 
-<br>
+## Contributors
 
-<p align="center"><img src="https://i.imgur.com/th4xsMi.png"></p>
+This mod was created by:
 
-<br>
-
-<details>
-  <summary>🖼️ Show more screenshots</summary>
-
-  <blockquote>
-  <p align="center"><img src="https://i.imgur.com/fS2o7pc.png"></p>
-  <p align="center"><img src="https://i.imgur.com/67uPzZZ.png"></p>
-  <p align="center"><img src="https://i.imgur.com/VhvWBcj.png"></p>
-  <p align="center"><img src="https://i.imgur.com/tdDfhkR.png"></p>
-  <p align="center"><img src="https://i.imgur.com/CPQN00C.png"></p>
-  <p align="center"><img src="https://i.imgur.com/04htj0O.png"></p>
-  <p align="center"><img src="https://i.imgur.com/cnW3Vob.png"></p>
-  <p align="center"><img src="https://i.imgur.com/016vjP0.png"></p>
-  <p align="center"><img src="https://i.imgur.com/E8mXQFj.png"></p>
-  </blockquote>
-</details>
-
-## 💌 Credits and more Information
-Please see: https://forum.stabyourself.net/viewtopic.php?f=13&t=3636
-Or the top of main.lua
-
-- thanks to [**NNB**](https://github.com/NNBnh) for this GitHub README page
+- @qixils: Wrote the networking code and several effects
