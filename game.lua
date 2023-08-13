@@ -352,16 +352,27 @@ function game_update(dt)
 	end
 
 	---- Crowd Control ----
-	-- (Un)Invert Controls
-	if cc_ack("invert_wasd") ~= controls_inverted then
-		controls_inverted = not controls_inverted
-		for i = 1, players do
+	-- (Un)Invert WASD
+	if cc_ack("invert_wasd") ~= wasd_inverted then
+		wasd_inverted = not wasd_inverted
+		for i = 1, #controls do
 			local left = controls[i]["left"]
 			controls[i]["left"] = controls[i]["right"]
 			controls[i]["right"] = left
 			local up = controls[i]["up"]
 			controls[i]["up"] = controls[i]["down"]
 			controls[i]["down"] = up
+		end
+	end
+	if cc_ack("invert_buttons") ~= buttons_inverted then
+		buttons_inverted = not buttons_inverted
+		for i = 1, #controls do
+			local jump = controls[i]["jump"]
+			controls[i]["jump"] = controls[i]["run"]
+			controls[i]["run"] = jump
+			local portal1 = controls[i]["portal1"]
+			controls[i]["portal1"] = controls[i]["portal2"]
+			controls[i]["portal2"] = portal1
 		end
 	end
 	-- Add/Remove Hat

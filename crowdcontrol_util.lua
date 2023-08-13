@@ -4,7 +4,8 @@ old_requests = {}
 local outgoing = love.thread.getChannel("cc_outgoing")
 
 -- misc state variables
-controls_inverted = false
+wasd_inverted = false
+buttons_inverted = false
 
 function cc_send(msg)
     if type(msg) == "table" then
