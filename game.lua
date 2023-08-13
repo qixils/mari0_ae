@@ -308,19 +308,6 @@ function game_update(dt)
 			end
 		end
 
-		-- CC: (Un)Invert Controls
-		if cc_ack("invert_wasd") ~= controls_inverted then
-			controls_inverted = not controls_inverted
-			for i = 1, players do
-				local left = controls[i]["left"]
-				controls[i]["left"] = controls[i]["right"]
-				controls[i]["right"] = left
-				local up = controls[i]["up"]
-				controls[i]["up"] = controls[i]["down"]
-				controls[i]["down"] = up
-			end
-		end
-		
 		if (notime == false or breakoutmode) and infinitetime == false and mariotime ~= 0 then
 			if realtime then --mario maker time
 				mariotime = mariotime - dt --mario maker purists rejoice
@@ -359,6 +346,42 @@ function game_update(dt)
 				mariotime = 0
 				for i, v in pairs(objects["player"]) do
 					v:die("time")
+				end
+			end
+		end
+	end
+
+	---- Crowd Control ----
+	-- (Un)Invert Controls
+	if cc_ack("invert_wasd") ~= controls_inverted then
+		controls_inverted = not controls_inverted
+		for i = 1, players do
+			local left = controls[i]["left"]
+			controls[i]["left"] = controls[i]["right"]
+			controls[i]["right"] = left
+			local up = controls[i]["up"]
+			controls[i]["up"] = controls[i]["down"]
+			controls[i]["down"] = up
+		end
+	end
+	-- Randomize Colors
+	if cc_ack("randomize_colors") then
+		for i = 1, players do
+			-- clear hats
+			while #mariohats[i] > 0 do
+				table.remove(mariohats[i])
+			end
+			-- add random hats
+			if math.random() < 0.8 then
+				table.insert(mariohats[i], math.random(1, hatcount))
+				while math.random() < 0.5 do
+					table.insert(mariohats[i], math.random(1, hatcount))
+				end
+			end
+			-- randomize colors
+			for j = 1, #mariocolors[i] do
+				for k = 1, #mariocolors[i][j] do
+					mariocolors[i][j][k] = math.random(0, 255)
 				end
 			end
 		end
