@@ -3,6 +3,9 @@ cc_requests = {}
 old_requests = {}
 local outgoing = love.thread.getChannel("cc_outgoing")
 
+-- misc state variables
+controls_inverted = false
+
 function cc_send(msg)
     if type(msg) == "table" then
         msg = JSON:encode(msg)
@@ -15,7 +18,9 @@ end
 function cc_ack(effect, response)
     for i, request in ipairs(cc_requests) do
         if request.code == effect then
-            request.started = love.timer.getTime()
+            if not request.started then
+                request.started = love.timer.getTime()
+            end
             if response then
                 request.response = response
             end
@@ -83,8 +88,10 @@ end
 
 function cc_reload()
     if cc_isactive() then
-        cc_request_channel:push("close")
+        outgoing:push("close")
         cc_thread:wait()
+    elseif cc_thread and cc_thread:getError() then
+        print("Previous thread closed due to: " .. cc_thread:getError())
     end
     cc_load()
 end
