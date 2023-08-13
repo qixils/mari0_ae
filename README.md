@@ -24,6 +24,8 @@ Note that the price and duration fields are just defaults that streamers can cha
 Also note that the category is anoptional field for narrowing down the list of effects. It can be whatever you want,
 even `new("Multiple", "Categories")`!
 
+![Screenshot of the category dropdown in the Crowd Control extension](https://github.com/qixils/mari0_ae/assets/13265322/f653ef93-a349-4cff-809c-e9bab54e67f5)
+
 ## Contributors
 
 This mod was created by:
