@@ -30,4 +30,4 @@ even `new("Multiple", "Categories")`!
 
 This mod was created by:
 
-- @qixils: Wrote the networking code and several effects
+- [Lexi](https://github.com/qixils): Wrote the networking code and several effects
