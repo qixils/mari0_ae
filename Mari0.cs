@@ -28,6 +28,8 @@ public class Mari0 : SimpleTCPPack<SimpleTCPServerConnector>
     public override EffectList Effects => new Effect[]
     {
         new("Invert Movement", "invert_wasd") { Price = 200, Duration = 15, Category = "Movement", Description = "Temporarily inverts WASD movement" },
-        new("Randomize Player Outfit", "randomize_colors") { Price = 10, Category = "Player", Description = "Randomizes the colors and accessories of the player" },
+        new("Randomize Outfit", "randomize_outfit") { Price = 20, Category = "Player", Description = "Randomizes Mario's color palette and accessories" },
+        new("Add a Hat", "hat_give") { Price = 10, Category = "Player", Description = "Places a random silly hat on Mario's head" },
+        new("Take a Hat", "hat_take") { Price = 10, Category = "Player", Description = "Takes a hat right off the top of Mario's head" },
     };
 }

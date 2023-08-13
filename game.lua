@@ -364,18 +364,21 @@ function game_update(dt)
 			controls[i]["down"] = up
 		end
 	end
+	-- Add/Remove Hat
+	for i = 1, #mariohats do
+		if #mariohats[i] > 0 and cc_ack("hat_take") then
+			table.remove(mariohats[i], 1)
+		end
+		if cc_ack("hat_give") then
+			table.insert(mariohats[i], math.random(1, hatcount))
+		end
+	end
 	-- Randomize Colors
-	if cc_ack("randomize_colors") then
+	if cc_ack("randomize_outfit") then
 		for i = 1, players do
-			-- clear hats
-			while #mariohats[i] > 0 do
-				table.remove(mariohats[i])
-			end
-			-- add random hats
-			local odds = 0.95
-			while math.random() < odds do
-				odds = 0.72 -- lower consecutive hat odds
-				table.insert(mariohats[i], math.random(1, hatcount))
+			-- randomize hats
+			for h = 1, #mariohats[i] do
+				mariohats[i][h] = math.random(1, hatcount)
 			end
 			-- randomize colors
 			for j = 1, #mariocolors[i] do
