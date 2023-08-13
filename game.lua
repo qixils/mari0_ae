@@ -372,11 +372,10 @@ function game_update(dt)
 				table.remove(mariohats[i])
 			end
 			-- add random hats
-			if math.random() < 0.9 then
+			local odds = 0.95
+			while math.random() < odds do
+				odds = 0.72 -- lower consecutive hat odds
 				table.insert(mariohats[i], math.random(1, hatcount))
-				while math.random() < 0.5 do
-					table.insert(mariohats[i], math.random(1, hatcount))
-				end
 			end
 			-- randomize colors
 			for j = 1, #mariocolors[i] do
