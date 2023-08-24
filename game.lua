@@ -305,6 +305,7 @@ function game_update(dt)
 		for i = 1, players do
 			if (objects["player"][i].controlsenabled == false and objects["player"][i].dead == false and objects["player"][i].groundfreeze == false) then
 				notime = true
+				break
 			end
 		end
 
@@ -352,49 +353,58 @@ function game_update(dt)
 	end
 
 	---- Crowd Control ----
-	-- (Un)Invert WASD
-	if cc_ack("invert_wasd") ~= wasd_inverted then
-		wasd_inverted = not wasd_inverted
-		for i = 1, #controls do
-			local left = controls[i]["left"]
-			controls[i]["left"] = controls[i]["right"]
-			controls[i]["right"] = left
-			local up = controls[i]["up"]
-			controls[i]["up"] = controls[i]["down"]
-			controls[i]["down"] = up
+	local playing = false
+	for i = 1, players do
+		if objects["player"][i].controlsenabled and not objects["player"][i].dead then
+			playing = true
+			break
 		end
 	end
-	if cc_ack("invert_buttons") ~= buttons_inverted then
-		buttons_inverted = not buttons_inverted
-		for i = 1, #controls do
-			local jump = controls[i]["jump"]
-			controls[i]["jump"] = controls[i]["run"]
-			controls[i]["run"] = jump
-			local portal1 = controls[i]["portal1"]
-			controls[i]["portal1"] = controls[i]["portal2"]
-			controls[i]["portal2"] = portal1
-		end
-	end
-	-- Add/Remove Hat
-	for i = 1, #mariohats do
-		if #mariohats[i] > 0 and cc_ack("hat_take") then
-			table.remove(mariohats[i], 1)
-		end
-		if cc_ack("hat_give") then
-			table.insert(mariohats[i], math.random(1, hatcount))
-		end
-	end
-	-- Randomize Colors
-	if cc_ack("randomize_outfit") then
-		for i = 1, players do
-			-- randomize hats
-			for h = 1, #mariohats[i] do
-				mariohats[i][h] = math.random(1, hatcount)
+	if playing then
+		-- (Un)Invert WASD
+		if cc_ack("invert_wasd") ~= wasd_inverted then
+			wasd_inverted = not wasd_inverted
+			for i = 1, #controls do
+				local left = controls[i]["left"]
+				controls[i]["left"] = controls[i]["right"]
+				controls[i]["right"] = left
+				local up = controls[i]["up"]
+				controls[i]["up"] = controls[i]["down"]
+				controls[i]["down"] = up
 			end
-			-- randomize colors
-			for j = 1, #mariocolors[i] do
-				for k = 1, #mariocolors[i][j] do
-					mariocolors[i][j][k] = math.random(0, 255)
+		end
+		if cc_ack("invert_buttons") ~= buttons_inverted then
+			buttons_inverted = not buttons_inverted
+			for i = 1, #controls do
+				local jump = controls[i]["jump"]
+				controls[i]["jump"] = controls[i]["run"]
+				controls[i]["run"] = jump
+				local portal1 = controls[i]["portal1"]
+				controls[i]["portal1"] = controls[i]["portal2"]
+				controls[i]["portal2"] = portal1
+			end
+		end
+		-- Add/Remove Hat
+		for i = 1, #mariohats do
+			if #mariohats[i] > 0 and cc_ack("hat_take") then
+				table.remove(mariohats[i], 1)
+			end
+			if cc_ack("hat_give") then
+				table.insert(mariohats[i], math.random(1, hatcount))
+			end
+		end
+		-- Randomize Colors
+		if cc_ack("randomize_outfit") then
+			for i = 1, players do
+				-- randomize hats
+				for h = 1, #mariohats[i] do
+					mariohats[i][h] = math.random(1, hatcount)
+				end
+				-- randomize colors
+				for j = 1, #mariocolors[i] do
+					for k = 1, #mariocolors[i][j] do
+						mariocolors[i][j][k] = math.random(0, 255)
+					end
 				end
 			end
 		end
