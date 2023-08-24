@@ -450,6 +450,8 @@ function game_update(dt)
 		end
 		-- Restart Level
 		if cc_ack("restart_level") then
+			stopmusic()
+			love.audio.stop()
 			levelscreen_load("crowdcontrol")
 			return
 		end
