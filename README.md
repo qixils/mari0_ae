@@ -31,3 +31,4 @@ even `new("Multiple", "Categories")`!
 This mod was created by:
 
 - [Lexi](https://github.com/qixils): Wrote the networking code and several effects
+- [Aidan](https://github.com/Aid0nModder): Wrote several effects
