@@ -448,6 +448,11 @@ function game_update(dt)
 				player.size = newsize
 			end
 		end
+		-- Restart Level
+		if cc_ack("restart_level") then
+			levelscreen_load("crowdcontrol")
+			return
+		end
 	end
 
 	--Portaldots

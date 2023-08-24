@@ -101,7 +101,7 @@ function levelscreen_load(reason, i)
 				dcfinish = true
 				blacktime = 0.8
 			end
-		else
+		elseif reason ~= "crowdcontrol" then
 			checkcheckpoint = true
 			
 			if reason == "death" and i then

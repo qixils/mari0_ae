@@ -19,7 +19,7 @@ namespace CrowdControl.Games.Packs;
 public class Mari0 : SimpleTCPPack<SimpleTCPServerConnector>
 {
     public override string Host => "127.0.0.1";
-    public override ushort Port => 58435;
+    public override ushort Port => 28379;
 
     public Mari0(UserRecord player, Func<CrowdControlBlock, bool> responseHandler, Action<object> statusUpdateHandler) : base(player, responseHandler, statusUpdateHandler) {}
 
@@ -27,14 +27,15 @@ public class Mari0 : SimpleTCPPack<SimpleTCPServerConnector>
 
     public override EffectList Effects => new Effect[]
     {
-        new("Invert D-Pad", "invert_wasd") { Price = 200, Duration = 15, Category = "Movement", Description = "Swaps left, right, up and down" },
-        new("Swap Buttons", "invert_buttons") { Price = 200, Duration = 15, Category = "Movement", Description = "Swaps the run, jump, and portal buttons" },
-        new("Randomize Outfit", "randomize_outfit") { Price = 20, Category = "Player", Description = "Randomizes Mario's color palette and accessories" },
+        new("Invert D-Pad", "invert_wasd") { Price = 150, Duration = 15, Category = "Movement", Description = "Swaps left, right, up and down" },
+        new("Swap Buttons", "invert_buttons") { Price = 150, Duration = 15, Category = "Movement", Description = "Swaps the run, jump, and portal buttons" },
+        new("Randomize Outfit", "randomize_outfit") { Price = 15, Category = "Player", Description = "Randomizes Mario's color palette and accessories" },
         new("Add a Hat", "hat_give") { Price = 10, Category = "Player", Description = "Places a random silly hat on Mario's head" },
         new("Take a Hat", "hat_take") { Price = 10, Category = "Player", Description = "Takes a hat right off the top of Mario's head" },
-        new("Randomize Power-up", "randomize_powerup") { Price = 20, Category = "Player", Description = "Randomize Mario's current power-up" },
-        new("Remove Powerup", "remove_powerup") { Price = 20, Category = "Player", Description = "Takes Mario's current power-up" },
-        new("Supersize nearby Enemies", "supersize_enemies") { Price = 50, Category = "Enemies", Description = "Supersizes all supported enemies that are within the boundries of a players view" },
-        new("Kill nearby Enemies", "kill_enemies") { Price = 50, Category = "Enemies", Description = "Kills all supported enemies that are within the boundries of a players view" },
+        new("Randomize Power-up", "randomize_powerup") { Price = 25, Category = "Player", Description = "Randomize Mario's current power-up" },
+        new("Remove Powerup", "remove_powerup") { Price = 25, Category = "Player", Description = "Takes Mario's current power-up" },
+        new("Supersize Enemies", "supersize_enemies") { Price = 75, Category = "Enemies", Description = "Supersizes all supported on-screen enemies" },
+        new("Kill Enemies", "kill_enemies") { Price = 75, Category = "Enemies", Description = "Kills all supported on-screen enemies" },
+        new("Restart Level", "restart_level") { Price = 150, Category = new("Player", "Level"), Description = "Restarts the current level" },
     };
 }
