@@ -393,7 +393,7 @@ function game_update(dt)
 				table.insert(mariohats[i], math.random(1, hatcount))
 			end
 		end
-		-- Randomize Colors
+		-- Randomize Outfit
 		if cc_ack("randomize_outfit") then
 			for i = 1, players do
 				-- randomize hats
@@ -409,31 +409,27 @@ function game_update(dt)
 			end
 		end
 		-- Supersize Nearby Enemies
-		if cc_ack("supersize_enemies") then
-			local startx, endx = splitxscroll[1], splitxscroll[1]+25
-			for j, w in pairs(enemies) do
-				if objects[w] then
-					for i, v in pairs(objects[w]) do
-						if (not v.supersized) and v.x >= startx and v.x+v.width <= endx then
-							supersizeentity(v, nil, true)
-						end
+		local startx, endx = splitxscroll[1], splitxscroll[1]+25
+		for j, w in pairs(enemies) do
+			if objects[w] then
+				for i, v in pairs(objects[w]) do
+					if (not v.supersized) and v.x >= startx and v.x+v.width <= endx and cc_ack("supersize_enemies") then
+						supersizeentity(v, nil, true)
 					end
 				end
 			end
 		end
 		-- Kills Nearby Enemies
-		if cc_ack("kill_enemies") then
-			local startx, endx = splitxscroll[1], splitxscroll[1]+25
-			for j, w in pairs(enemies) do
-				if objects[w] then
-					for i, v in pairs(objects[w]) do
-						if v.active and v.shotted and (not v.resistseverything) then
-							local dir = "right"
-							if math.random(1,2) == 1 then
-								dir = "left"
-							end
-							v:shotted(dir)
+		local startx, endx = splitxscroll[1], splitxscroll[1]+25
+		for j, w in pairs(enemies) do
+			if objects[w] then
+				for i, v in pairs(objects[w]) do
+					if v.active and v.shotted and (not v.resistseverything) and cc_ack("kill_enemies") then
+						local dir = "right"
+						if math.random(1,2) == 1 then
+							dir = "left"
 						end
+						v:shotted(dir)
 					end
 				end
 			end
