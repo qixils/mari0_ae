@@ -32,5 +32,9 @@ public class Mari0 : SimpleTCPPack<SimpleTCPServerConnector>
         new("Randomize Outfit", "randomize_outfit") { Price = 20, Category = "Player", Description = "Randomizes Mario's color palette and accessories" },
         new("Add a Hat", "hat_give") { Price = 10, Category = "Player", Description = "Places a random silly hat on Mario's head" },
         new("Take a Hat", "hat_take") { Price = 10, Category = "Player", Description = "Takes a hat right off the top of Mario's head" },
+        new("Randomize Power-up", "randomize_powerup") { Price = 20, Category = "Player", Description = "Randomize Mario's current power-up" },
+        new("Remove Powerup", "remove_powerup") { Price = 20, Category = "Player", Description = "Takes Mario's current power-up" },
+        new("Supersize nearby Enemies", "supersize_enemies") { Price = 50, Category = "Enemies", Description = "Supersizes all supported enemies that are within the boundries of a players view" },
+        new("Kill nearby Enemies", "kill_enemies") { Price = 50, Category = "Enemies", Description = "Kills all supported enemies that are within the boundries of a players view" },
     };
 }

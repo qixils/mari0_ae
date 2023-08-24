@@ -399,6 +399,50 @@ function game_update(dt)
 			end
 		end
 	end
+	-- Supersize Nearby Enemies
+	if cc_ack("supersize_enemies") then
+		local startx, endx = splitxscroll[1], splitxscroll[1]+25
+		for j, w in pairs(enemies) do
+			if objects[w] then
+				for i, v in pairs(objects[w]) do
+					if (not v.supersized) and v.x >= startx and v.x+v.width <= endx then
+						supersizeentity(v, nil, true)
+					end
+				end
+			end
+		end
+	end
+	-- Kills Nearby Enemies
+	if cc_ack("kill_enemies") then
+		local startx, endx = splitxscroll[1], splitxscroll[1]+25
+		for j, w in pairs(enemies) do
+			if objects[w] then
+				for i, v in pairs(objects[w]) do
+					if v.active and v.shotted and (not v.resistseverything) then
+						local dir = "right"
+						if math.random(1,2) == 1 then
+							dir = "left"
+						end
+						v:shotted(dir)
+					end
+				end
+			end
+		end
+	end
+	for i = 1, players do
+		player = objects["player"][i]
+		-- Randomize Powerups
+		if cc_ack("randomize_powerup") then
+			newsize = tonumber(powerupslistids[math.random(1,#powerupslistids)])
+			player:setsize(newsize)
+			player.size = newsize
+		end
+		if player.size ~= 1 and cc_ack("remove_powerup") then
+			newsize = tonumber(powerupslistids[math.random(1,#powerupslistids)])
+			player:setsize(newsize)
+			player.size = newsize
+		end
+	end
 
 	--Portaldots
 	portaldotstimer = portaldotstimer + dt
