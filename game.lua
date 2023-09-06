@@ -420,7 +420,6 @@ function game_update(dt)
 			end
 		end
 		-- Kills Nearby Enemies
-		local startx, endx = splitxscroll[1], splitxscroll[1]+25
 		for j, w in pairs(enemies) do
 			if objects[w] then
 				for i, v in pairs(objects[w]) do
@@ -484,6 +483,21 @@ function game_update(dt)
 		if cc_ack("kill_player") then
 			for i = 1, players do
 				objects["player"][i]:die("killscript")
+			end
+		end
+		-- Stun Player
+		local request = cc_get("stun_player", false)
+		if request then
+			for i = 1, players do
+				player = objects["player"][i]
+				if (not player.vine) and (not player.fence) and (not player.clearpipe) then
+					cc_start(request)
+					player.ccstun = true
+					player.groundfreeze = 5
+					player.speedx = 0
+					player.animationstate = "idle"
+					player:setquad()
+				end
 			end
 		end
 	end
