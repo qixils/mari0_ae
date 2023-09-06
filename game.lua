@@ -384,6 +384,15 @@ function game_update(dt)
 				controls[i]["portal2"] = portal1
 			end
 		end
+		-- Lights out
+		if (not lightsout) and cc_ack("enable_lightsout") ~= toggled_lightsout then
+			toggled_lightsout = not toggled_lightsout
+			truelightsout = not truelightsout
+		end
+		if lightsout and cc_ack("disable_lightsout") ~= toggled_lightsout then
+			toggled_lightsout = not toggled_lightsout
+			truelightsout = not truelightsout
+		end
 		-- Add/Remove Hat
 		for i = 1, #mariohats do
 			if #mariohats[i] > 0 and cc_ack("hat_take") then
@@ -647,7 +656,7 @@ function game_update(dt)
 	end
 
 	--make lights have a slight wave
-	if lightsout then
+	if truelightsout then
 		lightsoutwave = (lightsoutwave + dt)%0.2
 	end
 	
@@ -1947,7 +1956,7 @@ function game_draw()
 		end
 		
 		---UI
-		if ((not darkmode and not lightsout) or editormode) and not hudsimple then
+		if ((not darkmode and not truelightsout) or editormode) and not hudsimple then
 			love.graphics.scale(1/screenzoom,1/screenzoom)
 			if hudvisible then
 				drawHUD()
@@ -2698,7 +2707,7 @@ function game_draw()
 		
 		--UI over everything
 		love.graphics.scale(1/screenzoom,1/screenzoom)
-		if hudsimple and ((not darkmode and not lightsout) or editormode) then
+		if hudsimple and ((not darkmode and not truelightsout) or editormode) then
 			if hudvisible then
 				drawHUD()
 			end
@@ -2872,7 +2881,7 @@ function game_draw()
 		love.graphics.pop()
 	end
 	love.graphics.setScissor()
-	if lightsout and not editormode then
+	if truelightsout and not editormode then
 		local pass = true
 		for j, w in pairs(objects["player"]) do
 			if w.starred then
@@ -2953,7 +2962,7 @@ function game_draw()
 	end
 
 	--UI over everything in darkmode
-	if ((darkmode or lightsout) and not editormode) then
+	if ((darkmode or truelightsout) and not editormode) then
 		if hudvisible then
 			drawHUD()
 		end
@@ -4447,6 +4456,7 @@ function startlevel(level, reason)
 	autoscrollingy = false
 	edgewrapping = false
 	lightsout = false
+	truelightsout = false
 	lightsoutwave = 0
 	lowgravity = false
 	portalgun = true
@@ -4930,6 +4940,7 @@ function loadmap(filename)
 			edgewrapping = true
 		elseif s3[1] == "lightsout" then
 			lightsout = true
+			truelightsout = true
 			lightsoutwave = 0
 		elseif s3[1] == "lowgravity" then
 			lowgravity = true
