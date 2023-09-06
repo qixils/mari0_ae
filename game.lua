@@ -423,7 +423,7 @@ function game_update(dt)
 		for j, w in pairs(enemies) do
 			if objects[w] then
 				for i, v in pairs(objects[w]) do
-					if v.active and v.shotted and (not v.resistseverything) and cc_ack("kill_enemies") then
+					if v.active and v.shotted and (not v.resistseverything) and v.x >= startx and v.x+v.width <= endx and cc_ack("kill_enemies") then
 						local dir = "right"
 						if math.random(1,2) == 1 then
 							dir = "left"
