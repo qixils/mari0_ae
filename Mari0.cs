@@ -34,14 +34,14 @@ public class Mari0 : SimpleTCPPack<SimpleTCPServerConnector>
         new("Take a Hat", "hat_take") { Price = 10, Category = "Player", Description = "Takes a hat right off the top of Mario's head" },
         new("Randomize Powerup", "randomize_powerup") { Price = 25, Category = "Player", Description = "Randomize Mario's current powerup" },
         new("Remove Powerup", "remove_powerup") { Price = 25, Category = "Player", Description = "Takes Mario's current powerup" },
-        new("Supersize Enemies", "supersize_enemies") { Price = 75, Category = "Enemies", Description = "Supersizes all supported on-screen enemies" },
+        new("Supersize Enemies", "supersize_enemies") { Price = 50, Category = "Enemies", Description = "Supersizes all supported on-screen enemies" },
         new("Kill Enemies", "kill_enemies") { Price = 75, Category = "Enemies", Description = "Kills all supported on-screen enemies" },
         new("Restart Level", "restart_level") { Price = 150, Category = new("Player", "Level"), Description = "Restarts the current level" },
-        new("Enable Lights Out", "enable_lightsout") { Price = 75, Duration = 10, Category = "Level", Description = "Enables the lights out effect" },
-        new("Disable Lights Out", "disable_lightsout") { Price = 150, Duration = 10, Category = "Level", Description = "Disables the lights out effect" },
+        new("Lights Out", "enable_lightsout") { Price = 50, Duration = 10, Category = "Level", Description = "Enables the lights out effect" },
+        new("Lights On", "disable_lightsout") { Price = 75, Duration = 10, Category = "Level", Description = "Disables the lights out effect" },
         new("Give Extra Life", "add_life") { Price = 50, Quantity = 100, Category = "Player", Description = "Gives Mario an extra life" },
         new("Take Extra Life", "take_life") { Price = 100, Quantity = 100, Category = "Player", Description = "Steals an extra life from Mario" },
         new("Kill Player", "kill_player") { Price = 250, Category = "Player", Description = "Murder Mario." },
-        new("Stun Player", "stun_player") { Price = 100, Duration = 4, Category = "Player", Description = "Stuns Mario." },
+        new("Can't Move", "stun_player") { Price = 100, Duration = 5, Category = "Player", Description = "Stuns Mario, freezing him in place for a few seconds" },
     };
 }

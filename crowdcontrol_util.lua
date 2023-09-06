@@ -25,7 +25,7 @@ end
 
 --- Gets an active request by the given effect ID and optionally marks it as acknowledged.
 ---@param effect string The effect to get.
----@param ack boolean Whether to mark the effect as acknowledged.
+---@param ack boolean? Whether to mark the effect as acknowledged.
 ---@return table|nil
 function cc_get(effect, ack)
     for i, request in ipairs(cc_requests) do
@@ -37,6 +37,13 @@ function cc_get(effect, ack)
         end
     end
     return nil
+end
+
+--- Checks if an effect is active without marking it as acknowledged.
+---@param effect string The effect to check.
+---@return boolean
+function cc_check(effect)
+    return cc_get(effect) ~= nil
 end
 
 --- Checks if the effect is currently active and marks the effect as acknowledged.
