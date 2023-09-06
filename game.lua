@@ -492,8 +492,8 @@ function game_update(dt)
 				player = objects["player"][i]
 				if (not player.vine) and (not player.fence) and (not player.clearpipe) then
 					cc_start(request)
-					player.ccstun = true
-					player.groundfreeze = 5
+					duration = request.duration or 5000
+					player.groundfreeze = duration / 1000
 					player.speedx = 0
 					player.animationstate = "idle"
 					player:setquad()
