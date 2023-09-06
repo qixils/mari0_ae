@@ -473,11 +473,17 @@ function game_update(dt)
 				local amount = request.quantity or 1
 				for i = 1, #mariolives do
 					if mariolives[i] > amount then -- TODO: >= ?
-						request.start()
+						cc_start(request)
 						mariolives[i] = mariolives[i] - amount
 					end
 				end
 				-- TODO: sfx?
+			end
+		end
+		-- Kill Player
+		if cc_ack("kill_player") then
+			for i = 1, players do
+				objects["player"][i]:die("killscript")
 			end
 		end
 	end

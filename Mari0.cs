@@ -37,7 +37,8 @@ public class Mari0 : SimpleTCPPack<SimpleTCPServerConnector>
         new("Supersize Enemies", "supersize_enemies") { Price = 75, Category = "Enemies", Description = "Supersizes all supported on-screen enemies" },
         new("Kill Enemies", "kill_enemies") { Price = 75, Category = "Enemies", Description = "Kills all supported on-screen enemies" },
         new("Restart Level", "restart_level") { Price = 150, Category = new("Player", "Level"), Description = "Restarts the current level" },
-        new("Give Extra Life", "add_life") { Quantity = 100, Price = 50, Category = "Player", Description = "Gives Mario an extra life" },
-        new("Take Extra Life", "take_life") { Quantity = 100, Price = 100, Category = "Player", Description = "Steals an extra life from Mario" },
+        new("Give Extra Life", "add_life") { Price = 50, Quantity = 100, Category = "Player", Description = "Gives Mario an extra life" },
+        new("Take Extra Life", "take_life") { Price = 100, Quantity = 100, Category = "Player", Description = "Steals an extra life from Mario" },
+        new("Kill Player", "kill_player") { Price = 250, Category = "Player", Description = "Murder Mario." },
     };
 }

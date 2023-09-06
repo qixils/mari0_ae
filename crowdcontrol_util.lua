@@ -16,6 +16,12 @@ function cc_send(msg)
     outgoing:push(msg .. "\0")
 end
 
+--- Marks the given request as started.
+function cc_start(request)
+    if request.started then return end
+    request.started = love.timer.getTime()
+end
+
 --- Gets an active request by the given effect ID and optionally marks it as acknowledged.
 ---@param effect string The effect to get.
 ---@param ack boolean Whether to mark the effect as acknowledged.
@@ -23,8 +29,8 @@ end
 function cc_get(effect, ack)
     for i, request in ipairs(cc_requests) do
         if request.code == effect then
-            if not request.started and ack then
-                request.start()
+            if ack then
+                cc_start(request)
             end
             return request
         end
@@ -40,9 +46,7 @@ end
 function cc_ack(effect, response)
     for i, request in ipairs(cc_requests) do
         if request.code == effect then
-            if not request.started then
-                request.start()
-            end
+            cc_start(request)
             if response then
                 request.response = response
             end
@@ -74,7 +78,7 @@ function cc_ackunless(effect, unless, success_response)
     -- check if `effect` is active and `unless` is not
     for i, request in ipairs(cc_requests) do
         if request.code == effect then
-            request.start()
+            cc_start(request)
             if success_response then
                 request.response = success_response
             end

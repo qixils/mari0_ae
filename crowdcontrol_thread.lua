@@ -36,9 +36,6 @@ while true do
         if null then
             local request = json:decode(incoming:sub(1, null-1))
             if request ~= nil and request['type'] == 1 then -- if request to start
-                request.start = function()
-                    request.started = love.timer.getTime()
-                end
                 requests:push(request)
             end
             incoming = incoming:sub(null+1)
