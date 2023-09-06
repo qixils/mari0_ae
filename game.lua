@@ -442,10 +442,11 @@ function game_update(dt)
 				player:setsize(newsize)
 				player.size = newsize
 			end
+			-- Remove Powerups
 			if player.size ~= 1 and cc_ack("remove_powerup") then
-				newsize = tonumber(powerupslistids[math.random(1,#powerupslistids)])
-				player:setsize(newsize)
-				player.size = newsize
+				-- TODO: remove star
+				player:setsize(1)
+				player.size = 1
 			end
 		end
 		-- Restart Level
@@ -454,6 +455,30 @@ function game_update(dt)
 			love.audio.stop()
 			levelscreen_load("crowdcontrol")
 			return
+		end
+		if mariolivecount ~= false then
+			-- Add life
+			local request = cc_get("add_life", true)
+			if request then
+				local amount = request.quantity or 1
+				for i = 1, #mariolives do
+					mariolives[i] = mariolives[i]+amount
+				end
+				respawnplayers()
+				playsound(oneupsound)
+			end
+			-- Take life
+			request = cc_get("take_life", false)
+			if request then
+				local amount = request.quantity or 1
+				for i = 1, #mariolives do
+					if mariolives[i] > amount then -- TODO: >= ?
+						request.start()
+						mariolives[i] = mariolives[i] - amount
+					end
+				end
+				-- TODO: sfx?
+			end
 		end
 	end
 

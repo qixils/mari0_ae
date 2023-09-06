@@ -16,6 +16,22 @@ function cc_send(msg)
     outgoing:push(msg .. "\0")
 end
 
+--- Gets an active request by the given effect ID and optionally marks it as acknowledged.
+---@param effect string The effect to get.
+---@param ack boolean Whether to mark the effect as acknowledged.
+---@return table|nil
+function cc_get(effect, ack)
+    for i, request in ipairs(cc_requests) do
+        if request.code == effect then
+            if not request.started and ack then
+                request.start()
+            end
+            return request
+        end
+    end
+    return nil
+end
+
 --- Checks if the effect is currently active and marks the effect as acknowledged.
 --- Make sure that the effect can actually be applied before calling this method.
 ---@param effect string The effect to check.
@@ -25,7 +41,7 @@ function cc_ack(effect, response)
     for i, request in ipairs(cc_requests) do
         if request.code == effect then
             if not request.started then
-                request.started = love.timer.getTime()
+                request.start()
             end
             if response then
                 request.response = response
@@ -58,7 +74,7 @@ function cc_ackunless(effect, unless, success_response)
     -- check if `effect` is active and `unless` is not
     for i, request in ipairs(cc_requests) do
         if request.code == effect then
-            request.started = love.timer.getTime()
+            request.start()
             if success_response then
                 request.response = success_response
             end
