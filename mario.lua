@@ -2848,16 +2848,14 @@ function mario:movement(dt)
 	end
 		
 	--HORIZONTAL MOVEMENT
-	local runningkey = runkey(self.playernumber)
+	local runningkey = runkey(self.playernumber) or cc_check("auto_run")
 	local mariojumpkey = jumpkey(self.playernumber)
-	local mariorightkey = rightkey(self.playernumber)
+	local mariorightkey = rightkey(self.playernumber) or cc_check("auto_walk") or cc_check("auto_run")
 	local marioleftkey = leftkey(self.playernumber)
 	if self.gravitydir == "right" then
-		mariorightkey = leftkey(self.playernumber)
-		marioleftkey = rightkey(self.playernumber)
-	else
-		mariorightkey = rightkey(self.playernumber)
-		marioleftkey = leftkey(self.playernumber)
+		local oldmariorightkey = mariorightkey
+		mariorightkey = marioleftkey
+		marioleftkey = oldmariorightkey
 	end
 	if android and editormode and (not autoscroll) then mariorightkey = false; marioleftkey = false end
 	if self.reversecontrols then
@@ -2882,6 +2880,12 @@ function mario:movement(dt)
 	if self.groundpounding then
 		marioleftkey = false
 		mariorightkey = false
+	end
+
+	if cc_check("auto_run") and runningkey and mariorightkey then
+		cc_ack("auto_run")
+	elseif cc_check("auto_walk") and mariorightkey then
+		cc_ack("auto_walk")
 	end
 
 	--propeller box
@@ -3218,9 +3222,9 @@ function mario:runanimation(dt, speed, animationspeed)
 end
 
 function mario:underwatermovement(dt)
-	local runningkey = runkey(self.playernumber)
+	local runningkey = runkey(self.playernumber) or cc_check("auto_run")
 	local mariojumpkey = jumpkey(self.playernumber)
-	local mariorightkey = rightkey(self.playernumber)
+	local mariorightkey = rightkey(self.playernumber) or cc_check("auto_walk") or cc_check("auto_run")
 	local marioleftkey = leftkey(self.playernumber)
 	if self.gravitydir == "right" then
 		mariorightkey = leftkey(self.playernumber)
@@ -3235,6 +3239,13 @@ function mario:underwatermovement(dt)
 		mariorightkey = marioleftkey
 		marioleftkey = oldmariorightkey
 	end
+
+	if runningkey and mariorightkey then
+		cc_ack("auto_run")
+	elseif mariorightkey then
+		cc_ack("auto_walk")
+	end
+
 	local speedx, speedy = "speedx", "speedy"
 	if self.gravitydir == "left" or self.gravitydir == "right" then
 		speedx, speedy = "speedy", "speedx"

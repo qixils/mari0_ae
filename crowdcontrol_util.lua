@@ -43,7 +43,7 @@ end
 ---@param effect string The effect to check.
 ---@return boolean
 function cc_check(effect)
-    return cc_get(effect) ~= nil
+    return cc_get(effect, false) ~= nil
 end
 
 --- Checks if the effect is currently active and marks the effect as acknowledged.

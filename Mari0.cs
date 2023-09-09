@@ -42,6 +42,8 @@ public class Mari0 : SimpleTCPPack<SimpleTCPServerConnector>
         new("Give Extra Life", "add_life") { Price = 50, Quantity = 100, Category = "Player", Description = "Gives Mario an extra life" },
         new("Take Extra Life", "take_life") { Price = 100, Quantity = 100, Category = "Player", Description = "Steals an extra life from Mario" },
         new("Kill Player", "kill_player") { Price = 250, Category = "Player", Description = "Murder Mario." },
-        new("Can't Move", "stun_player") { Price = 100, Duration = 5, Category = "Player", Description = "Stuns Mario, freezing him in place for a few seconds" },
+        new("Can't Move", "stun_player") { Price = 150, Duration = 10, Category = "Movement", Description = "Stuns Mario, freezing him in place for a few seconds" },
+        new("Auto Walk", "auto_walk") { Price = 175, Duration = 10, Category = "Movement", Description = "Force Mario to auto-walk through the level" },
+        new("Auto Run", "auto_run") { Price = 200, Duration = 10, Category = "Movement", Description = "Force Mario to auto-run through the level" },
     };
 }
