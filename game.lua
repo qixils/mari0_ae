@@ -443,7 +443,7 @@ function game_update(dt)
 			end
 		end
 		for i = 1, players do
-			player = objects["player"][i]
+			local player = objects["player"][i]
 			-- Randomize Powerups
 			if cc_ack("randomize_powerup") then
 				newsize = tonumber(powerupslistids[math.random(1,#powerupslistids)])
@@ -498,17 +498,44 @@ function game_update(dt)
 		local request = cc_get("stun_player", false)
 		if request then
 			for i = 1, players do
-				player = objects["player"][i]
+				local player = objects["player"][i]
 				if (not player.vine) and (not player.fence) and (not player.clearpipe) then
 					cc_start(request)
 					duration = request.duration or 5000
 					player.groundfreeze = duration / 1000
 					player.speedx = 0
 					player.animationstate = "idle"
-					player:setquad()
+					player:setquad() 
 				end
 			end
 		end
+		-- Flip Gravity
+		if cc_ack("flip_gravity") ~= gravity_flipped then
+			gravity_flipped = not gravity_flipped
+			local dir, stick = "down", false
+			if gravity_flipped then
+				dir, stick = "up", true
+			end
+			for i = 1, players do
+				objects["player"][i].gravitydir = dir
+				objects["player"][i].gravitydirstick = stick
+			end
+		end
+		-- Speed up / Slow down Game
+		local speed = 1
+		local requestup = cc_get("speedup_game", false)
+		local requestdown = cc_get("slowdown_game", false)
+		if cc_ack("speedup_game") and (not requestdown) then
+			speed = 1.5
+		end
+		if cc_ack("slowdown_game") and (not requestup) then
+			speed = 0.67
+		end
+		dt = dt * speed
+		for i, v in pairs(soundlist) do
+			v:setPitch(speed)
+		end
+		music.pitch = speed
 	end
 
 	--Portaldots

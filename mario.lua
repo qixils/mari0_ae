@@ -4636,7 +4636,7 @@ function mario:floorcollide(a, b)
 			end
 		end
 		
-		if self.gravitydir ~= "down" then
+		if self.gravitydir ~= "down" and (not self.gravitydirstick) then
 			self.gravitydir = "down"
 		end
 		
@@ -6208,7 +6208,7 @@ function mario:ceilcollide(a, b)
 		local x, y = b.cox, b.coy
 		local r = map[x][y]
 		
-		if map[x][y]["gels"]["bottom"] == 4 and (not self.shoe) then
+		if (map[x][y]["gels"]["bottom"] == 4 or self.gravitydirstick) and (not self.shoe) then
 			if self.gravitydir == "left" then
 				self.reversecontrols = true
 				self.speedx = math.max(self.speedx,0)
@@ -6218,7 +6218,7 @@ function mario:ceilcollide(a, b)
 			end
 			self.gravitydir = "up"
 			self.falling = false
-		elseif self.gravitydir == "up" then
+		elseif self.gravitydir == "up" and (not self.gravitydirstick) then
 			self.gravitydir = "down"
 		end
 				

@@ -7,6 +7,7 @@ local outgoing = love.thread.getChannel("cc_outgoing")
 wasd_inverted = false
 buttons_inverted = false
 toggled_lightsout = false
+gravity_flipped = false
 
 --- Sends a message to the Crowd Control server.
 ---@param msg string|table The message to send. If a table is provided, it will be encoded as JSON.

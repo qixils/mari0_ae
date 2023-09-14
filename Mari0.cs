@@ -45,5 +45,9 @@ public class Mari0 : SimpleTCPPack<SimpleTCPServerConnector>
         new("Can't Move", "stun_player") { Price = 150, Duration = 10, Category = "Movement", Description = "Stuns Mario, freezing him in place for a few seconds" },
         new("Auto Walk", "auto_walk") { Price = 175, Duration = 10, Category = "Movement", Description = "Force Mario to auto-walk through the level" },
         new("Auto Run", "auto_run") { Price = 200, Duration = 10, Category = "Movement", Description = "Force Mario to auto-run through the level" },
+
+        new("Flip Gravity", "flip_gravity") { Price = 175, Duration = 10, Category = "Level", Description = "Inverts the levels gravity" },
+        new("Speedup Game", "speedup_game") { Price = 150, Duration = 10, Category = "Level", Description = "Speeds up the game to x1.5" },
+        new("Slowdown Game", "slowdown_game") { Price = 150, Duration = 10, Category = "Level", Description = "Speeds down the game to x0.67" },
     };
 }
