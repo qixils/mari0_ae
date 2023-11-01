@@ -536,6 +536,19 @@ function game_update(dt)
 			v:setPitch(speed)
 		end
 		music.pitch = speed
+		-- Spawn Enemy
+		for i, request in ipairs(cc_requests) do
+			if string.startswith(request.code, "spawn_") then
+				local enemy = string.sub(request.code, 7)
+				local creator = ccentitycreators[enemy]
+				if creator then
+					local target = math.random(players)
+					local player = objects["player"][target]
+					creator(player.x + math.random(7,15), player.y + 0.5 - math.random(10))
+					cc_start(request)
+				end
+			end
+		end
 	end
 
 	--Portaldots
@@ -1427,20 +1440,7 @@ function game_update(dt)
 						if tilequads[map[x][randomtable[rand]][1]].collision then
 							table.remove(randomtable, rand)
 						else
-							local n = math.random(1, 58)
-							if n <= 40 then
-								table.insert(objects["goomba"], goomba:new(x-.5, math.random(13)))
-							elseif n <= 46 then
-								table.insert(objects["goomba"], goomba:new(x-.5, math.random(13), "goombrat"))
-							elseif n <= 50 then
-								table.insert(objects["goomba"], goomba:new(x-.5, math.random(13), "biggoomba"))
-							elseif n <= 51 then
-								table.insert(objects["goomba"], goomba:new(x-.5, math.random(13), "drygoomba"))
-							elseif n <= 54 then
-								table.insert(objects["goomba"], goomba:new(x-.5, math.random(13), "paragoomba"))
-							elseif n <= 58 then
-								table.insert(objects["goomba"], goomba:new(x-.5, math.random(13), "tinygoomba"))
-							end
+							ccentitycreators.goomba(x, math.random(13))
 							break
 						end
 					end

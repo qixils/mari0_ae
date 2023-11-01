@@ -9,6 +9,52 @@ buttons_inverted = false
 toggled_lightsout = false
 gravity_flipped = false
 
+ccentitycreators = {
+    goomba = function(x, y)
+        local n = math.random(1, 58)
+        local type = nil
+        if n >= 55 then
+            type = "tinygoomba"
+        elseif n >= 52 then
+            type = "paragoomba"
+        elseif n >= 51 then
+            type = "drygoomba"
+        elseif n >= 47 then
+            type = "biggoomba"
+        elseif n >= 41 then
+            type = "goombrat"
+        end
+        table.insert(objects["goomba"], goomba:new(x - .5, y, type))
+    end,
+    koopa = function(x, y)
+        local n = math.random(1, 60)
+        local type = nil
+        -- red redflying flying2 flying beetle beetleshell downbeetle downspikey spikeyshell blue shell bigkoopa bigbeetle
+        if n >= 56 then
+            type = "bigkoopa"
+        elseif n >= 54 then
+            type = "redflying"
+        elseif n >= 52 then
+            type = "flying2"
+        elseif n >= 50 then
+            type = "flying"
+        elseif n >= 46 then
+            type = "blue" -- fast
+        elseif n >= 30 then
+            type = "red"
+        end
+        table.insert(objects["koopa"], koopa:new(x - .5, y, type))
+    end,
+}
+
+--- Determines if the given string starts with the given substring.
+---@param str string The string to check.
+---@param start string The substring to check for.
+---@return boolean
+function string.startswith(str, start)
+    return string.sub(str, 1, string.len(start)) == start
+end
+
 --- Sends a message to the Crowd Control server.
 ---@param msg string|table The message to send. If a table is provided, it will be encoded as JSON.
 function cc_send(msg)

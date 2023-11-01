@@ -42,12 +42,14 @@ public class Mari0 : SimpleTCPPack<SimpleTCPServerConnector>
         new("Give Extra Life", "add_life") { Price = 50, Quantity = 100, Category = "Player", Description = "Gives Mario an extra life" },
         new("Take Extra Life", "take_life") { Price = 100, Quantity = 100, Category = "Player", Description = "Steals an extra life from Mario" },
         new("Kill Player", "kill_player") { Price = 250, Category = "Player", Description = "Murder Mario." },
-        new("Can't Move", "stun_player") { Price = 150, Duration = 10, Category = "Movement", Description = "Stuns Mario, freezing him in place for a few seconds" },
+        new("Can't Move", "stun_player") { Price = 150, Duration = 5, Category = "Movement", Description = "Stuns Mario, freezing him in place for a few seconds" },
         new("Auto Walk", "auto_walk") { Price = 175, Duration = 10, Category = "Movement", Description = "Force Mario to auto-walk through the level" },
         new("Auto Run", "auto_run") { Price = 200, Duration = 10, Category = "Movement", Description = "Force Mario to auto-run through the level" },
-
         new("Flip Gravity", "flip_gravity") { Price = 175, Duration = 10, Category = "Level", Description = "Inverts the levels gravity" },
         new("Speedup Game", "speedup_game") { Price = 150, Duration = 10, Category = "Level", Description = "Speeds up the game to x1.5" },
         new("Slowdown Game", "slowdown_game") { Price = 150, Duration = 10, Category = "Level", Description = "Speeds down the game to x0.67" },
+
+        new("Spawn Goomba", "spawn_goomba") { Price = 25, Category = "Enemies", Description = "Spawn an enemy on the screen!" },
+        new("Spawn Koopa", "spawn_koopa") { Price = 25, Category = "Enemies", Description = "Spawn an enemy on the screen!" },
     };
 }
