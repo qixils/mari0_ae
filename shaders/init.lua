@@ -36,6 +36,7 @@ local function CreateShaderPass()
 			c = {}
 			local status, canvas = pcall(love.graphics.newCanvas, po2xr, po2yr)
 			if status then
+				notice.new("shader canvas set to " .. canvas:getWidth() .. "x" .. canvas:getHeight() .. " (" .. canvas:getPixelWidth() .. "x" .. canvas:getPixelHeight() .. ")", notice.white, 5)
 				canvas:setFilter("nearest", "nearest")
 				c.canvas = canvas
 				c.quad = love.graphics.newQuad(0, 0, shaders.xres, shaders.yres, po2xr, po2yr)
