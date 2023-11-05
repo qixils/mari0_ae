@@ -1750,7 +1750,7 @@ function changescale(s, fullscreen)
 		resizable = true
 		
 		uispace = math.floor(width*16*scale/4)
-		love.window.setMode(width*16*scale, 224*scale, {fullscreen=fullscreen, vsync=vsync, msaa=fsaa, resizable=window_resizable, minwidth=width*16, minheight=224}) --27x14 blocks (15 blocks actual height)
+		love.window.setMode(width*16*scale, 224*scale, {fullscreen=fullscreen, vsync=vsync, msaa=fsaa, resizable=window_resizable, minwidth=width*16, minheight=224, usedpiscale=false}) --27x14 blocks (15 blocks actual height)
 
 		local _w, _h = love.window.getMode()
 		notice.new("window mode set to " .. _w .. "x" .. _h .. " (#1)", notice.white, 5)
@@ -1778,14 +1778,14 @@ function changescale(s, fullscreen)
 		if fullscreen then
 			fullscreen = true
 			scale = 2
-			love.window.setMode(800, 600, {fullscreen=fullscreen, vsync=vsync, msaa=fsaa})
+			love.window.setMode(800, 600, {fullscreen=fullscreen, vsync=vsync, msaa=fsaa, usedpiscale=false})
 
 			local _w, _h = love.window.getMode()
 			notice.new("window mode set to " .. _w .. "x" .. _h .. " (#2)", notice.white, 5)
 		end
 		
 		uispace = math.floor(width*16*scale/4)
-		love.window.setMode(width*16*scale, height*16*scale, {fullscreen=fullscreen,vsync=vsync, msaa=fsaa}) --27x14 blocks (15 blocks actual height)
+		love.window.setMode(width*16*scale, height*16*scale, {fullscreen=fullscreen,vsync=vsync, msaa=fsaa, usedpiscale=false}) --27x14 blocks (15 blocks actual height)
 
 		local _w, _h = love.window.getMode()
 		notice.new("window mode set to " .. _w .. "x" .. _h .. " (#3)", notice.white, 5)
