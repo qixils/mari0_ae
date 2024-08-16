@@ -430,7 +430,7 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	local mappackname = ""
 	local mappackauthor = ""
 	local mappackdescription = ""
-	if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/settings.txt") then
+	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/settings.txt") then
 		local data = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/settings.txt")
 		local split1 = data:split("\n")
 		for i = 1, #split1 do
@@ -444,7 +444,7 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 			end
 		end
 	end
-	if love.filesystem.exists( mappackfolder .. "/" .. mappack .. "/icon.png" ) then
+	if love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/icon.png" ) then
 		editmappackicon = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/icon.png")
 	else
 		editmappackicon = nil
@@ -487,7 +487,7 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	end
 	
 	if PersistentEditorTools then
-		if PersistentEditorToolsLocal and (not editorsavedata) and love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/editorsave.json") then
+		if PersistentEditorToolsLocal and (not editorsavedata) and love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/editorsave.json") then
 			local data = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/editorsave.json")
 			editorsavedata = JSON:decode(data)
 		end
@@ -537,10 +537,10 @@ function editor_update(dt)
 	if editormenuopen == false or minimapmoving then
 		--key scroll
 		local speed = 30
-		if love.keyboard.isDown("lalt") then
+		if love.keyboard.isDown("rshift") then
 			speed = 70
 		end
-		if (love.keyboard.isDown("left") or (android and leftkey(1) and not autoscroll)) and (rightclickmenuopen or (not brushsizetoggle)) then
+		if (love.keyboard.isDown("left") or (android and leftkey(1) and not autoscroll)) and ((rightclickmenuopen or (not brushsizetoggle)) and not typingintextinput) then
 			autoscroll = false
 			guielements["autoscrollcheckbox"].var = autoscroll
 			splitxscroll[1] = splitxscroll[1] - speed*gdt
@@ -548,7 +548,7 @@ function editor_update(dt)
 				splitxscroll[1] = 0
 			end
 			generatespritebatch()
-		elseif (love.keyboard.isDown("right") or (android and rightkey(1) and not autoscroll)) and (rightclickmenuopen or (not brushsizetoggle)) then
+		elseif (love.keyboard.isDown("right") or (android and rightkey(1) and not autoscroll)) and ((rightclickmenuopen or (not brushsizetoggle)) and not typingintextinput) then
 			autoscroll = false
 			guielements["autoscrollcheckbox"].var = autoscroll
 			splitxscroll[1] = splitxscroll[1] + speed*gdt
@@ -557,7 +557,7 @@ function editor_update(dt)
 			end
 			generatespritebatch()
 		end
-		if mapheight ~= 15 and (rightclickmenuopen or (not brushsizetoggle)) then
+		if mapheight ~= 15 and ((rightclickmenuopen or (not brushsizetoggle)) and not typingintextinput) then
 			if (love.keyboard.isDown("up") or (android and upkey(1) and not autoscroll)) then
 				autoscroll = false
 				guielements["autoscrollcheckbox"].var = autoscroll
@@ -1333,7 +1333,7 @@ function editor_draw()
 									love.graphics.line(x1, y1, x2, y2)
 									
 									if printlabels then
-										properprintFbackground(t, math.floor(x2-string.len(t)*4*scale), y2+10*scale)--, {0, 0, 0, 255}) --why would the text be black? wtf, {0, 0, 0, 255})
+										properprintFbackground(t, math.floor(x2-string.len(t)*4*scale), y2+10*scale)
 									end
 								end
 							end
@@ -1797,7 +1797,7 @@ function editor_draw()
 							drawlinkline(x1, y1, x2, y2)
 						end
 						
-						properprintFbackground(t, math.floor(x2-string.len(t)*4*scale), y2+10*scale, true)--, {0, 0, 0, 255}) --why would the text be black? wtf
+						properprintFbackground(t, math.floor(x2-string.len(t)*4*scale), y2+10*scale, true)
 					end
 					
 					--draw actual menu
@@ -1918,7 +1918,7 @@ function editor_draw()
 							for yl = 1, brushsizey do
 								if yl == 1 and xl == 1 then
 								else
-									love.graphics.setColor(255, 255, 255, 200)	
+									love.graphics.setColor(255, 255, 255, 200)
 									love.graphics.draw(tilequads[currenttile].image, tilequads[currenttile].quad, math.floor((x-splitxscroll[1]-1+xl-1)*16*scale), math.floor(((y-splityscroll[1]-1+yl-1)*16+8)*scale), 0, scale, scale)
 								end
 							end
@@ -2026,7 +2026,7 @@ function editor_draw()
 										love.graphics.draw(v.graphic, v.quad, math.floor((x-splitxscroll[1]-1+xl-1)*16*scale+xoff), math.floor(((y-splityscroll[1]-1+yl-1)*16+16)*scale+yoff), 0, scale, scale)
 									end
 								else
-									love.graphics.setColor(255, 255, 255, 200)	
+									love.graphics.setColor(255, 255, 255, 200)
 									love.graphics.draw(entityquads[currenttile].image, entityquads[currenttile].quad, math.floor((x-splitxscroll[1]-1+xl-1)*16*scale), math.floor(((y-splityscroll[1]-1+yl-1)*16+8)*scale), 0, scale, scale)
 								end
 							end
@@ -2145,11 +2145,11 @@ function editor_draw()
 					if id ~= nil and (rgblist[id] or animatedrgblist[id]) and id ~= 0 and not tilequads[id].invisible then
 						if id > 90000 then
 							if animatedrgblist[id] and animatedrgblist[id][animatedtilesframe[id]] then
-								love.graphics.setColor(unpack(animatedrgblist[id][animatedtilesframe[id]]))
+								love.graphics.setColor(animatedrgblist[id][animatedtilesframe[id]])
 								love.graphics.rectangle("fill", (mapx+(x-1+nmox)*s)*scale, (mapy+(y-1+nmoy)*s)*scale, s*scale, s*scale)
 							end
 						else 
-							love.graphics.setColor(unpack(rgblist[id]))
+							love.graphics.setColor(rgblist[id])
 							love.graphics.rectangle("fill", (mapx+(x-1+nmox)*s)*scale, (mapy+(y-1+nmoy)*s)*scale, s*scale, s*scale)
 						end
 					end
@@ -2222,7 +2222,7 @@ function editor_draw()
 		guielements["tabcustom"]:draw()
 		guielements["tabanimations"]:draw()
 		
-		if editorstate == "tiles" then			
+		if editorstate == "tiles" then
 			--TILES
 			love.graphics.setColor(255, 255, 255)
 			
@@ -2383,8 +2383,9 @@ function editor_draw()
 							love.graphics.rectangle("fill", (333+15*(i-1))*scale, (39+math.floor((tile-1)/22)*17)*scale-tilesoffset, 14*scale, 14*scale)
 							love.graphics.setColor(0, 0, 0, 255)
 							love.graphics.rectangle("fill", (333+15*(i-1)+1)*scale, (39+math.floor((tile-1)/22)*17)*scale-tilesoffset+1*scale, 14*scale-2*scale, 14*scale-2*scale)
-							if mtbutton == i then if i == 3 then love.graphics.setColor(255, 0, 0, 255)
-							else love.graphics.setColor(255, 255, 255, 255) end
+							if mtbutton == i then
+								if i == 3 then love.graphics.setColor(255, 0, 0, 255)
+								else love.graphics.setColor(255, 255, 255, 255) end
 							else love.graphics.setColor(127, 127, 127, 255) end
 							if i == 1 then
 								--up
@@ -2531,7 +2532,7 @@ function editor_draw()
 			love.graphics.setColor(255, 255, 255)
 			properprintF(TEXT["minimap"], 3*scale, 21*scale)
 			love.graphics.rectangle("fill", minimapx*scale, minimapy*scale, 394*scale, 34*scale)
-			love.graphics.setColor(unpack(backgroundcolor[background]))
+			love.graphics.setColor(backgroundcolor[background])
 			love.graphics.rectangle("fill", (minimapx+2)*scale, (minimapy+2)*scale, 390*scale, 30*scale)
 			
 			local lmap = map
@@ -2546,12 +2547,12 @@ function editor_draw()
 							if id ~= nil and id ~= 0 and not tilequads[id].invisible then
 								if id > 90000 then
 									if animatedrgblist[id] and animatedrgblist[id][animatedtilesframe[id]] then
-										love.graphics.setColor(unpack(animatedrgblist[id][animatedtilesframe[id]]))
+										love.graphics.setColor(animatedrgblist[id][animatedtilesframe[id]])
 										love.graphics.rectangle("fill", (minimapx+x*2-minimapscroll*2)*scale, (minimapy+(y+1)*2-(math.floor(yscroll)+1)*2-math.fmod(yscroll, 1)*2)*scale, 2*scale, 2*scale)
 									end
 								else 
 									if rgblist[id] then
-										love.graphics.setColor(unpack(rgblist[id]))
+										love.graphics.setColor(rgblist[id])
 										love.graphics.rectangle("fill", (minimapx+x*2-minimapscroll*2)*scale, (minimapy+(y+1)*2-(math.floor(yscroll)+1)*2-math.fmod(yscroll, 1)*2)*scale, 2*scale, 2*scale)
 									end
 								end
@@ -3050,7 +3051,7 @@ function editor_draw()
 					local v = characters.data[mariocharacter[i]]
 					
 					for j = 1, #characters.data[mariocharacter[i]]["animations"] do
-						love.graphics.setColor(unpack(mariocolors[i][j]))
+						love.graphics.setColor(mariocolors[i][j])
 						if playertype == "classic" or playertype == "cappy" or not portalgun then--no portal gun
 							 love.graphics.draw(v["animations"][j], v["small"]["idle"][5], x+(v.smalloffsetX)*scale, y+(11-v.smalloffsetY)*scale, 0, scale, scale, v.smallquadcenterX, v.smallquadcenterY)
 						else
@@ -3254,7 +3255,7 @@ function editor_draw()
 			love.graphics.rectangle("fill", 0, 0, width*16*scale, height*16*scale)
 			love.graphics.setColor(0,0,0)
 			love.graphics.rectangle("fill", 69*scale, 71*scale, 262*scale, 82*scale)
-			love.graphics.setColor(255,255,255)
+			love.graphics.setColor(255, 255, 255)
 			drawrectangle(70, 72, 260, 80)
 
 			properprintF(TEXT["are you sure?"], (200-utf8.len(TEXT["are you sure?"])*4)*scale, 80*scale)
@@ -3640,11 +3641,11 @@ function texttabtab(t)
 		guielements["editlevelscreentext"].active = true
 		--levelscreenimage
 		if levelscreenimagecheck ~= mappack .. "-" .. marioworld .. "-" .. mariolevel then
-			if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png") then
+			if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png") then
 				levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png")
-			elseif love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "levelscreen.png") then
+			elseif love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "levelscreen.png") then
 				levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "levelscreen.png")
-			elseif love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/levelscreen.png") then
+			elseif love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/levelscreen.png") then
 				levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/levelscreen.png")
 			else
 				levelscreenimage = false
@@ -3826,7 +3827,7 @@ function createnewanimation(name,dont_generate_gui)
 	
 	if not name then
 		local i = 1
-		while love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/animations/animation" .. i .. ".json") do
+		while love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/animations/animation" .. i .. ".json") do
 			i = i + 1
 		end
 		name = "animation" .. i
@@ -4361,8 +4362,10 @@ function placetile(x, y, tilei)
 	elseif editentities == false then
 		if tilequads[currenttile].collision == true and (tilequads[map[cox][coy][1]].collision == false or (objects["tile"][tilemap(cox, coy)] and objects["tile"][tilemap(cox, coy)].slant)) then
 			local oldtile
-			if tilequads[currenttile].leftslant or tilequads[currenttile].halfleftslant1 or tilequads[currenttile].halfleftslant2 or
-				tilequads[currenttile].rightslant or tilequads[currenttile].halfrightslant1 or tilequads[currenttile].halfrightslant2 then
+			local tilequad = tilequads[currenttile]
+			if tilequad.platform or tilequad.leftslant or tilequad.halfleftslant1 or tilequad.halfleftslant2 or
+				tilequad.rightslant or tilequad.halfrightslant1 or tilequads.halfrightslant2 then
+				--fix platforms and slants acting like solid blocks when first placed in editor
 				--so many people complained about this minor oddity
 				--guess i have to do a wack workaround
 				oldtile = map[cox][coy][1]
@@ -4686,7 +4689,7 @@ function createlevelbuttons(i)
 				s = s .. "_" .. k
 			end
 			s = s .. ".txt"
-			if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. s) then
+			if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. s) then
 				existingmaps[i][j][k] = true
 				guielements[name].textcolor = {255, 255, 255}
 				if meta_data and meta_data[i .. "~" .. j .. "~" .. k] then
@@ -5262,7 +5265,7 @@ function editor_mousepressed(x, y, button)
 		end
 		
 	elseif button == "wu" then
-		if editormenuopen then
+		if editormenuopen or rightclickmenuopen then
 		else
 			if EditorZoom and ctrlpressed then
 				local dy = 1
@@ -5305,7 +5308,7 @@ function editor_mousepressed(x, y, button)
 			end
 		end
 	elseif button == "wd" then
-		if editormenuopen then
+		if editormenuopen or rightclickmenuopen then
 		else
 			if EditorZoom and ctrlpressed then
 				local dy = -1
@@ -5916,6 +5919,7 @@ function openrightclickmenu(x, y, tileX, tileY)
 		--Move if out of screen
 		local scootx = ((x/scale)+rightclickobjects.width > width*16)
 		local scooty = ((y/scale)+rightclickobjects.height > height*16)
+		local shiftx = ((x/scale)-rightclickobjects.width < 0)
 		local shifty = ((y/scale)-rightclickobjects.height < 0)
 	
 		local truey = rightclickobjects[1].y
@@ -5924,7 +5928,12 @@ function openrightclickmenu(x, y, tileX, tileY)
 			for i = 1, #rightclickobjects do
 				local obj = rightclickobjects[i]
 				if scootx then
-					rightclickobjects[i].x = rightclickobjects[i].x - rightclickobjects.width
+					if shiftx then
+						--neither work, just shift
+						rightclickobjects[i].x = ((width*16)-(x/scale))-rightclickobjects.width+rightclickobjects[i].x
+					else
+						rightclickobjects[i].x = rightclickobjects[i].x - rightclickobjects.width
+					end
 				end
 				if scooty then
 					if shifty then
@@ -6954,7 +6963,7 @@ function loadmtobjects()
 	multitileobjects = {}
 	multitileobjectnames = nil
 	multitileobjectnames = {}
-	if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/objects.txt") then
+	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/objects.txt") then
 		local data = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/objects.txt")
 		if #data > 0 then
 			data = string.sub(data, 1, -2)
@@ -7207,15 +7216,15 @@ function defaultbackground(i)
 
 	love.graphics.setBackgroundColor(backgroundcolor[i])
 	
-	--guielements["colorsliderr"].internvalue = background[1]/255
-	--guielements["colorsliderg"].internvalue = background[2]/255
-	--guielements["colorsliderb"].internvalue = background[3]/255
+	--guielements["colorsliderr"].internvalue = background[1]
+	--guielements["colorsliderg"].internvalue = background[2]
+	--guielements["colorsliderb"].internvalue = background[3]
 end
 
 --[[function updatebackground()
-	background[1] = guielements["colorsliderr"].internvalue*255
-	background[2] = guielements["colorsliderg"].internvalue*255
-	background[3] = guielements["colorsliderb"].internvalue*255
+	background[1] = guielements["colorsliderr"].internvalue
+	background[2] = guielements["colorsliderg"].internvalue
+	background[3] = guielements["colorsliderb"].internvalue
 	love.graphics.setBackgroundColor(unpack(background))
 end]]
 
@@ -7377,13 +7386,13 @@ function changecurrentenemy(var, initial)
 end
 function exportcustomimage(arg)
 	if customtabstate == "graphics" then
-		if not love.filesystem.exists( mappackfolder .. "/" .. mappack .. "/custom") then
+		if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/custom") then
 			love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/custom")
 		end
 		love.filesystem.write(mappackfolder .. "/" .. mappack .. "/custom/" .. currentcustomimage[3], love.filesystem.read("graphics/" .. graphicspack .. "/" .. currentcustomimage[3]))
 	elseif customtabstate == "tiles" then
 		if arg == "animated" then
-			if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/animated/1.png") then
+			if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/animated/1.png") then
 				love.filesystem.write(mappackfolder .. "/" .. mappack .. "/animated/template.png", love.filesystem.read("graphics/templates/animated/1.png"))
 				love.filesystem.write(mappackfolder .. "/" .. mappack .. "/animated/template.txt", love.filesystem.read("graphics/templates/animated/1.txt"))
 			else
@@ -7391,14 +7400,14 @@ function exportcustomimage(arg)
 				love.filesystem.write(mappackfolder .. "/" .. mappack .. "/animated/1.txt", love.filesystem.read("graphics/templates/animated/1.txt"))
 			end
 		else
-			if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/tiles.png") then
+			if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/tiles.png") then
 				love.filesystem.write(mappackfolder .. "/" .. mappack .. "/tilestemplate.png", love.filesystem.read("graphics/" .. graphicspack .. "/smbtiles.png"))
 			else
 				love.filesystem.write(mappackfolder .. "/" .. mappack .. "/tiles.png", love.filesystem.read("graphics/" .. graphicspack .. "/smbtiles.png"))
 			end
 		end
 	elseif customtabstate == "sounds" then
-		if not love.filesystem.exists( mappackfolder .. "/" .. mappack .. "/sounds") then
+		if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/sounds") then
 			love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/sounds")
 		end
 		love.filesystem.write(mappackfolder .. "/" .. mappack .. "/sounds/" .. currentcustomsound[3], love.filesystem.read("sounds/" .. currentcustomsound[3]))
@@ -7407,20 +7416,20 @@ function exportcustomimage(arg)
 		if not enemy then
 			enemy = "goomba"
 		end
-		if not love.filesystem.exists( mappackfolder .. "/" .. mappack .. "/enemies") then
+		if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/enemies") then
 			love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/enemies")
 		end
-		if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".json") then
+		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".json") then
 			love.filesystem.write(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".json", love.filesystem.read(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".json"))
-			if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".png") then
+			if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".png") then
 				love.filesystem.write(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".png", love.filesystem.read(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".png"))
 			end
-			if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".ogg") then
+			if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".ogg") then
 				love.filesystem.write(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".ogg", love.filesystem.read(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".ogg"))
 			end
-		elseif love.filesystem.exists("customenemies/" .. enemy .. ".json") then
+		elseif love.filesystem.getInfo("customenemies/" .. enemy .. ".json") then
 			love.filesystem.write(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".json", love.filesystem.read("customenemies/" .. enemy .. ".json"))
-			if love.filesystem.exists("customenemies/" .. enemy .. ".png") then
+			if love.filesystem.getInfo("customenemies/" .. enemy .. ".png") then
 				love.filesystem.write(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".png", love.filesystem.read("customenemies/" .. enemy .. ".png"))
 			end
 		end
@@ -7428,45 +7437,44 @@ function exportcustomimage(arg)
 end
 function opencustomimagefolder(f)
 	if android then
-		notice.new("On android use a file manager\nand go to:\nAndroid > data > Love.to.mario >\nfiles > save > mari0_android >\nalesans_entities > mappacks", notice.red, 15)
-		return false
+		notice.new("On android try a file manager\nand go to:\nAndroid > data > Love.to.mario >\nfiles > save > mari0_android", notice.red, 5)
 	end
 	if customtabstate == "graphics" then
-		if not love.filesystem.exists( mappackfolder .. "/" .. mappack .. "/custom") then
+		if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/custom", "directory") then
 			love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/custom")
 		end
-		love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack .. "/custom")
+		openfile(mappackfolder .. "/" .. mappack .. "/custom")
 	elseif customtabstate == "tiles" then
 		if f == "tiles" then
-			love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack)
+			openfile(mappackfolder .. "/" .. mappack)
 		elseif f == "animated" then
-			if not love.filesystem.exists( mappackfolder .. "/" .. mappack .. "/animated") then
+			if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/animated", "directory") then
 				love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/animated")
 			end
-			love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack .. "/animated")
+			openfile(mappackfolder .. "/" .. mappack .. "/animated")
 		end
 	elseif customtabstate == "backgrounds" then
-		if not love.filesystem.exists( mappackfolder .. "/" .. mappack .. "/backgrounds") then
+		if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/backgrounds", "directory") then
 			love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/backgrounds")
 		end
-		love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack .. "/backgrounds")
+		openfile(mappackfolder .. "/" .. mappack .. "/backgrounds")
 	elseif customtabstate == "sounds" then
 		if f == "sounds" then
-			if not love.filesystem.exists( mappackfolder .. "/" .. mappack .. "/sounds") then
+			if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/sounds", "directory") then
 				love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/sounds")
 			end
-			love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack .. "/sounds")
+			openfile(mappackfolder .. "/" .. mappack .. "/sounds")
 		else
-			if not love.filesystem.exists( mappackfolder .. "/" .. mappack .. "/music") then
+			if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/music", "directory") then
 				love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/music")
 			end
-			love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack .. "/music")
+			openfile(mappackfolder .. "/" .. mappack .. "/music")
 		end
 	elseif customtabstate == "enemies" then
-		if not love.filesystem.exists( mappackfolder .. "/" .. mappack .. "/enemies") then
+		if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/enemies", "directory") then
 			love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/enemies")
 		end
-		love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack .. "/enemies")
+		openfile(mappackfolder .. "/" .. mappack .. "/enemies")
 	end
 end
 function savecustomimage()
@@ -7479,7 +7487,7 @@ function savecustomimage()
 		collectgarbage()
 		notice.new("Updated sprites", notice.white, 2)
 	elseif customtabstate == "tiles" then
-		if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/tiles.png") then
+		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/tiles.png") then
 			--remove custom sprites
 			for i = smbtilecount+portaltilecount+1, #tilequads do
 				tilequads[i] = nil
@@ -7507,7 +7515,7 @@ function savecustomimage()
 			customtilecount = 0
 			notice.new("No tiles found!", notice.red, 2)
 		end
-		if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/animated/1.png") then
+		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/animated/1.png") then
 			loadanimatedtiles()
 			notice.new("Updated animated tiles", notice.white, 2)
 		end
@@ -7550,7 +7558,7 @@ function replacecustomimage(file)
 			end
 		elseif customtabstate == "text" and textstate == "levelscreen" then
 			d:encode("png", mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png")
-			if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png") then
+			if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png") then
 				levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png")
 			else
 				levelscreenimage = false
@@ -7741,7 +7749,7 @@ end
 function savemtobject(objecttable, name)
 	-- 1 read objects file
 	local data, data2, datalines, objectname
-	if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/objects.txt") then
+	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/objects.txt") then
 		data = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/objects.txt")
 	else
 		data = ""
@@ -7788,7 +7796,7 @@ function savemtobject(objecttable, name)
 end
 
 function changemtname(linenumber)
-	if not love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/objects.txt") then
+	if not love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/objects.txt") then
 		return false
 	end
 	
@@ -7812,7 +7820,7 @@ function changemtname(linenumber)
 end
 
 function moveline(file, line, direction)
-	if love.filesystem.exists(file) == false then
+	if not love.filesystem.getInfo(file) then
 		return false
 	end
 	if direction ~= "up" then
@@ -7860,7 +7868,7 @@ function moveline(file, line, direction)
 end
 
 function deleteline(file, line)
-	if love.filesystem.exists(file) == false then
+	if not love.filesystem.getInfo(file) then
 		return false
 	end
 	line = tonumber(line)
@@ -7878,7 +7886,7 @@ function deleteline(file, line)
 end
 
 function changeline(file, linenumber, newstring)
-	if love.filesystem.exists(file) == false then
+	if not love.filesystem.getInfo(file) then
 		return false
 	end
 	line = tonumber(line)
@@ -8075,7 +8083,7 @@ function levelrightclickmenuclick(i)
 		filename = filename .. "_" .. levelrightclickmenu.level[3]
 	end
 	if i == 2 then --copy
-		if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. filename .. ".txt") then
+		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. filename .. ".txt") then
 			levelrightclickmenu.copy = love.filesystem.newFileData(mappackfolder .. "/" .. mappack .. "/" .. filename .. ".txt")
 			notice.new("Level Copied", notice.white, 3)
 		else
@@ -8091,7 +8099,7 @@ function levelrightclickmenuclick(i)
 			notice.new("No level copied", notice.red, 3)
 		end
 	elseif i == 4 then --delete
-		if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. filename .. ".txt") then
+		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. filename .. ".txt") then
 			local readd = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/" .. filename .. ".txt")
 			if readd then
 				levelrightclickmenu.copy = readd
@@ -8104,7 +8112,7 @@ function levelrightclickmenuclick(i)
 			end
 		end
 	end
-	if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. filename .. ".txt") then
+	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. filename .. ".txt") then
 		existingmaps[levelrightclickmenu.level[1]][levelrightclickmenu.level[2]][levelrightclickmenu.level[3]] = true
 		levelrightclickmenu.button.textcolor = {255, 255, 255}
 	else
@@ -8217,7 +8225,7 @@ function loadeditormetadata()
 		end
 	end
 	--[[
-	if not love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/editor.txt") then
+	if not love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/editor.txt") then
 		return false
 	end
 	local s = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/editor.txt")
@@ -8242,18 +8250,27 @@ function saveeditormetadata()
 	end
 	w, h = math.min(mapwidth, w), math.min(mapheight, h)
 	local imgdata = love.image.newImageData(w, h)
-	for x = 1, w do
-		for y = 1, h do
+	local pointer   = require("ffi").cast("uint8_t*", imgdata:getFFIPointer()) -- imageData has one byte per channel per pixel.
+	local bytecount = imgdata:getWidth() * imgdata:getHeight() -- pixel count * 4
+
+	local i = 0
+	for y = 1, h do
+		for x = 1, w do
 			local id = map[x][mapheight-h+y][1]
-			if rgblist[id] and id ~= 0 and not tilequads[id].invisible  then
-				local r, g, b, a = rgblist[id]
-				imgdata:setPixel(x-1, y-1, r, g, b)
+			local r, g, b
+			if rgblist[id] and id ~= 0 and not tilequads[id].invisible then
+				r, g, b = unpack(rgblist[id])
 			else
-				local r, g, b, a = love.graphics.getBackgroundColor()
-				imgdata:setPixel(x-1, y-1, r, g, b)
+				r, g, b = love.graphics.getBackgroundColor()
 			end
+			pointer[i]   = r
+			pointer[i+1] = g
+			pointer[i+2] = b
+			pointer[i+3] = 255
+			i = i + 4
 		end
 	end
+
 	local levelstring = marioworld .. "~" .. mariolevel .. "~" .. mariosublevel
 	imgdata:encode("png", mappackfolder .. "/" .. mappack .. "/editor/" .. levelstring .. ".png")
 	if not meta_data[levelstring] then

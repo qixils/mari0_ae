@@ -198,8 +198,8 @@ function mario:init(x, y, i, animation, size, t, properties)
 	self.customscissor = nil
 	
 	if (players == 1 and (not CustomPortalColors)) or self.playernumber > 4 then
-		self.portal1color = {60, 188, 252}
-		self.portal2color = {232, 130, 30}
+		self.portal1color = getDefaultPortalColor(1)
+		self.portal2color = getDefaultPortalColor(2)
 	else
 		self.portal1color = portalcolor[self.playernumber][1]
 		self.portal2color = portalcolor[self.playernumber][2]
@@ -994,11 +994,28 @@ function mario:update(dt)
 	--sledge bros
 	if self.groundfreeze then
 		self.controlsenabled = false
-		self.groundfreeze = self.groundfreeze - dt
+		if self.animation ~= "shrink" then
+			self.groundfreeze = self.groundfreeze - dt
+		end
 		if self.groundfreeze < 0 then
 			self.controlsenabled = true
 			self.groundfreeze = false
-			self.frozen = false
+
+			if self.frozen then
+				self.frozen = false
+				self.static = false
+				playsound(iciclesound)
+				self.animationstate = "jumping"
+				self.speedx = 0
+				self.speedy = -5
+				local debris = rgbaToInt(80, 210, 250, 255)
+				if blockdebrisquads[debris] then
+					table.insert(blockdebristable, blockdebris:new(self.x+self.width/2, self.y+self.height/2, 3.5, -23, blockdebrisimage, blockdebrisquads[debris][spriteset]))
+					table.insert(blockdebristable, blockdebris:new(self.x+self.width/2, self.y+self.height/2, -3.5, -23, blockdebrisimage, blockdebrisquads[debris][spriteset]))
+					table.insert(blockdebristable, blockdebris:new(self.x+self.width/2, self.y+self.height/2, 3.5, -14, blockdebrisimage, blockdebrisquads[debris][spriteset]))
+					table.insert(blockdebristable, blockdebris:new(self.x+self.width/2, self.y+self.height/2, -3.5, -14, blockdebrisimage, blockdebrisquads[debris][spriteset]))
+				end
+			end
 		end
 	end
 	
@@ -2422,7 +2439,7 @@ function mario:update(dt)
 					self.friction = self.characterdata.icefriction
 				end
 				if self.animationstate == "sliding" then
-					if skidsound:isStopped() then
+					if not skidsound:isPlaying() then
 						playsound(skidsound)
 					end
 				end
@@ -2969,7 +2986,7 @@ function mario:movement(dt)
 					end
 					self.animationstate = "sliding"
 					if currentphysics == 3 or currentphysics == 4 or self.characterdata.skid then
-						if skidsound:isStopped() then
+						if not skidsound:isPlaying() then
 							playsound(skidsound)
 						end
 					end
@@ -3021,7 +3038,7 @@ function mario:movement(dt)
 					end
 					self.animationstate = "sliding"
 					if currentphysics == 3 or currentphysics == 4 or self.characterdata.skid then
-						if skidsound:isStopped() then
+						if not skidsound:isPlaying() then
 							playsound(skidsound)
 						end
 					end
@@ -3838,7 +3855,6 @@ function mario:jump(force)
 					speedx = self.speedy
 				end
 				local force = self.characterdata.uwjumpforce + (math.abs(speedx) / self.characterdata.maxrunspeed)*self.characterdata.uwjumpforceadd
-				print(force)
 				if self.gravitydir == "up" then
 					self.speedy = force
 				elseif self.gravitydir == "down" then
@@ -4884,7 +4900,7 @@ function mario:floorcollide(a, b)
 	elseif a == "icicle" or (a == "tilemoving" and b.ice) or a == "ice" or (a == "muncher" and b.frozen) then
 		self.friction = self.characterdata.icefriction
 		if self.animationstate == "sliding" then
-			if skidsound:isStopped() then
+			if not skidsound:isPlaying() then
 				playsound(skidsound)
 			end
 		end
@@ -8153,7 +8169,7 @@ function mario:axe()
 	levelfinishtype = "castle"
 	levelfinishedmisc = 0
 	levelfinishedmisc2 = 1
-	if marioworld >= 8 and not love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. marioworld+1 .. "-1.txt") then --changed  since 
+	if marioworld >= 8 and not love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld+1 .. "-1.txt") then --changed  since
 		levelfinishedmisc2 = 2
 	end
 	bridgedisappear = false
@@ -8932,7 +8948,9 @@ end
 
 function mario:freeze() --ice ball
 	if not self.frozen then
-		self.groundfreeze = 4
+		self.static = true
+		self.jumping = false
+		self.groundfreeze = icefreezetime
 		self.frozen = true
 		self.speedx = 0
 		self.animationstate = "idle"
@@ -9084,6 +9102,16 @@ function mario:statued(statue) --tanooki statue
 end
 
 function mario:animationwalk(dir, speed)
+	if self.ducking then
+		self:duck(false)
+	end
+	if self.fence then
+		self:dropfence()
+	end
+	if self.vine then
+		self:dropvine(self.vineside)
+	end
+
 	self.animation = "animationwalk"
 	self.animationstate = "running"
 	self.animationmisc = {dir, math.max(0, math.min(40, (speed or maxwalkspeed)))}

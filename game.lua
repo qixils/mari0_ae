@@ -91,8 +91,8 @@ function game_load(suspended)
 	objects = nil
 	if suspended == true then
 		continuegame()
-		loadmappacksettings()
-		updatemappacksettings()
+		loadmappacksettings("suspended")
+		updatemappacksettings("suspended")
 	elseif suspended then
 		marioworld = suspended
 	end
@@ -108,7 +108,7 @@ function game_load(suspended)
 	
 	--add custom tiles
 	local bla = love.timer.getTime()
-	if not dcplaying and love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/tiles.png") then
+	if not dcplaying and love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/tiles.png") then
 		loadtiles("custom")
 		customtiles = true
 	else
@@ -326,7 +326,7 @@ function game_update(dt)
 			if queuelowtime and queuelowtime < 0 and (not levelfinished) then
 				local star = false
 				for i = 1, players do
-					if objects["player"][i].starred then
+					if objects["player"][i].starred and not objects["player"][i].size == 8 then
 						star = true
 					end
 				end
@@ -912,7 +912,7 @@ function game_update(dt)
 	end
 	--UPDATE OBJECTS
 	local delete
-	for i, v in pairs(objects) do
+	for i, v in kpairs(objects, objectskeys) do
 		if i ~= "tile" and i ~= "portalwall" and i ~= "screenboundary" and i ~= "coin" and i ~= "risingwater" and i ~= "clearpipesegment" and i ~= "tracksegment" and i ~= "funnel" and i ~= "clearpipe" then
 			delete = nil
 			for j, w in pairs(v) do
@@ -1610,7 +1610,7 @@ function game_update(dt)
 	
 	--WIND
 	if windstarted and (not levelfinished) then
-		if windsound:isStopped() then --couldn't find a wind sound!!! 11/14/2015 went to the level myself and got the sound (with a beat on it but oh well)
+		if not windsound:isPlaying() then --couldn't find a wind sound!!! 11/14/2015 went to the level myself and got the sound (with a beat on it but oh well)
 			playsound(windsound)
 		end
 		local dist = windentityspeed*dt
@@ -1699,7 +1699,7 @@ function game_draw()
 				local alpha = math.rad((i/backgroundstripes + math.fmod(sunrot/5, 1)) * 360)
 				local point1 = {width*8*scale+300*scale*math.cos(alpha), 112*scale+300*scale*math.sin(alpha)}
 				
-				local alpha = math.rad(((i+1)/backgroundstripes + math.fmod(sunrot/5, 1)) * 360)
+				alpha = math.rad(((i+1)/backgroundstripes + math.fmod(sunrot/5, 1)) * 360)
 				local point2 = {width*8*scale+300*scale*math.cos(alpha), 112*scale+300*scale*math.sin(alpha)}
 				
 				love.graphics.polygon("fill", width*8*scale, 112*scale, point1[1], point1[2], point2[1], point2[2])
@@ -1804,7 +1804,7 @@ function game_draw()
 			--[[for j, w in pairs(objects["redseesaw"]) do --has overlapping shadows
 				w:draw()
 			end]]
-			for j, w in pairs(objects) do	
+			for j, w in kpairs(objects, objectskeys) do
 				if j ~= "tile" then
 					for i, v in pairs(w) do
 						if v.drawable and (not v.nodropshadow) then--and not v.drawback then
@@ -2227,7 +2227,7 @@ function game_draw()
 		end
 		
 		--OBJECTS
-		for j, w in pairs(objects) do	
+		for j, w in kpairs(objects, objectskeys) do	
 			if j ~= "tile" then
 				for i, v in pairs(w) do
 					if v.drawable and not v.drawback then
@@ -2328,7 +2328,7 @@ function game_draw()
 					for j, w in pairs(objects["tilemoving"]) do
 						w:draw()
 					end
-					for j, w in pairs(objects) do	
+					for j, w in kpairs(objects, objectskeys) do	
 						if j ~= "tile" then
 							for i, v in pairs(w) do
 								if v.drawable and (not v.nodropshadow) then--and not v.drawback then
@@ -2492,7 +2492,7 @@ function game_draw()
 		if HITBOXDEBUG and (editormode or testlevel) then
 			local lw = love.graphics.getLineWidth()
 			love.graphics.setLineWidth(.5*scale)
-			for i, v in pairs(objects) do
+			for i, v in kpairs(objects, objectskeys) do
 				for j, k in pairs(v) do
 					if k.width then
 						if xscroll >= k.x-width and k.x+k.width > xscroll then
@@ -2565,7 +2565,7 @@ function game_draw()
 			for j, w in pairs(objects["regiontrigger"]) do
 				love.graphics.rectangle("fill", math.floor((w.rx-xscroll)*16*scale)+.5, math.floor((w.ry-yscroll-.5)*16*scale)+.5, w.rw*16*scale-1, w.rh*16*scale-1)
 			end
-			
+
 			for j, w in pairs(userects) do
 				love.graphics.setColor(0, 255, 255, 150)
 				love.graphics.rectangle("line", math.floor((w.x-xscroll)*16*scale)+.5, math.floor((w.y-yscroll-.5)*16*scale)+.5, w.width*16*scale-1, w.height*16*scale-1)
@@ -3928,7 +3928,7 @@ function drawHUD()
 	if hudoutline then
 		properprintfunc = properprintFbackground
 	end
-	love.graphics.setColor(unpack(hudtextcolor))
+	love.graphics.setColor(hudtextcolor)
 	love.graphics.translate(0, -yoffset*scale)
 	if yoffset < 0 then
 		love.graphics.translate(0, yoffset*scale)
@@ -3942,7 +3942,7 @@ function drawHUD()
 		--properprintfunc(playername .. " * " .. tostring(mariolives[1]), 16*scale, 8*scale)
 		love.graphics.setColor(255, 255, 255)
 		love.graphics.draw(coinanimationimage, coinanimationquads[spriteset or 1][coinframe or 1], 16*scale, 12*scale, 0, scale, scale)
-		love.graphics.setColor(unpack(hudtextcolor))
+		love.graphics.setColor(hudtextcolor)
 		properprintfunc("*" .. addzeros((mariocoincount or 0), 2), 24*scale, 12*scale)
 		
 		properprintfunc(addzeros((marioscore or 0), 9), (width*16-56-(9*8))*scale, 12*scale)
@@ -3959,7 +3959,7 @@ function drawHUD()
 		
 		love.graphics.setColor(255, 255, 255)
 		love.graphics.draw(coinanimationimage, coinanimationquads[spriteset or 1][coinframe or 1], uispace*1.5-16*scale, 16*scale, 0, scale, scale)
-		love.graphics.setColor(unpack(hudtextcolor))
+		love.graphics.setColor(hudtextcolor)
 		properprintfunc("*" .. addzeros((mariocoincount or 0), 2), uispace*1.5-8*scale, 16*scale)
 		
 		properprintfunc(TEXT["world"], uispace*2.5 - 20*scale, 8*scale)
@@ -3997,7 +3997,7 @@ function drawHUD()
 			if collectablescount[i] > 0 and (not hudhidecollectables[i]) then
 				love.graphics.setColor(255, 255, 255)
 				love.graphics.draw(collectableuiimg, collectableuiquad[spriteset or 1][i][coinframe or 1], 16*scale, cy*scale, 0, scale, scale)
-				love.graphics.setColor(unpack(hudtextcolor))
+				love.graphics.setColor(hudtextcolor)
 				properprintfunc("*" .. collectablescount[i], 24*scale, cy*scale)
 				cy = cy + 10
 			end
@@ -4006,7 +4006,7 @@ function drawHUD()
 		if players == 1 and objects["player"][1].key and objects["player"][1].key > 0 then
 			love.graphics.setColor(255, 255, 255)
 			love.graphics.draw(keyuiimg, keyuiquad[spriteset or 1][coinframe or 1], 16*scale, cy*scale, 0, scale, scale)
-			love.graphics.setColor(unpack(hudtextcolor))
+			love.graphics.setColor(hudtextcolor)
 			properprintfunc("*" .. objects["player"][1].key, 24*scale, cy*scale)
 			cy = cy + 10
 		end
@@ -4296,161 +4296,32 @@ function startlevel(level, reason)
 	portals = {}
 	blockedportaltiles = {}
 	
+	objectskeys = {
+		"mariohammer", "icicle", "thwomp", "threeup", "ceilblocker", "energyball", "belt", "brofireball", "bomb",
+		"musicchanger", "mole", "lightbridge", "splunkin", "bulletbill", "cannonballcannon", "randomizer",
+		"collectable", "plant", "lakito", "laser", "squid", "star", "bowser", "powblock", "animationoutput",
+		"chainchomp", "energylauncher", "skewer", "platformspawner", "collectablelock", "cubedispenser", "door",
+		"bigmole", "hammersuit", "flipblock", "notgate", "frozencoin", "portalent", "yoshi", "coin", "bigbill",
+		"torpedolauncher", "seesawplatform", "groundlight", "koopa", "flyingfish", "kingbill", "spike", "donut",
+		"player", "mushroom", "clearpipesegment", "angrysun", "turretshot", "edgewrap", "spikeball", "rocketturret",
+		"redseesaw", "koopaling", "levelball", "torpedoted", "upfire", "magikoopa", "fireball", "cheep", "pixeltile",
+		"tilemoving", "platform", "drybones", "hammerbro", "animationtrigger", "meteor", "pushbutton", "leaf",
+		"wrench", "hammer", "muncher", "fire", "faithplate", "castlefire", "ninji", "doorsprite", "boo",
+		"blocktogglebutton", "iceball", "longfire", "animatedtiletrigger", "cannonball", "tiletool", "text",
+		"turretrocket", "funnel", "trackcontroller", "rsflipflop", "portalwall", "smallspring", "core",
+		"screenboundary", "boomboom", "cappy", "grinder", "ice", "checkpointflag", "plantfire", "geldispenser",
+		"castlefirefire", "tracksegment", "plantcreepersegment", "rockywrench", "wallindicator", "oneup", "box",
+		"snakeblock", "risingwater", "plantcreeper", "orgate", "pbutton", "delayer", "camerastop", "vine", "glados",
+		"gel", "yoshiegg", "spring", "pokey", "sidestepper", "windleaf", "button", "turret", "flower", "tile",
+		"mariotail", "laserdetector", "regiontrigger", "boomerang", "smbsitem", "walltimer", "fuzzy", "frogsuit",
+		"checkpoint", "lightbridgebody", "andgate", "fishbone", "goomba", "squarewave", "parabeetle", "amp",
+		"energycatcher", "pedestal", "buttonblock", "enemy", "enemytool", "barrel", "poisonmush"
+	}
 	objects = {}
-	objects["player"] = {}
-	objects["portalwall"] = {}
-	objects["tile"] = {}
-	objects["tilemoving"] = {}
-	objects["enemy"] = {}
-	objects["goomba"] = {}
-	objects["koopa"] = {}
-	objects["mushroom"] = {}
-	objects["flower"] = {}
-	objects["oneup"] = {}
-	objects["star"] = {}
-	objects["vine"] = {}
-	objects["box"] = {}
-	objects["door"] = {}
-	objects["button"] = {}
-	objects["groundlight"] = {}
-	objects["wallindicator"] = {}
-	objects["walltimer"] = {}
-	objects["notgate"] = {}
-	objects["lightbridge"] = {}
-	objects["lightbridgebody"] = {}
-	objects["faithplate"] = {}
-	objects["laser"] = {}
-	objects["laserdetector"] = {}
-	objects["gel"] = {}
-	objects["geldispenser"] = {}
-	objects["cubedispenser"] = {}
-	objects["pushbutton"] = {}
-	objects["bulletbill"] = {}
-	objects["hammerbro"] = {}
-	objects["hammer"] = {}
-	objects["fireball"] = {}
-	objects["platform"] = {}
-	objects["platformspawner"] = {}
-	objects["plant"] = {}
-	objects["castlefire"] = {}
-	objects["castlefirefire"] = {}
-	objects["fire"] = {}
-	objects["bowser"] = {}
-	objects["spring"] = {}
-	objects["cheep"] = {}
-	objects["flyingfish"] = {}
-	objects["upfire"] = {}
-	objects["seesawplatform"] = {}
-	objects["ceilblocker"] = {}
-	objects["lakito"] = {}
-	objects["squid"] = {}
-	objects["poisonmush"] = {}
-	objects["bigbill"] = {}
-	objects["kingbill"] = {}
-	objects["sidestepper"] = {}
-	objects["barrel"] = {}
-	objects["icicle"] = {}
-	objects["angrysun"] = {}
-	objects["splunkin"] = {}
-	objects["threeup"] = {}
-	objects["brofireball"] = {}
-	objects["smbsitem"] = {}
-	objects["thwomp"] = {}
-	objects["fishbone"] = {}
-	objects["drybones"] = {}
-	objects["muncher"] = {}
-	objects["meteor"] = {}
-	objects["donut"] = {}
-	objects["boomerang"] = {}
-	objects["parabeetle"] = {}
-	objects["ninji"] = {}
-	objects["hammersuit"] = {}
-	objects["mariohammer"] = {}
-	objects["boo"] = {}
-	objects["mole"] = {}
-	objects["bigmole"] = {}
-	objects["bomb"] = {}
-	objects["plantfire"] = {}
-	objects["flipblock"] = {}
-	objects["torpedoted"] = {}
-	objects["torpedolauncher"] = {}
-	objects["frogsuit"] = {}
-	objects["boomboom"] = {}
-	objects["levelball"] = {}
-	objects["leaf"] = {}
-	objects["mariotail"] = {}
-	objects["windleaf"] = {}
-	objects["energylauncher"] = {}
-	objects["energyball"] = {}
-	objects["energycatcher"] = {}
-	objects["turret"] = {}
-	objects["turretshot"] = {}
-	objects["blocktogglebutton"] = {}
-	objects["buttonblock"] = {}
-	objects["squarewave"] = {}
-	objects["delayer"] = {}
-	objects["coin"] = {}
-	objects["frozencoin"] = {}
-	objects["amp"] = {}
-	objects["fuzzy"] = {}
-	objects["funnel"] = {}
-	objects["longfire"] = {}
-	objects["cannonball"] = {}
-	objects["cannonballcannon"] = {}
-	objects["rocketturret"] = {}
-	objects["turretrocket"] = {}
-	objects["glados"] = {}
-	objects["core"] = {}
-	objects["pedestal"] = {}
-	objects["portalent"] = {}
-	objects["text"] = {}
-	objects["regiontrigger"] = {}
-	objects["tiletool"] = {}
-	objects["iceball"] = {}
-	objects["enemytool"] = {}
-	objects["randomizer"] = {}
-	objects["yoshiegg"] = {}
-	objects["yoshi"] = {}
-	objects["musicchanger"] = {}
-	objects["pbutton"] = {}
-	objects["pokey"] = {}
-	objects["chainchomp"] = {}
-	objects["rockywrench"] = {}
-	objects["wrench"] = {}
-	objects["koopaling"] = {}
-	objects["checkpoint"] = {}
-	objects["doorsprite"] = {}
-	objects["magikoopa"] = {}
-	objects["skewer"] = {}
-	objects["belt"] = {}
-	objects["animationtrigger"] = {}
-	objects["animationoutput"] = {}
-	objects["animatedtiletrigger"] = {}
-	objects["rsflipflop"] = {}
-	objects["orgate"] = {}
-	objects["andgate"] = {}
-	objects["collectable"] = {}
-	objects["collectablelock"] = {}
-	objects["powblock"] = {}
-	objects["smallspring"] = {}
-	objects["risingwater"] = {}
-	objects["redseesaw"] = {}
-	objects["snakeblock"] = {}
-	objects["spike"] = {}
-	objects["spikeball"] = {}
-	objects["camerastop"] = {}
-	objects["clearpipesegment"] = {}
-	objects["plantcreeper"] = {}
-	objects["plantcreepersegment"] = {}
-	objects["tracksegment"] = {}
-	objects["trackcontroller"] = {}
-	objects["checkpointflag"] = {}
-	objects["ice"] = {}
-	objects["grinder"] = {}
-	
-	objects["cappy"] = {}
-	
-	objects["screenboundary"] = {}
+	for i = 1, #objectskeys do
+		local key = objectskeys[i]
+		objects[key] = {}
+	end
 	objects["screenboundary"]["left"] = screenboundary:new(0)
 	
 	splitxscroll = {0}
@@ -4805,7 +4676,7 @@ function startlevel(level, reason)
 	end
 
 	--is it toad or no
-	showtoad = not (tonumber(marioworld) and marioworld >= 8 and not love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. marioworld+1 .. "-1.txt"))
+	showtoad = not (tonumber(marioworld) and marioworld >= 8 and not love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld+1 .. "-1.txt"))
 	
 	updatespritebatch()
 
@@ -4816,7 +4687,7 @@ end
 function loadmap(filename)
 	print("Loading " .. mappackfolder .. "/" .. mappack .. "/" .. filename .. ".txt")
 	
-	if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. filename .. ".txt") == false then
+	if not love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. filename .. ".txt") then
 		print(mappackfolder .. "/" .. mappack .. "/" .. filename .. ".txt not found!")
 		return false
 	end
@@ -4825,7 +4696,7 @@ function loadmap(filename)
 	
 	if s2[2] and s2[2]:sub(1,7) == "height=" then
 		mapheight = tonumber(s2[2]:sub(8,-1)) or 15
-	elseif love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/heights/" .. marioworld .. "-" .. mariolevel .. "_" .. actualsublevel .. ".txt") then
+	elseif love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/heights/" .. marioworld .. "-" .. mariolevel .. "_" .. actualsublevel .. ".txt") then
 		local s11 = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/heights/" .. marioworld .. "-" .. mariolevel .. "_" .. actualsublevel .. ".txt")
 		mapheight = tonumber(s11)
 	else
@@ -5074,8 +4945,8 @@ function loadmap(filename)
 	table.sort(checkpoints)
 	
 	--Add links
-	for i, v in pairs(objects) do
-		for j, w in pairs(v) do
+	for key, value in kpairs(objects, objectskeys) do
+		for j, w in pairs(value) do
 			if w.link then
 				w:link()
 			end
@@ -5372,7 +5243,12 @@ function game_keypressed(key, textinput)
 		elseif (key == "return" or key == "enter" or key == "kpenter" or key == " ") then
 			if pausemenuoptions[pausemenuselected] == "resume" then
 				pausemenuopen = false
-				love.audio.resume()
+				if pausedaudio then
+					love.audio.play(pausedaudio)
+					pausedaudio = nil
+				else
+					playmusic()
+				end
 			elseif pausemenuoptions[pausemenuselected] == "suspend" then
 				if dcplaying then
 					pausemenuopen = false
@@ -5392,7 +5268,12 @@ function game_keypressed(key, textinput)
 			end
 		elseif key == "escape" then
 			pausemenuopen = false
-			love.audio.resume()
+			if pausedaudio then
+				love.audio.play(pausedaudio)
+				pausedaudio = nil
+			else
+				playmusic()
+			end
 		elseif (key == "right" or key == "d") then
 			if pausemenuoptions[pausemenuselected] == "volume" then
 				if volume < 1 then
@@ -5534,7 +5415,7 @@ function game_keypressed(key, textinput)
 		elseif not editormode and not everyonedead then
 			pausemenuopen = true
 			if not android then --doesn't work for some reason
-				love.audio.pause()
+				pausedaudio = love.audio.pause()
 			end
 			playsound(pausesound)
 		end
@@ -6222,7 +6103,7 @@ function insideportal(x, y, width, height) --returns whether an object is in, an
 end
 
 function moveoutportal() --pushes objects out of the portal i in.
-	for i, v in pairs(objects) do
+	for i, v in kpairs(objects, objectskeys) do
 		if i ~= "tile" and i ~= "portalwall" then
 			for j, w in pairs(v) do
 				if w.active and w.static == false then
@@ -6461,7 +6342,7 @@ function savemap(filename)
 	
 	--don't create a map height file if it's 15 (default) (Update: no more map files cause they're bad)
 	if mapheight ~= 15 then
-		if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/heights/" .. marioworld .. "-" .. mariolevel .. "_" .. actualsublevel .. ".txt") then
+		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/heights/" .. marioworld .. "-" .. mariolevel .. "_" .. actualsublevel .. ".txt") then
 			love.filesystem.remove(mappackfolder .. "/" .. mappack .. "/heights/" .. marioworld .. "-" .. mariolevel .. "_" .. actualsublevel .. ".txt") --remove file
 		end
 	end
@@ -8070,11 +7951,9 @@ function playsound(sound)
 	if soundenabled then
 		if sound.stop then --string?
 			sound:stop()
-			if sound.rewind then sound:rewind() end
 			sound:play()
 		elseif _G[sound .. "sound"] then
 			_G[sound .. "sound"]:stop()
-			if sound.rewind then _G[sound .. "sound"]:rewind() end
 			_G[sound .. "sound"]:play()
 		end
 	end
@@ -8176,7 +8055,14 @@ function checkkey(s,i,n)
 			end
 		end
 	elseif s[1] then
-		if love.keyboard.isDown(s[1]) then
+		if s[1] == "" then
+			return false
+		end
+		local success, keyIsDown = pcall(love.keyboard.isDown, s[1])
+		if not success then
+			print("Invalid key: '" .. s[1] .. "'")
+			return false
+		elseif keyIsDown then
 			return true
 		elseif android then
 			return androidButtonDown(i,n)
@@ -8939,7 +8825,7 @@ function convertr(r, types, dontgivedefaultvalues) --convert right cick values
 end
 
 function lightsoutstencil()
-	for i2, v2 in pairs(objects) do
+	for i2, v2 in kpairs(objects, objectskeys) do
 		if i2 ~= "tile" and i2 ~="buttonblock" and i2 ~= "clearpipesegment" then
 			for i, v in pairs(objects[i2]) do
 				if (v.active or (i2 == "player" or i2 == "enemy")) and v.light and onscreen(v.x+v.width/2-v.light, v.y+v.height/2-v.light, v.light*2, v.light*2) then
@@ -9498,22 +9384,14 @@ function getdrawrange(xscroll,yscroll,spritebatch)
 			yoff = math.ceil(yscroll)+math.fmod(yscroll, 1)
 		end
 	end
+	if spritebatch and dropshadow then -- fix shadows disappearing too early, .1875 equals to 3 pixels (3/16)
+		xfromdraw = math.floor(math.max(xfromdraw - .1875, 1))
+		yfromdraw = math.floor(math.max(yfromdraw - .1875, 1))
+	end
 	return xfromdraw,xtodraw, yfromdraw,ytodraw, xoff,yoff
 end
 
 function setscreenzoom(z)
-	if z ~= 1 or (screenzoom and screenzoom ~= 1) then
-		for i = 1, #smbspritebatch do
-			smbspritebatch[i]:setBufferSize(math.max(maxtilespritebatchsprites,width*height+width+height+1))
-			portalspritebatch[i]:setBufferSize(math.max(maxtilespritebatchsprites,width*height+width+height+1))
-			if customtiles then
-				for i2 = 1, #customtilesimg do
-					customspritebatch[i][i2]:setBufferSize(math.max(maxtilespritebatchsprites,width*height+width+height+1))
-				end
-			end
-		end
-	end
-	
 	screenzoom = z
 	screenzoom2 = 1/screenzoom
 end

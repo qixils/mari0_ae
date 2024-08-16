@@ -28,7 +28,8 @@ airslidefactor = 0.8 --multiply of acceleration in air when changing direction
 icefriction = 3 --friction when on ice entity
 icewalkacceleration = 4 --acceleration of walking on ground on ice entitiy
 icerunacceleration = 8 --^^^
-groundfreezetime = 3 --seconds stunned when sledge bro ground pounded
+icefreezetime = 1 --seconds stunned when hit by ice bro balls
+groundfreezetime = 1 --seconds stunned when sledge bro ground pounded
 goombashoehop = 8 --height of hops when mario has goomba shoe
 fencespeed = 4 --speed when climbing fence
 fencejumptime = 0.05 --how long mario jumps when holding up and jumping while climbing
@@ -40,16 +41,16 @@ starcolors[2] = {{  0, 168,   0}, {252, 152,  56}, {252, 252, 252}}
 starcolors[3] = {{252, 216, 168}, {216,  40,   0}, {252, 152,  56}}
 starcolors[4] = {{216,  40,   0}, {252, 152,  56}, {252, 252, 252}}
 
-flowercolor = {{252, 216, 168}, {216,  40,   0}, {252, 152,  56}}
-hammersuitcolor = {{  0,   0,   0}, { 255, 255, 255}, {252, 152,  56}}
-frogsuitcolor = {{  0, 168,   0}, {  0,   0,   0}, {252, 152,  56}}
-leafcolor = {{224, 32,   0}, {136, 112,   0}, {252, 152,  56}}
-iceflowercolor = {{255, 255, 255}, {60, 188, 252}, {252, 152,  56}}
-tanookisuitcolor =  {{200,  76,   12}, {0, 0, 0}, {252, 152,  56}}
+flowercolor = {{252, 216, 168}, {216, 40, 0}, {252, 152, 56}}
+hammersuitcolor = {{0, 0, 0}, {255, 255, 255}, {252, 152, 56}}
+frogsuitcolor = {{0, 168, 0}, {0, 0, 0}, {252, 152, 56}}
+leafcolor = {{224, 32, 0}, {136, 112, 0}, {252, 152, 56}}
+iceflowercolor = {{225,255,255}, {60, 188, 252}, {252, 152, 56}}
+tanookisuitcolor =  {{200, 76, 12}, {0, 0, 0}, {252, 152, 56}}
 statuecolor =  {{116, 116, 116}, {0, 0, 0}, {188, 188, 188}}
-superballcolor = {{100, 100, 50},{160, 160, 110},{230, 230, 180}}
-blueshellcolor = {{ 40, 0, 186}, { 255, 255, 255}, {252, 152,  56}}
-boomerangcolor = {{ 32, 56, 236}, { 255, 255, 255}, {252, 152,  56}}
+superballcolor = {{100, 100, 50}, {160, 160, 110}, {230, 230, 180}}
+blueshellcolor = {{40, 0, 186}, {255, 255, 255}, {252, 152, 56}}
+boomerangcolor = {{32, 56, 236}, {255, 255, 255}, {252, 152, 56}}
 
 mariocombo = {100, 200, 400, 500, 800, 1000, 2000, 4000, 5000, 8000} --combo scores for bouncing on enemies
 koopacombo = {500, 800, 1000, 2000, 4000, 5000, 8000} --combo scores for series of koopa kills
@@ -403,12 +404,16 @@ angrysunpassivespeed = 5
 angrysunfalltime = 0.1
 
 fireballspeed = 15
+fireballbrospeed = 10 -- 2/3
 fireballjumpforce = 10
 maxfireballs = 2
 fireanimationtime = 0.11
 iceballspeed = 7
+iceballbrospeed = 5 -- 2/3 ish
 iceballjumpforce = 10
 superballspeed = 12
+boomerangspeed = 10
+boomerangbrospeed = 7 -- 2/3 ish
 
 shotspeedx = 4 --X speed (constant) of fire/shell killed enemies
 shotjumpforce = 8 --initial speedy (negative) when shot
@@ -825,14 +830,14 @@ dropshadowoverlapshader = love.graphics.newShader[[
 anyiteminblock = false --allows any entity to be in block (doesn't work, use block=true instead)
 
 levelballfinishback = {
-	{0, 168, 0},
-	{0, 148, 0},
-	{200, 76, 12},
-	{252, 152, 56},
-	{0, 168, 0},
-	{0, 148, 0},
-	{200, 76, 12},
-	{252, 152, 56},}
+	{  0, 168,   0},
+	{  0, 148,   0},
+	{200,  76,  12},
+	{252, 152,  56},
+	{  0, 168,   0},
+	{  0, 148,   0},
+	{200,  76,  12},
+	{252, 152,  56},}
 --less eye hurt (not nes accurate but it's worth it to reduce the possiblity of a seizure)
 for i = 1, #levelballfinishback do
 	for i2 = 1, #levelballfinishback[i] do
@@ -841,13 +846,13 @@ for i = 1, #levelballfinishback do
 end
 
 --[[levelballfinishback = { --nes accurate
-	{0, 168, 0},
+	{  0, 168,   0},
 	{252, 116, 180},
-	{0, 168, 0},
-	{255, 57, 0},
-	{0, 168, 0},
-	{255, 57, 0},
-	{0, 168, 0}}]] --background colors for level ball
+	{  0, 168,   0},
+	{  1,  57,   0},
+	{  0, 168,   0},
+	{  1,  57,   0},
+	{  0, 168,   0}}]] --background colors for level ball
 
 helmetbounceforce = 14
 
@@ -868,35 +873,35 @@ onlysaveiflevelmodified = true
 --colors for text entity and hud
 textcolorsnames = {"black","blue","brown","gray","green","lime","maroon","orange","pink","purple","red","sky","white","yellow"}
 textcolors = {
-	white = {255,255,255},
-	black = {0,0,0},
-	gray = {120,120,120},
-	red = {216,40,0},
-	maroon = {168,0,16},
-	blue = {32,52,236},
-	sky = {60,188,252},
-	yellow = {240,188,60},
-	green = {0,168,0},
-	lime = {128,208,16},
-	orange = {252,152,56},
-	pink = {252,116,180},
-	purple = {116,0,116},
-	brown = {200,76,12},
+	white =  {255,255,255},
+	black =  {  0,  0,  0},
+	gray =   {120,120,120},
+	red =    {216, 40,  0},
+	maroon = {168,  0, 16},
+	blue =   { 32, 52,236},
+	sky =    { 60,188,252},
+	yellow = {240,188, 60},
+	green =  {  0,168,  0},
+	lime =   {128,208, 16},
+	orange = {252,152, 56},
+	pink =   {252,116,180},
+	purple = {116,  0,116},
+	brown =  {200, 76, 12},
 }
 
 --background colors in calendar image for every month
 calendarcolors = {
-	{248, 133, 43},
+	{248, 133,  43},
 	{252, 116, 180},
-	{128, 208, 16},
-	{0, 168, 0},
+	{128, 208,  16},
+	{  0, 168,   0},
 	{168, 240, 188},
-	{92, 148, 252},
-	{32, 56, 236},
-	{228, 0, 88},
-	{200, 76, 12},
-	{216, 40, 0},
-	{60, 188, 252},
+	{ 92, 148, 252},
+	{ 32,  56, 236},
+	{228,   0,  88},
+	{200,  76,  12},
+	{216,  40,   0},
+	{ 60, 188, 252},
 	{156, 252, 240}
 }
 
@@ -924,3 +929,17 @@ end
 maxtilespritebatchsprites = 1000
 
 emptytile = {1,gels={}}
+
+-- portal colors
+-- note: this should not be read directly due to mutation
+-- use getDefaultPortalColor(index) or getDefaultPortalColors() instead to get a copy of the color
+__defaultPortalColor = {{60, 188, 252}, {232, 130, 30}}
+
+function getDefaultPortalColor(index)
+	color = __defaultPortalColor[index]
+	return {unpack(color)}
+end
+
+function getDefaultPortalColors()
+	return {getDefaultPortalColor(1), getDefaultPortalColor(2)}
+end

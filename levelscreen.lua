@@ -54,11 +54,11 @@ function levelscreen_load(reason, i)
 			--check if next level doesn't exist
 			if not dcplaying then
 				local gamefinished = false
-				if not love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. ".txt") then
+				if not love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. ".txt") then
 					gamefinished = true
 					--check incase there are fewer than 4 levels in the world
 					if reason == "next" and tonumber(mariolevel) and mariolevel <= 4 then
-						if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. marioworld+1 .. "-1.txt") then
+						if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld+1 .. "-1.txt") then
 							marioworld = marioworld + 1
 							mariolevel = 1
 							gamefinished = false
@@ -75,24 +75,24 @@ function levelscreen_load(reason, i)
 						gamestate = "mappackfinished"
 						blacktime = gameovertime
 						
-						if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/endingmusic.ogg") or love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/endingmusic.mp3") then
+						if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/endingmusic.ogg") or love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/endingmusic.mp3") then
 							playsound(endingmusic)
 						else
 							music:play("princessmusic")
 						end
-						if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/ending.png") then
+						if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/ending.png") then
 							levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/ending.png")
 							levelscreenimagecheck = true
 						end
 					end
 				else
-					if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png") then
+					if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png") then
 						levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png")
 						levelscreenimagecheck = true
-					elseif love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "levelscreen.png") then
+					elseif love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "levelscreen.png") then
 						levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "levelscreen.png")
 						levelscreenimagecheck = true
-					elseif love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/levelscreen.png") then
+					elseif love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/levelscreen.png") then
 						levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/levelscreen.png")
 						levelscreenimagecheck = true
 					end
@@ -110,13 +110,13 @@ function levelscreen_load(reason, i)
 			end
 			
 			if not dcplaying then
-				if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png") then
+				if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png") then
 					levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png")
 					levelscreenimagecheck = true
-				elseif love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "levelscreen.png") then
+				elseif love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "levelscreen.png") then
 					levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "levelscreen.png")
 					levelscreenimagecheck = true
-				elseif love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/levelscreen.png") then
+				elseif love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/levelscreen.png") then
 					levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/levelscreen.png")
 					levelscreenimagecheck = true
 				end
@@ -128,7 +128,7 @@ function levelscreen_load(reason, i)
 		playsound(gameoversound)
 		checkpointx = nil
 		
-		if not dcplaying and love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/gameover.png") then
+		if not dcplaying and love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/gameover.png") then
 			levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/gameover.png")
 			levelscreenimagecheck = true
 		end
@@ -270,7 +270,7 @@ function levelscreen_draw()
 				local v = characters.data[mariocharacter[i]]
 				
 				for j = 1, #characters.data[mariocharacter[i]]["animations"] do
-					love.graphics.setColor(unpack(mariocolors[i][j]))
+					love.graphics.setColor(mariocolors[i][j])
 					if playertype == "classic" or playertype == "cappy" or not portalgun then--no portal gun
 					 	love.graphics.draw(v["animations"][j], v["small"]["idle"][5], x+(v.smalloffsetX)*scale, y+(11-v.smalloffsetY)*scale, 0, scale, scale, v.smallquadcenterX, v.smallquadcenterY)
 					else
@@ -335,9 +335,6 @@ function levelscreen_draw()
 					end
 				end
 				properprintfunc(s, (width/2*16)*scale-string.len(s)*4*scale, 200*scale)
-			elseif mappack == "only_for_alesans_entities" and marioworld == 1 and mariolevel == 1 then
-				local s = "mappack by alesan99"
-				properprintfunc(s, (width/2*16)*scale-string.len(s)*4*scale, 200*scale)
 			elseif levelscreentext[marioworld .. "-" .. mariolevel] then
 				local s = levelscreentext[marioworld .. "-" .. mariolevel]
 				properprintbasicfunc(s, (width/2*16)*scale-string.len(s)*4*scale, 200*scale)
@@ -347,7 +344,7 @@ function levelscreen_draw()
 			if levelscreenimagecheck then
 				love.graphics.draw(levelscreenimage, 0, 0, 0, scale, scale)
 			end
-			love.graphics.setColor(endingtextcolor[1], endingtextcolor[2], endingtextcolor[3])
+			love.graphics.setColor(endingtextcolor)
 			
 			properprintfunc(endingtext[1], width*8*scale-string.len(endingtext[1])*4*scale, 120*scale)
 			properprintfunc(endingtext[2], width*8*scale-string.len(endingtext[2])*4*scale, 140*scale)

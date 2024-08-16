@@ -57,7 +57,7 @@ function text:draw()
 			love.graphics.setColor(0,0,0,255)
 			properprintbackground(self.text, x*16*scale, y*16*scale, false, nil, size)
 		end
-		love.graphics.setColor(unpack(self.color))
+		love.graphics.setColor(self.color)
 		properprint(self.text, x*16*scale, y*16*scale, size)
 	end
 end

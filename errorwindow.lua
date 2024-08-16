@@ -31,7 +31,7 @@ function errorwindow:update(dt)
 end
 
 function errorwindow:draw(a)
-	local a = a or self.a
+	a = a or self.a
 	--window
 	love.graphics.setColor(0,0,0,230*(a/255))
 	love.graphics.rectangle("fill", self.x*scale, self.y*scale, self.width*scale, self.height*scale)

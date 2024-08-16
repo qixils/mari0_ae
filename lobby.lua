@@ -33,9 +33,9 @@ function lobby_load()
 				server_setmappack(mappacklist[mappackselection])
 			--end
 		end, 1, nil, nil, 192, true)
-	guielements.mappackleft = guielement:new("button", 7, 57, "{", 
+	guielements.mappackleft = guielement:new("button", 7, 57, "{",
 		function() mappackselection = math.max(1, mappackselection-1); guielements.mappack.text = mappacklist[mappackselection]:lower(); guielements.mappack.textcolor = {127, 127, 127} end, 1)
-	guielements.mappackright = guielement:new("button", 219, 57, "}", 
+	guielements.mappackright = guielement:new("button", 219, 57, "}",
 		function() mappackselection = math.min(#mappacklist, mappackselection+1); guielements.mappack.text = mappacklist[mappackselection]:lower(); guielements.mappack.textcolor = {127, 127, 127} end, 1)
 	if CLIENT then
 		guielements.infinitelives.active = false
@@ -199,7 +199,7 @@ function lobby_drawchat()
 				background = {0, 0, 0}
 			end]]
 			
-			love.graphics.setColor(unpack(playerlist[pid].colors[1]))
+			love.graphics.setColor(playerlist[pid].colors[1])
 			properprintbackground(nick, 8*scale, (196-(height*10))*scale, true)
 			
 			love.graphics.setColor(255, 255, 255)

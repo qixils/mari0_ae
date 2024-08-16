@@ -16,6 +16,6 @@ function magic:update(dt)
 end
 
 function magic:draw()
-	love.graphics.setColor(unpack(self.color))
+	love.graphics.setColor(self.color)
 	love.graphics.draw(magicimg, magicquad[math.floor(self.t/self.lifetime*6)+1], self.x, self.y, 0, scale, scale, 5, 5)
 end

@@ -1,6 +1,6 @@
 --[[
 	STEAL MY SHIT AND I'LL FUCK YOU UP
-	PRETTY MUCH EVERYTHING BY MAURICE GU�GAN AND IF SOMETHING ISN'T BY ME THEN IT SHOULD BE OBVIOUS OR NOBODY CARES
+	PRETTY MUCH EVERYTHING BY MAURICE GUÉGAN AND IF SOMETHING ISN'T BY ME THEN IT SHOULD BE OBVIOUS OR NOBODY CARES
 
 	Please keep in mind that for obvious reasons, I do not hold the rights to artwork, audio or trademarked elements of the game.
 	This license only applies to the code and original other assets. Obviously. Duh.
@@ -41,22 +41,168 @@
 	-HansAgain for new portal sprites, new mario sprites, banzai bills, and pneumatic tubes
 	-Subpixel for bowser3, rotodiscs, ninji, and splunkin sprites
 	-Critfish for overgrown portal sprites
-	-Aidan for general bugtesting and misc. contributions on github
+	-Britdan for general bugtesting and misc. contributions on github
 	-MadNyle for propeller sound effect and mega mushroom
 	-fußmatte for helping create a TON of new characters for the font and Esperanto Translation
 	-HugoBDesigner for Portugese-Br translation
 	-Los for Russian Translation
-	-WilliamFr0g and Kant for contributions on github
+	-qixils for the automatic GitHub workflows and LÖVE 11.4 update
+	-WilliamFr0g and Kant for contributions on GitHub
 	-----------------------------------------------------------------------------
 ]]
+
+--version check
+if love._version_major ~= 11 then error("You have an outdated version of Love2d! Get 11.5 and retry.") end
+
+----- COLOR MIGRATION helpers -----
+function clamp(x, lower, upper)
+    return math.min(math.max(x, lower), upper)
+end
+
+local function convertFromByte(x)
+    return clamp(math.floor(x + 0.5) / 255, 0, 1)
+end
+
+local colorCache = {}
+for i = 0, 255 do colorCache[i] = convertFromByte(i) end
+
+local function convertFromCachedByte(x)
+	x = clamp(x, 0, 255)
+	local cached = colorCache[x]
+	return (cached ~= nil and cached) or convertFromByte(x) -- fallback for decimals
+end
+
+local function convertFromCachedTable(table)
+	for i, v in ipairs(table) do
+		table[i] = v ~= nil and convertFromCachedByte(v) or nil
+	end
+	return table
+end
+
+local function convertText(text)
+	if type(text) == "table" then
+		for i, v in ipairs(text) do
+			if type(v) == "table" then
+				text[i] = unpack(convertFromCachedTable(v))
+			end
+		end
+	end
+	return text
+end
+
+----- COLOR MIGRATION for real -----
+
+local defaultSetColor = love.graphics.setColor
+function love.graphics.setColor(r, g, b, a, ...)
+	if type(r) == "table" then r, g, b, a = r[1], r[2], r[3], r[4] end
+    return defaultSetColor(convertFromCachedTable({r, g, b, a}), ...)
+end
+
+local defaultGetColor = love.graphics.getColor
+function love.graphics.getColor(...)
+	return love.math.colorToBytes(defaultGetColor(...))
+end
+
+local defaultSetBackgroundColor = love.graphics.setBackgroundColor
+function love.graphics.setBackgroundColor(r, g, b, a, ...)
+	if type(r) == "table" then r, g, b, a = r[1], r[2], r[3], r[4] end
+    return defaultSetBackgroundColor(convertFromCachedTable({r, g, b, a}), ...)
+end
+
+local defaultGetBackgroundColor = love.graphics.getBackgroundColor
+function love.graphics.getBackgroundColor(...)
+	return love.math.colorToBytes(defaultGetBackgroundColor(...))
+end
+
+local defaultClear = love.graphics.clear
+function love.graphics.clear(r, g, b, a, ...)
+	if r ~= nil and g ~= nil and b ~= nil then
+		r, g, b, a = unpack(convertFromCachedTable({r, g, b, a}))
+	end
+	return defaultClear(r, g, b, a, ...)
+end
+
+local defaultPrint = love.graphics.print
+function love.graphics.print(text, ...)
+	return defaultPrint(convertText(text), ...)
+end
+
+local defaultPrintf = love.graphics.printf
+function love.graphics.printf(text, ...)
+	return defaultPrintf(convertText(text), ...)
+end
+
+local defaultNewText = love.graphics.newText
+function love.graphics.newText(font, text, ...)
+	return defaultNewText(font, convertText(text), ...)
+end
+
+local Text = debug.getregistry().Text
+
+local defaultTextSet = Text.set
+function Text:set(text, ...)
+	return defaultTextSet(self, convertText(text), ...)
+end
+
+local defaultTextSetf = Text.setf
+function Text:setf(text, ...)
+	return defaultTextSetf(self, convertText(text), ...)
+end
+
+local defaultTextAdd = Text.add
+function Text:add(text, ...)
+	return defaultTextAdd(self, convertText(text), ...)
+end
+
+local defaultTextAddf = Text.addf
+function Text:addf(text, ...)
+	return defaultTextAddf(self, convertText(text), ...)
+end
+
+local SpriteBatch = debug.getregistry().SpriteBatch
+
+local defaultSpriteBatchSetColor = SpriteBatch.setColor
+function SpriteBatch:setColor(...)
+	return defaultSpriteBatchSetColor(self, unpack(convertFromCachedTable({...})))
+end
+
+local defaultSpriteBatchGetColor = SpriteBatch.getColor
+function SpriteBatch:getColor(...)
+	return love.math.colorToBytes(defaultSpriteBatchGetColor(self, ...))
+end
+
+local ImageData = debug.getregistry().ImageData
+
+local defaultImageDataSetPixel = ImageData.setPixel
+function ImageData:setPixel(x, y, ...)
+	return defaultImageDataSetPixel(self, x, y, unpack(convertFromCachedTable({...})))
+end
+
+local defaultImageDataGetPixel = ImageData.getPixel
+function ImageData:getPixel(...)
+	return love.math.colorToBytes(defaultImageDataGetPixel(self, ...))
+end
+
+local defaultImageDataMapPixel = ImageData.mapPixel
+function ImageData:mapPixel(pixelFunction, ...)
+	return defaultImageDataMapPixel(self, function(x, y, r, g, b, a) return unpack(convertFromCachedTable({pixelFunction(x, y, love.math.colorToBytes(r, g, b, a))})) end, ...)
+end
+
+-- TODO: ParticleSystem, linear/gamma functions, points, sendColor, newMesh, [gs]etVertex
+
+----- MAIN -----
+
+require("utils")
+hardloadhttps()
 
 local debugconsole = false --debug
 if debugconsole then debuginputon = true; debuginput = "print()"; print("DEBUG ON") end
 local debugGraph,fpsGraph,memGraph,drawGraph
 local debugGraphs = false
 
-VERSION = 13.1005
-VERSIONSTRING = "13.1 (4/18/23)"
+VERSION = 13.2000
+VERSIONSTRING = "13.2 (8/10/24)"
+ANDROIDVERSION = 17
 
 android = (love.system.getOS() == "Android" or love.system.getOS() == "iOS") --[DROID]
 androidtest = false--testing android on pc
@@ -155,12 +301,9 @@ function love.load()
 
 	love.window.setTitle( "Mari0: AE" )
 	
-	--version check by checking for a const that was added in 0.8.0
-	if love._version_major == nil then error("You have an outdated version of Love! Get 0.10.0 or higher and retry.") end
-	
 	love.window.setIcon(love.image.newImageData("graphics/icon.png"))
 	
-	love.graphics.setDefaultFilter("nearest")
+	love.graphics.setDefaultFilter("nearest", "nearest")
 	
 	love.graphics.setBackgroundColor(0, 0, 0)
 	
@@ -182,7 +325,7 @@ function love.load()
 	love.graphics.setFont(font)
 
 	utf8 = require("utf8")
-	local t = require("libs/utf8_simple")
+	local t = require("libs.utf8_simple")
 	utf8.chars = t.chars
 	utf8.sub = t.sub
 	fontglyphs = [[
@@ -239,7 +382,7 @@ function love.load()
 	fontindexOLD["D"] = "↓"
 	fontindexOLD["U"] = "↑"
 
-	if love.filesystem.exists("alesans_entities/familyfriendly.txt") then FamilyFriendly = true end
+	if love.filesystem.getInfo("alesans_entities/familyfriendly.txt") then FamilyFriendly = true end
 	
 	math.randomseed(os.time());math.random();math.random()
 	
@@ -287,7 +430,7 @@ function love.load()
 				"emancipationfizzle", "emancipateanimation", "ceilblocker", "belt", "hatloader", "poof", "animationguiline", "animation",
 				"animationsystem", "animationtrigger", "dialogbox", "portal", "orgate", "andgate", "animatedtiletrigger", "rsflipflop", "animatedtimer",
 				"collectable", "powblock", "smallspring", "risingwater", "redseesaw", "snakeblock", "frozencoin", "entitytooltip", "spawnanimation",
-				"camerastop", "clearpipe", "track", "tilemoving", "laserfield", "checkpointflag", "ice", "pipe", "errorwindow"}
+				"camerastop", "clearpipe", "track", "tilemoving", "laserfield", "checkpointflag", "ice", "pipe", "errorwindow", "filebrowser"}
 	for i = 1, #luas do
 		require(luas[i])
 	end
@@ -295,7 +438,7 @@ function love.load()
 	loadingbardraw(1)
 	local enemyluas = love.filesystem.getDirectoryItems("enemies")
 	for i = 1, #enemyluas do
-		require("enemies/" .. enemyluas[i]:sub(1, enemyluas[i]:len()-4))
+		require("enemies." .. enemyluas[i]:sub(1, enemyluas[i]:len()-4))
 	end
 	print("done loading enemies!")
 	loadingbardraw(1)
@@ -332,10 +475,10 @@ function love.load()
 	local zips = love.filesystem.getDirectoryItems("alesans_entities/dlc_mappacks")
 	if #zips > 0 then
 		for j, w in pairs(zips) do
-			if not love.filesystem.exists("alesans_entities/onlinemappacks/" .. w) then
+			if not love.filesystem.getInfo("alesans_entities/onlinemappacks/" .. w) then
 				local filedata = love.filesystem.newFileData("alesans_entities/dlc_mappacks/" .. w)
 				love.filesystem.write("alesans_entities/onlinemappacks/" .. w, filedata)
-				if j == 1 and not love.filesystem.exists("alesans_entities/onlinemappacks/" .. w) then
+				if j == 1 and not love.filesystem.getInfo("alesans_entities/onlinemappacks/" .. w) then
 					break
 				end
 			end
@@ -344,15 +487,10 @@ function love.load()
 
 	--mount dlc zip files
 	if onlinedlc then
-		local zips = love.filesystem.getDirectoryItems("alesans_entities/onlinemappacks")
-		if #zips > 0 then
-			for j, w in pairs(zips) do
-				mountmappack(w)
-			end
-		end
+		mountalldlc()
 	end
 	
-	if checkmappack and love.filesystem.exists(mappackfolder .. "/" .. checkmappack .. "/") then
+	if checkmappack and love.filesystem.getInfo(mappackfolder .. "/" .. checkmappack .. "/") then
 		mappack = checkmappack
 		checkmappack = nil
 		saveconfig()
@@ -364,7 +502,7 @@ function love.load()
 	datet = {os.date("%m"),os.date("%d"),os.date("%Y")}
 	DChigh = {"-", "-", "-"}
 	DChightemp = false
-	if love.filesystem.exists("alesans_entities/dc.txt") then
+	if love.filesystem.getInfo("alesans_entities/dc.txt") then
 		local s = love.filesystem.read("alesans_entities/dc.txt")
 		local s2 = s:split("~")
 		DCcompleted = tonumber(s2[1])
@@ -1026,7 +1164,7 @@ function love.load()
 
 	--debug graphs
 	if debugGraphs then
-		debugGraph = require "libs/debugGraph"
+		debugGraph = require "libs.debugGraph"
 		fpsGraph = debugGraph:new('fps', 0, 0)
 		memGraph = debugGraph:new('mem', 0, 30)
 		drawGraph = debugGraph:new('custom', 0, 60)
@@ -1106,7 +1244,9 @@ function love.update(dt)
 	elseif gamestate == "game" then
 		game_update(dt)	
 	elseif gamestate == "intro" then
-		intro_update(dt)	
+		intro_update(dt)
+	elseif gamestate == "filebrowser" then
+		filebrowser_update(dt)
 	end
 	
 	for i, v in pairs(guielements) do
@@ -1129,36 +1269,31 @@ end
 
 function love.draw()
 	if resizable or android then
-		if canvassupported or android then
-			if letterboxfullscreen and (shaders.passes[1].on or shaders.passes[2].on) then
-				love.graphics.setColor(0, 0, 0)
-				love.graphics.rectangle("fill", 0, 0, winwidth, winheight)
-			end
-			love.graphics.setCanvas(canvas)
-			love.graphics.clear()
-			canvas:renderTo(lovedraw)
-			love.graphics.setCanvas()
-			if letterboxfullscreen and not (shaders.passes[1].on or shaders.passes[2].on) then
-				love.graphics.setColor(0, 0, 0)
-				love.graphics.rectangle("fill", 0, 0, winwidth, winheight)
-				local cw, ch = canvas:getWidth(), canvas:getHeight()--current size
-				local tw, th = winwidth, winheight--target size
-				local s
-				if cw/tw > ch/th then s = tw/cw
-				else s = th/ch end
-				love.graphics.setColor(255, 255, 255)
-				love.graphics.draw(canvas, winwidth/2, winheight/2, 0, s, s, cw/2, ch/2)
-			else
-				love.graphics.setColor(255, 255, 255)
-				love.graphics.draw(canvas, 0, 0, 0, winwidth/(width*16*scale), winheight/(224*scale))
-			end
-
-			if android and not androidLowRes then
-				androidDraw()
-			end
+		if letterboxfullscreen and (shaders.passes[1].on or shaders.passes[2].on) then
+			love.graphics.setColor(0, 0, 0)
+			love.graphics.rectangle("fill", 0, 0, winwidth, winheight)
+		end
+		love.graphics.setCanvas({canvas, stencil=true})
+		love.graphics.clear()
+		lovedraw()
+		love.graphics.setCanvas()
+		if letterboxfullscreen and not (shaders.passes[1].on or shaders.passes[2].on) then
+			love.graphics.setColor(0, 0, 0)
+			love.graphics.rectangle("fill", 0, 0, winwidth, winheight)
+			local cw, ch = canvas:getWidth(), canvas:getHeight()--current size
+			local tw, th = winwidth, winheight--target size
+			local s
+			if cw/tw > ch/th then s = tw/cw
+			else s = th/ch end
+			love.graphics.setColor(255, 255, 255)
+			love.graphics.draw(canvas, winwidth/2, winheight/2, 0, s, s, cw/2, ch/2)
 		else
-			love.graphics.scale(winwidth/(width*16*scale), winheight/(224*scale))
-			lovedraw()
+			love.graphics.setColor(255, 255, 255)
+			love.graphics.draw(canvas, 0, 0, 0, winwidth/(width*16*scale), winheight/(224*scale))
+		end
+
+		if android and not androidLowRes then
+			androidDraw()
 		end
 	else
 		lovedraw()
@@ -1261,10 +1396,8 @@ function lovedraw()
 	shaders:predraw()
 	
 	if resizable then
-		if canvassupported then
-			love.graphics.setColor(love.graphics.getBackgroundColor())
-			love.graphics.rectangle("fill", 0, 0, width*16*scale, height*16*scale)
-		end
+		love.graphics.setColor(love.graphics.getBackgroundColor())
+		love.graphics.rectangle("fill", 0, 0, width*16*scale, height*16*scale)
 	end
 	love.graphics.setColor(255, 255, 255)
 	love.graphics.push()
@@ -1276,6 +1409,8 @@ function lovedraw()
 		game_draw()
 	elseif gamestate == "intro" then
 		intro_draw()
+	elseif gamestate == "filebrowser" then
+		filebrowser_draw()
 	end
 	love.graphics.pop()
 	
@@ -1306,7 +1441,7 @@ function lovedraw()
 	--love.graphics.setColor(255,255,255)
 	--properprint("mariosublevel: " .. tostring(mariosublevel) .. "\nprevsublevel: " .. tostring(prevsublevel) .. "\nactualsublevel: " .. tostring(actualsublevel), 2, 2)
 
-	love.graphics.setColor(255, 255,255)
+	love.graphics.setColor(255, 255, 255)
 end
 
 function saveconfig()
@@ -1385,9 +1520,7 @@ function saveconfig()
 		s = s .. "scale:" .. scale .. ";"
 	end
 
-	if letterboxfullscreen then
-		s = s .. "letterbox;"
-	end
+	s = s .. "letterbox:" .. tostring(letterboxfullscreen) .. ";"
 	
 	s = s .. "shader1:" .. shaderlist[currentshaderi1] .. ";"
 	s = s .. "shader2:" .. shaderlist[currentshaderi2] .. ";"
@@ -1452,9 +1585,9 @@ function loadconfig(nodefaultconfig)
 	end
 	
 	local s
-	if love.filesystem.exists("alesans_entities/options.txt") then
+	if love.filesystem.getInfo("alesans_entities/options.txt") then
 		s = love.filesystem.read("alesans_entities/options.txt")
-	elseif love.filesystem.exists("options.txt") then
+	elseif love.filesystem.getInfo("options.txt") then
 		s = love.filesystem.read("options.txt")
 	else
 		return
@@ -1476,6 +1609,8 @@ function loadconfig(nodefaultconfig)
 				for k = 2, #s4 do
 					if tonumber(s4[k]) ~= nil then
 						controls[tonumber(s2[2])][s4[1]][k-1] = tonumber(s4[k])
+					elseif s4[k] == "space" then
+						controls[tonumber(s2[2])][s4[1]][k-1] = " " -- fix imported configs from 1.6
 					else
 						controls[tonumber(s2[2])][s4[1]][k-1] = s4[k]
 					end
@@ -1519,15 +1654,15 @@ function loadconfig(nodefaultconfig)
 			end
 			
 		elseif s2[1] == "scale" then
-			if not nodefaultconfig then
-				if android then
-					scale = 1
-				else
-					scale = tonumber(s2[2])
-				end
+			if not nodefaultconfig and not android then
+				scale = tonumber(s2[2])
 			end
 		elseif s2[1] == "letterbox" then
-			letterboxfullscreen = true
+			if s2[2] then
+				letterboxfullscreen = (s2[2] == "true")
+			else
+				letterboxfullscreen = true
+			end
 		elseif s2[1] == "shader1" then
 			for i = 1, #shaderlist do
 				if shaderlist[i] == s2[2] then
@@ -1546,7 +1681,7 @@ function loadconfig(nodefaultconfig)
 		elseif s2[1] == "mouseowner" then
 			mouseowner = tonumber(s2[2])
 		elseif s2[1] == "mappack" then
-			if love.filesystem.exists(mappackfolder .. "/" .. s2[2] .. "/") then
+			if love.filesystem.getInfo(mappackfolder .. "/" .. s2[2] .. "/") then
 				mappack = s2[2]
 			else
 				checkmappack = s2[2]
@@ -1635,7 +1770,7 @@ function defaultconfig()
 	controls[i]["pause"] = {""}
 	
 	for i = 2, 4 do
-		controls[i] = {}		
+		controls[i] = {}
 		controls[i]["right"] = {"joy", i-1, "hat", 1, "r"}
 		controls[i]["left"] = {"joy", i-1, "hat", 1, "l"}
 		controls[i]["down"] = {"joy", i-1, "hat", 1, "d"}
@@ -1676,7 +1811,7 @@ function defaultconfig()
 	--3: skin (yellow-orange)
 	
 	mariocolors = {}
-	mariocolors[1] = {{224,  32,   0}, {136, 112,   0}, {252, 152,  56}}
+	mariocolors[1] = {{225,  32,   0}, {136, 112,   0}, {252, 152,  56}}
 	mariocolors[2] = {{255, 255, 255}, {  0, 160,   0}, {252, 152,  56}}
 	mariocolors[3] = {{  0,   0,   0}, {200,  76,  12}, {252, 188, 176}}
 	mariocolors[4] = {{ 32,  56, 236}, {  0, 128, 136}, {252, 152,  56}}
@@ -1687,9 +1822,13 @@ function defaultconfig()
 	mariocharacter = {"mario", "mario", "mario", "mario"}
 	
 	--options
-	scale = 2
+	if android then
+		scale = 1
+	else
+		scale = 2
+	end
 	resizable = true
-	letterboxfullscreen = false
+	letterboxfullscreen = true
 	volume = 1
 	mappack = "smb"
 	vsync = false
@@ -1757,7 +1896,7 @@ function suspendgame()
 end
 
 function continuegame()
-	if not love.filesystem.exists("suspend") then
+	if not love.filesystem.getInfo("suspend") then
 		return
 	end
 	
@@ -1819,8 +1958,11 @@ end
 
 function changescale(s, fullscreen)
 	if android or (s == 5) then
+		local window_resizable = true
 		if android then
 			scale = 1
+			window_resizable = false
+			fullscreen = true
 		elseif fullscreen then
 			local w, h = love.window.getDesktopDimensions()
 			scale = math.max(1, math.floor(w/(width*16)))
@@ -1830,7 +1972,7 @@ function changescale(s, fullscreen)
 		resizable = true
 		
 		uispace = math.floor(width*16*scale/4)
-		love.window.setMode(width*16*scale, 224*scale, {fullscreen=fullscreen, vsync=vsync, msaa=fsaa, resizable=true, minwidth=width*16, minheight=224}) --27x14 blocks (15 blocks actual height)
+		love.window.setMode(width*16*scale, 224*scale, {fullscreen=fullscreen, vsync=vsync, msaa=fsaa, resizable=window_resizable, minwidth=width*16, minheight=224, highdpi=false, usedpiscale=false}) --27x14 blocks (15 blocks actual height)
 		
 		gamewidth, gameheight = love.graphics.getDimensions()
 		if android then
@@ -1839,12 +1981,9 @@ function changescale(s, fullscreen)
 			gamewidth, gameheight = width*16*scale, height*16*scale
 		end
 		winwidth, winheight = getWindowSize()
-		
-		canvassupported = true--love.graphics.isSupported("canvas")
-		if canvassupported then
-			canvas = love.graphics.newCanvas(width*16*scale, height*16*scale)
-			canvas:setFilter("nearest", "nearest")
-		end
+
+		canvas = love.graphics.newCanvas(width*16*scale, height*16*scale)
+		canvas:setFilter("nearest", "nearest")
 		
 		if shaders then
 			shaders:refresh()
@@ -1856,11 +1995,11 @@ function changescale(s, fullscreen)
 		if fullscreen then
 			fullscreen = true
 			scale = 2
-			love.window.setMode(800, 600, {fullscreen=fullscreen, vsync=vsync, msaa=fsaa})
+			love.window.setMode(800, 600, {fullscreen=fullscreen, vsync=vsync, msaa=fsaa, highdpi=false, usedpiscale=false})
 		end
 		
 		uispace = math.floor(width*16*scale/4)
-		love.window.setMode(width*16*scale, height*16*scale, {fullscreen=fullscreen,vsync=vsync, msaa=fsaa}) --27x14 blocks (15 blocks actual height)
+		love.window.setMode(width*16*scale, height*16*scale, {fullscreen=fullscreen,vsync=vsync, msaa=fsaa, highdpi=false, usedpiscale=false}) --27x14 blocks (15 blocks actual height)
 		
 		gamewidth, gameheight = love.graphics.getDimensions()
 		winwidth, winheight = getWindowSize()
@@ -1874,7 +2013,7 @@ end
 --resizing stuff
 function love.resize(w, h)
 	winwidth, winheight = w, h
-	if resizable and canvassupported then
+	if resizable then
 		if winwidth < (width*16*scale)*1.5 or winheight < (224*scale)*1.5 then
 			canvas:setFilter("linear", "linear")
 		else
@@ -1915,9 +2054,6 @@ end
 lgs = love.graphics.setScissor
 function love.graphics.setScissor(x, y, w, h)
 	if x and y and w and h then
-		if resizable and not canvassupported then
-			x, y, w, h = x*(winwidth/gamewidth), y*(winheight/gameheight), w*(winwidth/gamewidth), h*(winheight/gameheight)
-		end
 		lgs(x, y, w, h)
 	else
 		lgs()
@@ -1931,7 +2067,7 @@ function love.mouse.getX()
 		return x
 	end
 	local x = lmx()
-	if resizable and letterboxfullscreen and canvassupported and canvas then
+	if resizable and letterboxfullscreen and canvas then
 		local cw, ch = canvas:getWidth(), canvas:getHeight()--current size
 		local tw, th = winwidth, winheight--target size
 		local s
@@ -1950,7 +2086,7 @@ function love.mouse.getY()
 		return y
 	end
 	local y = lmy()
-	if resizable and letterboxfullscreen and canvassupported and canvas then
+	if resizable and letterboxfullscreen and canvas then
 		local cw, ch = canvas:getWidth(), canvas:getHeight()--current size
 		local tw, th = winwidth, winheight--target size
 		local s
@@ -2051,7 +2187,7 @@ function love.keypressed(key, scancode, isrepeat, textinput)
 		if key == konami[konamii] or (android and key == androidkonami[konamii]) then--[[DROID]]
 			konamii = konamii + 1
 			if konamii == #konami+1 then
-				if konamisound:isStopped() then
+				if not konamisound:isPlaying() then
 					playsound(konamisound)
 				end
 				gamefinished = true
@@ -2070,6 +2206,8 @@ function love.keypressed(key, scancode, isrepeat, textinput)
 		levelscreen_keypressed(key)
 	elseif gamestate == "intro" then
 		intro_keypressed()
+	elseif gamestate == "filebrowser" then
+		filebrowser_keypressed(key, textinput)
 	end
 end
 
@@ -2079,6 +2217,8 @@ function love.keyreleased(key, unicode)
 		menu_keyreleased(key, unicode)
 	elseif gamestate == "game" then
 		game_keyreleased(key, unicode)
+	elseif gamestate == "filebrowser" then
+		filebrowser_keyreleased(key, unicode)
 	end
 end
 
@@ -2101,7 +2241,7 @@ function love.mousepressed(x, y, button, istouch)
 			love.touchpressed(1,x,y)
 			return false
 		end
-	elseif resizable and letterboxfullscreen and canvassupported and canvas then
+	elseif resizable and letterboxfullscreen and canvas then
 		x, y = love.mouse.getPosition()
 	elseif resizable then
 		x, y = x/(winwidth/gamewidth), y/(winheight/gameheight)
@@ -2118,6 +2258,8 @@ function love.mousepressed(x, y, button, istouch)
 		game_mousepressed(x, y, button)
 	elseif gamestate == "intro" then
 		intro_mousepressed()
+	elseif gamestate == "filebrowser" then
+		filebrowser_mousepressed(x, y, button)
 	end
 	
 	--animations priorities
@@ -2178,7 +2320,7 @@ function love.mousereleased(x, y, button, istouch)
 			love.touchreleased(1,x,y)
 			return false
 		end
-	elseif resizable and letterboxfullscreen and canvassupported and canvas then
+	elseif resizable and letterboxfullscreen and canvas then
 		x, y = love.mouse.getPosition()
 	elseif resizable then
 		x, y = x/(winwidth/gamewidth), y/(winheight/gameheight)
@@ -2193,6 +2335,8 @@ function love.mousereleased(x, y, button, istouch)
 		menu_mousereleased(x, y, button)
 	elseif gamestate == "game" then
 		game_mousereleased(x, y, button)
+	elseif gamestate == "filebrowser" then
+		filebrowser_mousereleased(x, y, button)
 	end
 	
 	if ignoregui then
@@ -2215,7 +2359,7 @@ function love.mousemoved(x, y, dx, dy, istouch)
 			end
 			return false
 		end
-	elseif resizable and letterboxfullscreen and canvassupported and canvas then
+	elseif resizable and letterboxfullscreen and canvas then
 		x, y = love.mouse.getPosition()
 		local cw, ch = canvas:getWidth(), canvas:getHeight()--current size
 		local tw, th = winwidth, winheight--target size
@@ -2402,19 +2546,22 @@ function getrainbowcolor(i)
 end
 
 function newRecoloredImage(path, tablein, tableout)
+	local minalpha = 128
 	local imagedata = love.image.newImageData( path )
-	local width, height = imagedata:getWidth(), imagedata:getHeight()
-	
-	for y = 0, height-1 do
-		for x = 0, width-1 do
-			local oldr, oldg, oldb, olda = imagedata:getPixel(x, y)
-			
-			if olda > 128 then
-				for i = 1, #tablein do
-					if oldr == tablein[i][1] and oldg == tablein[i][2] and oldb == tablein[i][3] then
-						local r, g, b = unpack(tableout[i])
-						imagedata:setPixel(x, y, r, g, b, olda)
-					end
+
+	local pointer   = require("ffi").cast("uint8_t*", imagedata:getFFIPointer()) -- imageData has one byte per channel per pixel.
+	local bytecount = imagedata:getWidth() * imagedata:getHeight() -- pixel count * 4
+
+	for i = 0, 4*bytecount-1, 4 do
+		local r, g, b, a = pointer[i], pointer[i+1], pointer[i+2], pointer[i+3]
+
+		if a > minalpha then
+			for j, v in ipairs(tablein) do
+				if r == v[1] and g == v[2] and b == v[3] then
+					local nr, ng, nb = unpack(tableout[j])
+					pointer[i]   = nr
+					pointer[i+1] = ng
+					pointer[i+2] = nb
 				end
 			end
 		end
@@ -2463,6 +2610,7 @@ function tablecontainsistring(t, entry)
 end
 
 function getaveragecolor(imgdata, cox, coy)
+	local minalpha = 127
 	local xstart = (cox-1)*17
 	local ystart = (coy-1)*17
 	
@@ -2473,7 +2621,7 @@ function getaveragecolor(imgdata, cox, coy)
 	for x = xstart, xstart+15 do
 		for y = ystart, ystart+15 do
 			local pr, pg, pb, a = imgdata:getPixel(x, y)
-			if a > 127 then
+			if a > minalpha then
 				r, g, b = r+pr, g+pg, b+pb
 				count = count + 1
 			end
@@ -2486,6 +2634,7 @@ function getaveragecolor(imgdata, cox, coy)
 end
 
 function getaveragecolor2(imgdata, cox, coy)
+	local minalpha = 127
 	local xstart = (cox-1)*16
 	local ystart = (coy-1)*16
 	if imgdata:getHeight() > 16 then
@@ -2500,7 +2649,7 @@ function getaveragecolor2(imgdata, cox, coy)
 	for x = xstart, xstart+15 do
 		for y = ystart, ystart+15 do
 			local pr, pg, pb, a = imgdata:getPixel(x, y)
-			if a > 127 then
+			if a > minalpha then
 				r, g, b = r+pr, g+pg, b+pb
 				count = count + 1
 			end
@@ -2549,21 +2698,24 @@ end
 function love.focus(f)
 	if (not f) and gamestate == "game"and (not editormode) and (not testlevel) and (not levelfinished) and (not everyonedead) and (not CLIENT) and (not SERVER) and (not dontPauseOnUnfocus) then
 		pausemenuopen = true
-		love.audio.pause()
+		pausedaudio = love.audio.pause()
 	end
 end
 
 function openSaveFolder(subfolder) --By Slime
+	if android then
+		notice.new("On android try a file manager\nand go to:\nAndroid > data > Love.to.mario", notice.white, 5)
+		filebrowser_load(subfolder or "")
+		return true
+	end
+
 	local path = love.filesystem.getSaveDirectory()
 	path = subfolder and path.."/"..subfolder or path
 	
 	local cmdstr
 	local successval = 0
 	
-	if android then
-		notice.new("On android use a file manager\nand go to:\nAndroid > data > Love.to.mario >\nfiles > save > mari0_android >\nalesans_entities > mappacks", notice.red, 15)
-		return false
-	elseif os.getenv("WINDIR") then -- lolwindows
+	if os.getenv("WINDIR") then -- lolwindows
 		--cmdstr = "Explorer /root,%s"
 		if path:match("LOVE") then --hardcoded to fix ISO characters in usernames and made sure release mode doesn't mess anything up -saso
 			cmdstr = "Explorer %%appdata%%\\LOVE\\mari0"
@@ -2786,7 +2938,7 @@ local function error_printer(msg, layer)
     print((debug.traceback("Error: " .. tostring(msg), 1+(layer or 1)):gsub("\n[^\n]+$", "")))
 end
 
-function love.errhand(msg)
+function love.errorhandler(msg)
     msg = tostring(msg)
 
     error_printer(msg, 2)
@@ -2794,28 +2946,32 @@ function love.errhand(msg)
     if not love.window or not love.graphics or not love.event then
         return
     end
+	
 	if not love.graphics.isCreated() or not love.window.isOpen() then
 		local success, status = pcall(love.window.setMode, 800, 600)
 		if not success or not status then
 			return
 		end
 	end
+
+	-- Reset state.
 	if love.mouse then
 		love.mouse.setVisible(true)
 		love.mouse.setGrabbed(false)
 		love.mouse.setRelativeMode(false)
+		if love.mouse.isCursorSupported() then
+			love.mouse.setCursor()
+		end
 	end
-	if love.joystick then -- Stop all joystick vibrations.
+	if love.joystick then
+		-- Stop all joystick vibrations.
 		for i,v in ipairs(love.joystick.getJoysticks()) do
 			v:setVibration()
 		end
 	end
 	local screenshot = false
-	if love.graphics.newScreenshot then
-		local s, r = pcall(function() return love.graphics.newImage(love.graphics.newScreenshot()) end)
-		if s and r then
-			screenshot = r
-		end
+	if love.graphics.captureScreenshot then
+		love.graphics.captureScreenshot(function(s) screenshot = love.graphics.newImage(s) end)
 	end
 
     -- Load.
@@ -2835,11 +2991,21 @@ function love.errhand(msg)
 
     love.graphics.clear()
 
+	local sanitizedmsg = {}
+	for char in msg:gmatch(utf8.charpattern) do
+		table.insert(sanitizedmsg, char)
+	end
+	sanitizedmsg = table.concat(sanitizedmsg)
+
 	local err = {}
 	local traceback = {}
 
-    table.insert(err, "Error\n")
-    table.insert(err, msg.."\n\n")
+	table.insert(err, "Error\n")
+	table.insert(err, sanitizedmsg.."\n\n")
+
+	if #sanitizedmsg ~= #msg then
+		table.insert(err, "Invalid UTF-8 string in error message.")
+	end
 
     for l in string.gmatch(trace, "(.-)\n") do
         if not string.match(l, "boot.lua") then
@@ -2881,13 +3047,14 @@ function love.errhand(msg)
 	end
 	
     local function draw()
+		if not love.graphics.isActive() then return end
 		love.graphics.clear(love.graphics.getBackgroundColor())
 		if screenshot then
 			love.graphics.setColor(30, 30, 30)
 			love.graphics.draw(screenshot, 0, 0, 0, love.graphics.getWidth()/screenshot:getWidth(), love.graphics.getHeight()/screenshot:getHeight())
 			if gradientimg and width and height then
-				love.graphics.setColor(0, 0, 0)
-				love.graphics.draw(gradientimg, 0, 0, 0, love.graphics.getWidth()/(width*16), love.graphics.getHeight()/(height*16))
+			 	love.graphics.setColor(0, 0, 0)
+			 	love.graphics.draw(gradientimg, 0, 0, 0, love.graphics.getWidth()/(width*16), love.graphics.getHeight()/(height*16))
 			end
 		end
 		love.graphics.setColor(255, 255, 255)
@@ -2900,21 +3067,23 @@ function love.errhand(msg)
 	
 	local e, a, b, c
 	
-	while true do
+	return function()
 		love.event.pump()
  
 		for e, a, b, c in love.event.poll() do
 			if e == "quit" then
-				return
+				return 1
 			elseif e == "keypressed" and a == "escape" then
-				return
+				return 1
 			elseif e == "touchpressed" then
 				local name = love.window.getTitle()
 				if #name == 0 or name == "Untitled" then name = "Game" end
 				local buttons = {"OK", "Cancel"}
 				local pressed = love.window.showMessageBox("Quit "..name.."?", "", buttons)
 				if pressed == 1 then
-					return
+					return 1
+				elseif pressed == 3 then
+					copyToClipboard()
 				end
 			end
 		end
@@ -2939,7 +3108,7 @@ function loadnitpicks()
 	--shit i don't want to add
 	--if people complain about stuff they can use this
 	nitpicks = false
-	if love.filesystem.exists("alesans_entities/nitpicks.json") then
+	if love.filesystem.getInfo("alesans_entities/nitpicks.json") then
 		local data = love.filesystem.read("alesans_entities/nitpicks.json")
 		t = JSON:decode(data or "")
 		--CASE INSENSITVE THING

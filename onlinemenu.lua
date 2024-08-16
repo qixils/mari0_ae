@@ -174,7 +174,7 @@ function drawplayercard(x, y, colortable, hattable, nick, ping, focus, character
 		love.graphics.setColor(255, 255, 255, 255)
 		for i = 0, #v.colorables do
 			if i > 0 then
-				love.graphics.setColor(unpack(colortable[i]))
+				love.graphics.setColor(colortable[i])
 			else
 				love.graphics.setColor(255, 255, 255)
 			end
@@ -193,7 +193,7 @@ function drawplayercard(x, y, colortable, hattable, nick, ping, focus, character
 		for i = 1, #hattable do
 			if hat[hattable[i] ] then
 				if addcolortohat then
-					love.graphics.setColor(unpack(colortable[1]))
+					love.graphics.setColor(colortable[1])
 				end
 				local offsets = customplayerhatoffsets(character, "hatoffsets", "running") or hatoffsets["running"]
 				love.graphics.draw(hat[hattable[i] ].graphic, hat[hattable[i] ].quad[1], (x+4+v.smalloffsetX*2)*scale, (y+26-v.smalloffsetY*2)*scale, 0, scale*2, scale*2, v.smallquadcenterX - hat[hattable[i] ].x + offsets[runanimationframe][1], v.smallquadcenterY - hat[hattable[i] ].y + offsets[runanimationframe][2] + yadd)

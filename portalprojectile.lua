@@ -48,8 +48,7 @@ function portalprojectile:update(dt)
 			local ty = self.starty + (self.endy-self.starty)*(t/self.time)
 			
 			--INNER LINE
-			local r, g, b = unpack(self.color)			
-			table.insert(self.particles, portalprojectileparticle:new(tx, ty, {r, g, b}))
+			table.insert(self.particles, portalprojectileparticle:new(tx, ty, self.color))
 			
 			--OUTER LINES
 			local r, g, b = unpack(self.color)
@@ -106,7 +105,7 @@ end
 
 function portalprojectile:draw()
 	if self.timer < self.time then
-		love.graphics.setColor(unpack(self.color))
+		love.graphics.setColor(self.color)
 		
 		love.graphics.draw(portalprojectileimg, math.floor((self.x-xscroll)*16*scale), math.floor((self.y-yscroll-0.5)*16*scale), 0, scale, scale, 3, 3)
 	end
@@ -114,7 +113,7 @@ end
 
 portalprojectileparticle = class:new()
 
-function portalprojectileparticle:init(x, y, color, r, g, b)
+function portalprojectileparticle:init(x, y, color)
 	self.x = x
 	self.y = y
 	self.color = color

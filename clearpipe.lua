@@ -858,7 +858,7 @@ addsegment = function(x, y, parent, quad, stage, dir, entrance, exit, graphic)
 end
 function clearpipe:getstage(v,dir)
 	if dir == "forward" then
-		return math.max(1, math.min(#self.path, math.floor(v))) 
+		return math.max(1, math.min(#self.path, math.floor(v)))
 	else
 		return math.max(1, math.min(#self.path, math.ceil(v)))
 	end
@@ -1053,12 +1053,12 @@ function clearpipesegment:init(x, y, parent, quad, stage, dir, entrance, exit, g
 	self.static = true
 	self.category = 2
 	self.mask = {true}
-	
+
 	self.emancipatecheck = false
 	self.autodelete = false
 	self.drawable = false
 	self.portalable = false
-	
+
 	self.rotation = 0 --for portals
 	self.graphic = {graphic or clearpipeimg}
 	self.quadi = {quad[1], quad[2]}
@@ -1072,7 +1072,7 @@ function clearpipesegment:init(x, y, parent, quad, stage, dir, entrance, exit, g
 	self.entrance = entrance or false
 	self.exit = exit or false
 	self.stage = stage
-	
+
 	if self.entrance or self.exit then
 		self.hollow = true
 	end
