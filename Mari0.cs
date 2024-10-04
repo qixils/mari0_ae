@@ -56,6 +56,8 @@ public class Mari0 : SimpleTCPPack<SimpleTCPServerConnector>
 		new("Gamemode to Gelcannon", "gelcannon") { Price = 100, Duration = 30, Category = "Player", Description = "Replaces the Portal Gun with the Gel Cannon, which fires out various gels for bouncing and increasing speed" },
 		// new("Gamemode to Cappy", "cappy") { Price = 100, Duration = 30, Category = "Player", Description = "Replaces the Portal Gun with Cappy from Super Mario Odyssey, which can be used to gain height and capture enemies" },
 		new("Gamemode to Classic", "classic") { Price = 150, Duration = 30, Category = "Player", Description = "Replaces the Portal Gun with nothing! All the player can do is run and jump!" },
+		new("Become 3D", "3d") { Price = 75, Duration = 30, Category = "Visual", Description = "Turns the game 3-dimensional" },
+		// TODO: gravity
 
         new("Spawn Goomba", "spawn_goomba") { Price = 25, Category = "Enemies", Description = "Spawn an enemy on the screen!" },
         new("Spawn Koopa", "spawn_koopa") { Price = 25, Category = "Enemies", Description = "Spawn an enemy on the screen!" },

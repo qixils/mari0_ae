@@ -595,6 +595,8 @@ function game_update(dt)
 			player.t = playertype
 			player.portalgun = portalgun
 		end
+		-- 3D
+		_3DMODE = cc_ack("3d")
 	end
 
 	--Portaldots
