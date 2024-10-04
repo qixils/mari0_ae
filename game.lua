@@ -549,6 +549,31 @@ function game_update(dt)
 				end
 			end
 		end
+		-- Shader 1
+		if shaderssupported ~= false and cc_ack("shader_1") then
+			local newi = currentshaderi1
+			while newi == currentshaderi1 do
+				newi = math.random(2, #shaderlist)
+			end
+			currentshaderi1 = newi
+			shaders:set(1, shaderlist[currentshaderi1])
+		end
+		-- Shader 2
+		if shaderssupported ~= false and cc_ack("shader_2") then
+			local newi = currentshaderi2
+			while newi == currentshaderi2 do
+				newi = math.random(2, #shaderlist)
+			end
+			currentshaderi2 = newi
+			shaders:set(2, shaderlist[currentshaderi2])
+		end
+		-- Shader Reset
+		if (currentshaderi1 ~= 1 or currentshaderi2 ~= 1) and cc_ack("shader_clear") then
+			currentshaderi1 = 1
+			currentshaderi2 = 1
+			shaders:set(1, shaderlist[currentshaderi1])
+			shaders:set(2, shaderlist[currentshaderi2])
+		end
 	end
 
 	--Portaldots

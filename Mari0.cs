@@ -48,6 +48,9 @@ public class Mari0 : SimpleTCPPack<SimpleTCPServerConnector>
         new("Flip Gravity", "flip_gravity") { Price = 175, Duration = 10, Category = "Level", Description = "Inverts the levels gravity" },
         new("Speedup Game", "speedup_game") { Price = 150, Duration = 10, Category = "Level", Description = "Speeds up the game to x1.5" },
         new("Slowdown Game", "slowdown_game") { Price = 150, Duration = 10, Category = "Level", Description = "Speeds down the game to x0.67" },
+		new("Shader Shuffle", "shader_1") { Note = "Slot 1", Price = 50, Category = "Visual", Description = "Selects a random shader in the first slot" },
+		new("Shader Shuffle", "shader_2") { Note = "Slot 2", Price = 50, Category = "Visual", Description = "Selects a random shader in the second slot" },
+		new("Shader Reset", "shader_clear") { Price = 40, Category = "Visual", Description = "Clears all active shaders" },
 
         new("Spawn Goomba", "spawn_goomba") { Price = 25, Category = "Enemies", Description = "Spawn an enemy on the screen!" },
         new("Spawn Koopa", "spawn_koopa") { Price = 25, Category = "Enemies", Description = "Spawn an enemy on the screen!" },
