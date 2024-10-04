@@ -576,16 +576,24 @@ function game_update(dt)
 		end
 		-- Goomba Attack
 		goombaattack = cc_ack("goomba_attack")
-		-- Gelcannon
-		if playertypei ~= 3 and cc_ack("gelcannon") then
+		-- Gamemodes
+		if cc_ackunless("minecraft", {"gelcannon", "cappy", "classic"}) then
+			playertypei = 2
+		elseif cc_ackunless("gelcannon", {"minecraft", "cappy", "classic"}) then
 			playertypei = 3
-			playertype = playertypelist[playertypei]
+		-- elseif cc_ackunless("cappy", {"gelcannon", "minecraft", "classic"}) then
+		-- 	playertypei = 4
+		elseif cc_ackunless("classic", {"gelcannon", "cappy", "minecraft"}) then
+			playertypei = 5
 		else
 			playertypei = 1
-			playertype = playertypelist[playertypei]
 		end
+		playertype = playertypelist[playertypei]
+		portalgun = playertype ~= "cappy" and playertype ~= "classic"
 		for i = 1, players do
-			objects["player"][i].t = playertype
+			local player = objects["player"][i]
+			player.t = playertype
+			player.portalgun = portalgun
 		end
 	end
 

@@ -52,7 +52,10 @@ public class Mari0 : SimpleTCPPack<SimpleTCPServerConnector>
 		new("Shader Shuffle", "shader_2") { Note = "Slot 2", Price = 50, Category = "Visual", Description = "Selects a random shader in the second slot" },
 		new("Shader Reset", "shader_clear") { Price = 40, Category = "Visual", Description = "Clears all active shaders" },
 		new("Goomba Attack", "goomba_attack") { Price = 125, Duration = 20, Category = "Level", Description = "Enables the Goomba Attack cheat, spawning random goombas as the player walks through the level" },
-		new("Gelcannon Mode", "gelcannon") { Price = 100, Duration = 30, Category = "Player", Description = "Replaces the Portal Gun with the Gel Cannon, which fires out various gels for bouncing and increasing speed" },
+		new("Gamemode to Minecraft", "minecraft") { Price = 100, Duration = 30, Category = "Player", Description = "Replaces the Portal Gun with the pickaxe from Minecraft, which can be used to break and place tiles" },
+		new("Gamemode to Gelcannon", "gelcannon") { Price = 100, Duration = 30, Category = "Player", Description = "Replaces the Portal Gun with the Gel Cannon, which fires out various gels for bouncing and increasing speed" },
+		// new("Gamemode to Cappy", "cappy") { Price = 100, Duration = 30, Category = "Player", Description = "Replaces the Portal Gun with Cappy from Super Mario Odyssey, which can be used to gain height and capture enemies" },
+		new("Gamemode to Classic", "classic") { Price = 150, Duration = 30, Category = "Player", Description = "Replaces the Portal Gun with nothing! All the player can do is run and jump!" },
 
         new("Spawn Goomba", "spawn_goomba") { Price = 25, Category = "Enemies", Description = "Spawn an enemy on the screen!" },
         new("Spawn Koopa", "spawn_koopa") { Price = 25, Category = "Enemies", Description = "Spawn an enemy on the screen!" },
