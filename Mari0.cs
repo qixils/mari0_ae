@@ -51,6 +51,7 @@ public class Mari0 : SimpleTCPPack<SimpleTCPServerConnector>
 		new("Shader Shuffle", "shader_1") { Note = "Slot 1", Price = 50, Category = "Visual", Description = "Selects a random shader in the first slot" },
 		new("Shader Shuffle", "shader_2") { Note = "Slot 2", Price = 50, Category = "Visual", Description = "Selects a random shader in the second slot" },
 		new("Shader Reset", "shader_clear") { Price = 40, Category = "Visual", Description = "Clears all active shaders" },
+		new("Goomba Attack", "goomba_attack") { Price = 125, Duration = 20, Category = "Level", Description = "Enables the Goomba Attack cheat, spawning random goombas as the player walks through the level" },
 
         new("Spawn Goomba", "spawn_goomba") { Price = 25, Category = "Enemies", Description = "Spawn an enemy on the screen!" },
         new("Spawn Koopa", "spawn_koopa") { Price = 25, Category = "Enemies", Description = "Spawn an enemy on the screen!" },

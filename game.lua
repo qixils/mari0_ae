@@ -574,6 +574,8 @@ function game_update(dt)
 			shaders:set(1, shaderlist[currentshaderi1])
 			shaders:set(2, shaderlist[currentshaderi2])
 		end
+		-- Goomba Attack
+		goombaattack = cc_ack("goomba_attack")
 	end
 
 	--Portaldots
