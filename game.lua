@@ -576,6 +576,17 @@ function game_update(dt)
 		end
 		-- Goomba Attack
 		goombaattack = cc_ack("goomba_attack")
+		-- Gelcannon
+		if playertypei ~= 3 and cc_ack("gelcannon") then
+			playertypei = 3
+			playertype = playertypelist[playertypei]
+		else
+			playertypei = 1
+			playertype = playertypelist[playertypei]
+		end
+		for i = 1, players do
+			objects["player"][i].t = playertype
+		end
 	end
 
 	--Portaldots
