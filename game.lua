@@ -178,6 +178,63 @@ function game_load(suspended)
 	end
 end
 
+local function update_timer(dt)
+	if editormode ~= false then return false end
+
+	--get if any player has their controls disabled
+	local notime = false
+	for i = 1, players do
+		if (objects["player"][i].controlsenabled == false and objects["player"][i].dead == false and objects["player"][i].groundfreeze == false) then
+			notime = true
+			break
+		end
+	end
+
+	if not ((notime == false or breakoutmode) and infinitetime == false and mariotime ~= 0) then return false end
+
+	if realtime then --mario maker time
+		mariotime = mariotime - dt --mario maker purists rejoice
+	else
+		mariotime = mariotime - 2.5*dt
+	end
+	
+	if queuelowtime then
+		queuelowtime = queuelowtime - 2.5*dt
+	end
+	if mariotime > 0 and mariotime + 2.5*dt >= 99 and mariotime < 99 and (not dcplaying) and (not levelfinished) and not nolowtime then
+		startlowtime()
+	end
+	
+	if queuelowtime and queuelowtime < 0 and (not levelfinished) then
+		local star = false
+		for i = 1, players do
+			if objects["player"][i].starred and not objects["player"][i].size == 8 then
+				star = true
+			end
+		end
+		
+		if pbuttonsound:isPlaying() then
+			pbuttonsound:setVolume(1)
+		else
+			if not star then
+				playmusic()
+			else
+				music:play("starmusic")
+			end
+		end
+		queuelowtime = false
+	end
+	
+	if mariotime <= 0 then
+		mariotime = 0
+		for i, v in pairs(objects["player"]) do
+			v:die("time")
+		end
+	end
+
+	return true
+end
+
 function game_update(dt)
 	--------
 	--GAME--
@@ -298,59 +355,7 @@ function game_update(dt)
 		return
 	end
 	
-	--timer	
-	if editormode == false then
-		--get if any player has their controls disabled
-		local notime = false
-		for i = 1, players do
-			if (objects["player"][i].controlsenabled == false and objects["player"][i].dead == false and objects["player"][i].groundfreeze == false) then
-				notime = true
-				break
-			end
-		end
-
-		if (notime == false or breakoutmode) and infinitetime == false and mariotime ~= 0 then
-			if realtime then --mario maker time
-				mariotime = mariotime - dt --mario maker purists rejoice
-			else
-				mariotime = mariotime - 2.5*dt
-			end
-			
-			if queuelowtime then
-				queuelowtime = queuelowtime - 2.5*dt
-			end
-			if mariotime > 0 and mariotime + 2.5*dt >= 99 and mariotime < 99 and (not dcplaying) and (not levelfinished) and not nolowtime then
-				startlowtime()
-			end
-			
-			if queuelowtime and queuelowtime < 0 and (not levelfinished) then
-				local star = false
-				for i = 1, players do
-					if objects["player"][i].starred and not objects["player"][i].size == 8 then
-						star = true
-					end
-				end
-				
-				if pbuttonsound:isPlaying() then
-					pbuttonsound:setVolume(1)
-				else
-					if not star then
-						playmusic()
-					else
-						music:play("starmusic")
-					end
-				end
-				queuelowtime = false
-			end
-			
-			if mariotime <= 0 then
-				mariotime = 0
-				for i, v in pairs(objects["player"]) do
-					v:die("time")
-				end
-			end
-		end
-	end
+	update_timer(dt)
 
 	---- Crowd Control ----
 	local playing = false
@@ -597,6 +602,16 @@ function game_update(dt)
 		end
 		-- 3D
 		_3DMODE = cc_ack("3d")
+		-- Timer
+		local timeadd = cc_get("time_add")
+		if timeadd ~= nil and update_timer((timeadd.quantity or 1) * -1) then
+			cc_ack("time_add")
+		end
+		local timesub = cc_get("time_sub")
+		if timesub ~= nil and update_timer(timesub.quantity or 1) then
+			cc_ack("time_sub")
+		end
+
 	end
 
 	--Portaldots

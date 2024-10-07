@@ -45,7 +45,7 @@ public class Mari0 : SimpleTCPPack<SimpleTCPServerConnector>
         new("Can't Move", "stun_player") { Price = 150, Duration = 5, Category = "Movement", Description = "Stuns Mario, freezing him in place for a few seconds" },
         new("Auto Walk", "auto_walk") { Price = 175, Duration = 10, Category = "Movement", Description = "Force Mario to auto-walk through the level" },
         new("Auto Run", "auto_run") { Price = 200, Duration = 10, Category = "Movement", Description = "Force Mario to auto-run through the level" },
-        new("Flip Gravity", "flip_gravity") { Price = 175, Duration = 10, Category = "Level", Description = "Inverts the levels gravity" },
+        new("Flip Gravity", "flip_gravity") { Price = 200, Duration = 10, Category = "Level", Description = "Inverts the levels gravity" },
         new("Speedup Game", "speedup_game") { Price = 150, Duration = 10, Category = "Level", Description = "Speeds up the game to x1.5" },
         new("Slowdown Game", "slowdown_game") { Price = 150, Duration = 10, Category = "Level", Description = "Speeds down the game to x0.67" },
 		new("Shader Shuffle", "shader_1") { Note = "Slot 1", Price = 50, Category = "Visual", Description = "Selects a random shader in the first slot" },
@@ -57,7 +57,8 @@ public class Mari0 : SimpleTCPPack<SimpleTCPServerConnector>
 		// new("Gamemode to Cappy", "cappy") { Price = 100, Duration = 30, Category = "Player", Description = "Replaces the Portal Gun with Cappy from Super Mario Odyssey, which can be used to gain height and capture enemies" },
 		new("Gamemode to Classic", "classic") { Price = 150, Duration = 30, Category = "Player", Description = "Replaces the Portal Gun with nothing! All the player can do is run and jump!" },
 		new("Become 3D", "3d") { Price = 75, Duration = 30, Category = "Visual", Description = "Turns the game 3-dimensional" },
-		// TODO: gravity
+		new("Time Add", "time_add") { Price = 2, Quantity = 60, Category = "Level", Description = "Adds real-time to the in-game timer" },
+		new("Time Remove", "time_sub") { Price = 5, Quantity = 60, Category = "Level", Description = "Removes real-time from the in-game timer" },
 
         new("Spawn Goomba", "spawn_goomba") { Price = 25, Category = "Enemies", Description = "Spawn an enemy on the screen!" },
         new("Spawn Koopa", "spawn_koopa") { Price = 25, Category = "Enemies", Description = "Spawn an enemy on the screen!" },
