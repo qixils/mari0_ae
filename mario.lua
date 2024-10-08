@@ -2001,9 +2001,9 @@ function mario:update(dt)
 				for y = math.ceil(self.y), math.ceil(self.y+self.height) do
 					if inmap(x, y) then
 						if tilequads[map[x][y][1]].coin then
-							collectcoin(x, y)
+							collectcoin(x, y, nil, nil, self)
 						elseif objects["coin"][tilemap(x, y)] then
-							collectcoinentity(x, y)
+							collectcoinentity(x, y, self)
 						elseif objects["collectable"][tilemap(x, y)] and not objects["collectable"][tilemap(x, y)].coinblock then
 							getcollectable(x, y)
 						end
@@ -2015,9 +2015,9 @@ function mario:update(dt)
 			local y = math.floor(self.y+self.height)+1
 			if inmap(x, y) then
 				if tilequads[map[x][y][1]].coin then
-					collectcoin(x, y)
+					collectcoin(x, y, nil, nil, self)
 				elseif objects["coin"][tilemap(x, y)] then
-					collectcoinentity(x, y)
+					collectcoinentity(x, y, self)
 				elseif objects["collectable"][tilemap(x, y)] and not objects["collectable"][tilemap(x, y)].coinblock then
 					getcollectable(x, y)
 				end
@@ -2025,9 +2025,9 @@ function mario:update(dt)
 			local y = math.floor(self.y+self.height/2)+1
 			if inmap(x, y) then
 				if tilequads[map[x][y][1]].coin then
-					collectcoin(x, y)
+					collectcoin(x, y, nil, nil, self)
 				elseif objects["coin"][tilemap(x, y)] then
-					collectcoinentity(x, y)
+					collectcoinentity(x, y, self)
 				elseif objects["collectable"][tilemap(x, y)] and not objects["collectable"][tilemap(x, y)].coinblock then
 					getcollectable(x, y)
 				end
@@ -2035,9 +2035,9 @@ function mario:update(dt)
 			if self.size > 1 and not (self.ducking and self.size == 14) then
 				if inmap(x, y-1) then
 					if tilequads[map[x][y-1][1]].coin then
-						collectcoin(x, y-1)
+						collectcoin(x, y-1, nil, nil, self)
 					elseif objects["coin"][tilemap(x, y-1)] then
-						collectcoinentity(x, y-1)
+						collectcoinentity(x, y-1, self)
 					elseif objects["collectable"][tilemap(x, y-1)] and not objects["collectable"][tilemap(x, y-1)].coinblock then
 						getcollectable(x, y-1)
 					end
@@ -7014,6 +7014,8 @@ function hitblock(x, y, t, v)
 				if collectablet then --was there one to collect?
 					table.insert(coinblockanimations, coinblockanimation:new(x-0.5, y-1, "collectable", collectablet))
 				end
+			elseif t ~= nil and cc_ack("deadly_coin") then
+				t:die("killscript")
 			else
 				table.insert(coinblockanimations, coinblockanimation:new(x-0.5, y-1))
 				mariocoincount = mariocoincount + 1
@@ -7080,7 +7082,7 @@ function hitblock(x, y, t, v)
 		end
 		
 		if dir == "up" then
-			hitontop(x, y)
+			hitontop(x, y, t)
 		end
 	else
 		if t and t.helmet and t.helmet == "spikey" and tilequads[r[1]].debris and blockdebrisquads[tilequads[r[1]].debris] then
@@ -7090,7 +7092,7 @@ function hitblock(x, y, t, v)
 	end
 end
 
-function hitontop(x, y)
+function hitontop(x, y, t)
 	if breakoutmode then return end
 	--kill enemies on top
 	for i, v in pairs(enemies) do
@@ -7173,10 +7175,10 @@ function hitontop(x, y)
 	--check for coin on top
 	if ismaptile(x, y-1) then
 		if tilequads[map[x][y-1][1]].coin then
-			collectcoin(x, y-1)
+			collectcoin(x, y-1, nil, nil, t)
 			table.insert(coinblockanimations, coinblockanimation:new(x-0.5, y-1))
 		elseif objects["coin"][tilemap(x, y-1)] then
-			collectcoinentity(x, y-1)
+			collectcoinentity(x, y-1, t)
 			table.insert(coinblockanimations, coinblockanimation:new(x-0.5, y-1))
 		elseif objects["collectable"][tilemap(x, y-1)] and not objects["collectable"][tilemap(x, y-1)].coinblock then
 			getcollectable(x, y-1)
@@ -8708,7 +8710,12 @@ function mario:mariohammercallback()
 	self.fireballcount = self.fireballcount - 1
 end
 
-function collectcoin(x, y, amount, group)
+function collectcoin(x, y, amount, group, t)
+	print("coin yeah", t)
+	if t ~= nil and cc_ack("deadly_coin") then
+		t:die("killscript")
+		return
+	end
 	if x and y then
 		map[x][y][1] = 1
 
@@ -8719,7 +8726,7 @@ function collectcoin(x, y, amount, group)
 			for tx = x1, x2 do
 				for ty = y1, y2 do
 					if (not (x == tx and y == ty)) and tilequads[map[tx][ty][1]].coin then
-						collectcoin(tx, ty, amount, "group")
+						collectcoin(tx, ty, amount, "group", t)
 					end
 				end
 			end
@@ -8740,7 +8747,12 @@ function collectcoin(x, y, amount, group)
 	end
 end
 
-function collectcoinentity(x, y) --DONT MIND ME OK
+function collectcoinentity(x, y, t) --DONT MIND ME OK
+	print("coin entity", t)
+	if t ~= nil and cc_ack("deadly_coin") then
+		t:die("killscript")
+		return
+	end
 	objects["coin"][tilemap(x, y)] = nil
 	addpoints(200)
 	playsound(coinsound)

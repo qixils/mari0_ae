@@ -626,6 +626,8 @@ function game_update(dt)
 				player:star()
 			end
 		end
+		-- Deadly Coins (for balance, this is insta accepted)
+		cc_ack("deadly_coin")
 	end
 
 	--Portaldots
