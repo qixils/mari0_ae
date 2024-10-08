@@ -619,6 +619,13 @@ function game_update(dt)
 				player.speedy = 0
 			end
 		end
+		-- Star
+		for i = 1, players do
+			local player = objects["player"][i]
+			if not player.starred and cc_ack("star") then
+				player:star()
+			end
+		end
 	end
 
 	--Portaldots

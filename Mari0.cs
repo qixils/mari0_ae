@@ -60,12 +60,12 @@ public class Mari0 : SimpleTCPPack<SimpleTCPServerConnector>
 		new("Time Add", "time_add") { Price = 2, Quantity = 60, Category = "Level", Description = "Adds real-time to the in-game timer" },
 		new("Time Remove", "time_sub") { Price = 5, Quantity = 60, Category = "Level", Description = "Removes real-time from the in-game timer" },
 		new("Bonk", "bonk") { Price = 25, Category = "Player", Description = "Halts Mario's vertical momentum as if he hit an invisible block" },
+		new("Starman", "star") { Price = 50, Category = "Player", Description = "Grants Mario a Super Star! Yahoo!" },
 		// TODO: cloud tiles
 		// TODO: deadly coins
 		// TODO: disable screen scroll
 		// TODO: coins give/remove
 		// TODO: hammer party?
-		// TODO: star mode
 		// TODO: water mode
 		// TODO: water tiles
 
