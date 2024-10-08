@@ -1326,7 +1326,21 @@ function love.run() -- from https://love2d.org/wiki/love.run
 	-- Main loop time.
 	while true do
 		---- Update Crowd Control request queue ----
-		old_requests = cc_requests
+		for i, request in ipairs(old_requests) do
+			if not request.duration or request.waschecked then
+				table.remove(old_requests, i)
+			end
+		end
+		for i, request in ipairs(cc_requests) do
+			local skip = false
+			for j, oldrequest in ipairs(old_requests) do
+				if oldrequest.id == request.id then
+					skip = true
+					break
+				end
+			end
+			if not skip then table.insert(old_requests, request) end
+		end
 		cc_requests = {}
 		-- Check for timed effects and requests that were not acknowledged
 		-- (Do this first to ensure certain timed effects are not overwritten)

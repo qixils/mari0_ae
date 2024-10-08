@@ -65,11 +65,7 @@ public class Mari0 : SimpleTCPPack<SimpleTCPServerConnector>
 		new("Deadly Coins", "deadly_coin") { Price = 100, Duration = 15, Category = "Level", Description = "Makes collected coins kill the player for a short time" },
 		new("Coin Give", "coin_add") { Price = 2, Quantity = 99, Category = "Level", Description = "Gives some coins which might contribute to a 1-Up!" },
 		new("Coin Take", "coin_sub") { Price = 2, Quantity = 99, Category = "Level", Description = "Take some coins away from contributing to a 1-Up!" },
-		// TODO: cloud tiles
-		// TODO: coins give/remove
-		// TODO: hammer party?
-		// TODO: water mode
-		// TODO: water tiles
+		new("Underwater", "underwater") { Price = 100, Duration = 15, Category = new("Player", "Level"), Description = "Sets the player to swim through the sky!" },
 
         new("Spawn Goomba", "spawn_goomba") { Price = 25, Category = "Enemies", Description = "Spawn an enemy on the screen!" },
         new("Spawn Koopa", "spawn_koopa") { Price = 25, Category = "Enemies", Description = "Spawn an enemy on the screen!" },

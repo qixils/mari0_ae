@@ -151,13 +151,29 @@ end
 
 --- Checks if the effect was active on the last frame.
 --- Used for cleaning up effects that are no longer active.
----@param effect string The effect to check.
+---@param effect string|table The effect(s) to check.
 ---@return boolean
 function cc_wasactive(effect)
+	-- convert to table if necessary, else copy table
+	if type(effect) == "string" then
+		effect = {effect}
+	else
+		effect = effect and {unpack(effect)} or {}
+	end
+	-- ignore if currently active
+	for j, e in ipairs(effect) do
+		if cc_check(e) then
+			return false
+		end
+	end
+	-- do check
     for i, request in ipairs(old_requests) do
-        if request.code == effect then
-            return true
-        end
+		for j, e in ipairs(effect) do
+			if request.code == e then
+				request.waschecked = true
+				return true
+			end
+		end
     end
     return false
 end

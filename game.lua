@@ -580,25 +580,33 @@ function game_update(dt)
 			shaders:set(2, shaderlist[currentshaderi2])
 		end
 		-- Goomba Attack
-		goombaattack = cc_ack("goomba_attack")
-		-- Gamemodes
-		if cc_ackunless("minecraft", {"gelcannon", "cappy", "classic"}) then
-			playertypei = 2
-		elseif cc_ackunless("gelcannon", {"minecraft", "cappy", "classic"}) then
-			playertypei = 3
-		-- elseif cc_ackunless("cappy", {"gelcannon", "minecraft", "classic"}) then
-		-- 	playertypei = 4
-		elseif cc_ackunless("classic", {"gelcannon", "cappy", "minecraft"}) then
-			playertypei = 5
-		else
-			playertypei = 1
+		if not goombaattack and cc_ack("goomba_attack") then
+			goombaattack = true
+		elseif cc_wasactive("goomba_attack") then
+			goombaattack = false
 		end
-		playertype = playertypelist[playertypei]
-		portalgun = playertype ~= "cappy" and playertype ~= "classic"
-		for i = 1, players do
-			local player = objects["player"][i]
-			player.t = playertype
-			player.portalgun = portalgun
+		-- Gamemodes
+		local newplayertypei = nil
+		if cc_ackunless("minecraft", {"gelcannon", "cappy", "classic"}) then
+			newplayertypei = 2
+		elseif cc_ackunless("gelcannon", {"minecraft", "cappy", "classic"}) then
+			newplayertypei = 3
+		-- elseif cc_ackunless("cappy", {"gelcannon", "minecraft", "classic"}) then
+		-- 	newplayertypei = 4
+		elseif cc_ackunless("classic", {"gelcannon", "cappy", "minecraft"}) then
+			newplayertypei = 5
+		elseif cc_wasactive({"minecraft", "gelcannon", "cappy", "classic"}) then
+			newplayertypei = 1
+		end
+		if newplayertypei ~= nil then
+			playertypei = newplayertypei
+			playertype = playertypelist[playertypei]
+			portalgun = playertype ~= "cappy" and playertype ~= "classic"
+			for i = 1, players do
+				local player = objects["player"][i]
+				player.t = playertype
+				player.portalgun = portalgun
+			end
 		end
 		-- 3D
 		_3DMODE = cc_ack("3d")
@@ -636,6 +644,12 @@ function game_update(dt)
 		local coinsub = cc_get("coin_sub", true)
 		if coinsub ~= nil then
 			collectcoin(nil, nil, -(coinsub.quantity or 1))
+		end
+		-- Underwater
+		if not underwater and cc_ack("underwater") then
+			underwater = true
+		elseif cc_wasactive("underwater") then
+			underwater = false
 		end
 	end
 
