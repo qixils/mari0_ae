@@ -628,6 +628,15 @@ function game_update(dt)
 		end
 		-- Deadly Coins (for balance, this is insta accepted)
 		cc_ack("deadly_coin")
+		-- Add/Remove Coins
+		local coinadd = cc_get("coin_add", true)
+		if coinadd ~= nil then
+			collectcoin(nil, nil, coinadd.quantity)
+		end
+		local coinsub = cc_get("coin_sub", true)
+		if coinsub ~= nil then
+			collectcoin(nil, nil, -(coinsub.quantity or 1))
+		end
 	end
 
 	--Portaldots

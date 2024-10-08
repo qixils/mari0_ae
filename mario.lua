@@ -8711,7 +8711,6 @@ function mario:mariohammercallback()
 end
 
 function collectcoin(x, y, amount, group, t)
-	print("coin yeah", t)
 	if t ~= nil and cc_ack("deadly_coin") then
 		t:die("killscript")
 		return
@@ -8748,7 +8747,6 @@ function collectcoin(x, y, amount, group, t)
 end
 
 function collectcoinentity(x, y, t) --DONT MIND ME OK
-	print("coin entity", t)
 	if t ~= nil and cc_ack("deadly_coin") then
 		t:die("killscript")
 		return

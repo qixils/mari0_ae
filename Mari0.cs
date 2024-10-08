@@ -63,6 +63,8 @@ public class Mari0 : SimpleTCPPack<SimpleTCPServerConnector>
 		new("Starman", "star") { Price = 50, Category = "Player", Description = "Grants Mario a Super Star! Yahoo!" },
 		new("Disable Screen Scroll", "disable_scroll") { Price = 50, Duration = 10, Category = "Level", Description = "Prevents the screen from scrolling for a short time" },
 		new("Deadly Coins", "deadly_coin") { Price = 100, Duration = 15, Category = "Level", Description = "Makes collected coins kill the player for a short time" },
+		new("Coin Give", "coin_add") { Price = 2, Quantity = 99, Category = "Level", Description = "Gives some coins which might contribute to a 1-Up!" },
+		new("Coin Take", "coin_sub") { Price = 2, Quantity = 99, Category = "Level", Description = "Take some coins away from contributing to a 1-Up!" },
 		// TODO: cloud tiles
 		// TODO: coins give/remove
 		// TODO: hammer party?
