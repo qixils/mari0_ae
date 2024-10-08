@@ -61,9 +61,9 @@ public class Mari0 : SimpleTCPPack<SimpleTCPServerConnector>
 		new("Time Remove", "time_sub") { Price = 5, Quantity = 60, Category = "Level", Description = "Removes real-time from the in-game timer" },
 		new("Bonk", "bonk") { Price = 25, Category = "Player", Description = "Halts Mario's vertical momentum as if he hit an invisible block" },
 		new("Starman", "star") { Price = 50, Category = "Player", Description = "Grants Mario a Super Star! Yahoo!" },
+		new("Disable Screen Scroll", "disable_scroll") { Price = 50, Duration = 10, Category = "Level", Description = "Prevents the screen from scrolling for a short time" },
 		// TODO: cloud tiles
 		// TODO: deadly coins
-		// TODO: disable screen scroll
 		// TODO: coins give/remove
 		// TODO: hammer party?
 		// TODO: water mode

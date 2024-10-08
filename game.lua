@@ -1152,7 +1152,7 @@ function game_update(dt)
 				
 				--LEFT
 
-				if (not (autoscrollingx and not editormode)) and (camerasetting ~= 3 or editormode) then
+				if (not (autoscrollingx and not editormode)) and (camerasetting ~= 3 or editormode) and not cc_ack("disable_scroll") then
 					if fastestplayer.x < splitxscroll[split] + scrollingleftstart*screenzoom2 and splitxscroll[split] > 0 then
 						if fastestplayer.x < splitxscroll[split] + scrollingleftstart*screenzoom2 and fastestplayer.speedx < 0 then
 							if fastestplayer.speedx < -scrollrate then
@@ -1170,13 +1170,13 @@ function game_update(dt)
 						end
 					end
 				end
-				if autoscrollingx and not editormode then
+				if autoscrollingx and not editormode and not cc_ack("disable_scroll") then
 					splitxscroll[split] = math.max(0, math.min(mapwidth-width*screenzoom2, splitxscroll[split] + autoscrollingx*dt))
 				end
 				
 				--RIGHT
 				
-				if not (autoscrollingx and not editormode) then
+				if not (autoscrollingx and not editormode) and not cc_ack("disable_scroll") then
 					if fastestplayer.x > splitxscroll[split] + width*screenzoom2 - scrollingstart*screenzoom2 and splitxscroll[split] < mapwidth - width*screenzoom2 then
 						if fastestplayer.x > splitxscroll[split] + width*screenzoom2 - scrollingstart*screenzoom2 and fastestplayer.speedx > 0.3 then
 							if fastestplayer.speedx > scrollrate then
@@ -1199,7 +1199,7 @@ function game_update(dt)
 				end
 
 				--just force that shit
-				if not levelfinished and not (autoscrollingx and not editormode) then
+				if not levelfinished and not (autoscrollingx and not editormode) and not cc_ack("disable_scroll") then
 					if fastestplayer.x > splitxscroll[split] + width*screenzoom2 - scrollingcomplete*screenzoom2 then
 						splitxscroll[split] = splitxscroll[split] + superscroll*dt
 						if fastestplayer.x < splitxscroll[split] + width*screenzoom2 - scrollingcomplete*screenzoom2 then
@@ -1234,7 +1234,7 @@ function game_update(dt)
 	
 	--VERTICAL SCROLLING
 	local oldscrolly = splityscroll[1]
-	if autoscroll and autoscrolly ~= false and not minimapdragging then
+	if autoscroll and autoscrolly ~= false and not minimapdragging and not cc_ack("disable_scroll") then
 		for split = 1, #splitscreen do
 			local fastestplayer = 1
 			while fastestplayer <= players and objects["player"][fastestplayer].dead do
@@ -1335,7 +1335,7 @@ function game_update(dt)
 	end
 
 	--camera pan x
-	if xpan then
+	if xpan and not cc_ack("disable_scroll") then
 		xpantimer = xpantimer + dt
 		if xpantimer >= xpantime then
 			xpan = false
@@ -1349,7 +1349,7 @@ function game_update(dt)
 	end
 	
 	--camera pan y
-	if ypan then
+	if ypan and not cc_ack("disable_scroll") then
 		ypantimer = ypantimer + dt
 		if ypantimer >= ypantime then
 			ypan = false
