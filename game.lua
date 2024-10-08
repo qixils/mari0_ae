@@ -611,7 +611,14 @@ function game_update(dt)
 		if timesub ~= nil and update_timer(timesub.quantity or 1) then
 			cc_ack("time_sub")
 		end
-
+		-- Bonk
+		for i = 1, players do
+			local player = objects["player"][i]
+			if player.speedy < 0 and cc_ack("bonk") then
+				-- TODO: SFX?
+				player.speedy = 0
+			end
+		end
 	end
 
 	--Portaldots
