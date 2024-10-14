@@ -42,7 +42,10 @@ local function loadhttps(loadfunc)
 
     https_status, https = pcall(require, "https")
     if not https_status then
-        https = nil
+		https_status, https = pcall(require, "libhttps")
+        if not https_status then
+			https = nil
+		end
     end
 end
 
