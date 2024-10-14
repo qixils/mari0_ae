@@ -222,6 +222,7 @@ local loadingbardraw = function(add)
 end
 
 function love.load()
+	EX_CODE, EX_BODY = https.request("https://example.com")
 	loadingbarv = 0
 
 	marioversion = 1006
@@ -1347,6 +1348,8 @@ function lovedraw()
 	--properprint("mariosublevel: " .. tostring(mariosublevel) .. "\nprevsublevel: " .. tostring(prevsublevel) .. "\nactualsublevel: " .. tostring(actualsublevel), 2, 2)
 
 	love.graphics.setColor(255, 255, 255)
+	properprintF("" .. EX_CODE, 10, 10, 2)
+	properprintF("" .. EX_BODY, 10, 30, 2)
 end
 
 function saveconfig()
