@@ -1348,8 +1348,8 @@ function lovedraw()
 	--properprint("mariosublevel: " .. tostring(mariosublevel) .. "\nprevsublevel: " .. tostring(prevsublevel) .. "\nactualsublevel: " .. tostring(actualsublevel), 2, 2)
 
 	love.graphics.setColor(255, 255, 255)
-	properprintF("" .. EX_CODE, 10, 10, 2)
-	properprintF("" .. EX_BODY, 10, 30, 2)
+	love.graphics.print("" .. EX_CODE, 10, 10, 0, 1.5, 1.5)
+	love.graphics.print("" .. EX_BODY, 10, 30, 0, 1.5, 1.5)
 end
 
 function saveconfig()
