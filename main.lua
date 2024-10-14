@@ -222,7 +222,13 @@ local loadingbardraw = function(add)
 end
 
 function love.load()
-	EX_CODE, EX_BODY = https.request("https://example.com")
+	if https then
+		EX_PCALL, EX_CODE, EX_BODY = pcall(https.request, "https://example.com")
+	else
+		EX_PCALL = "N/A"
+		EX_CODE = "N/A"
+		EX_BODY = "https doesn't exist"
+	end
 	loadingbarv = 0
 
 	marioversion = 1006
@@ -1348,8 +1354,8 @@ function lovedraw()
 	--properprint("mariosublevel: " .. tostring(mariosublevel) .. "\nprevsublevel: " .. tostring(prevsublevel) .. "\nactualsublevel: " .. tostring(actualsublevel), 2, 2)
 
 	love.graphics.setColor(255, 255, 255)
-	love.graphics.print("" .. EX_CODE, 10, 10, 0, 1.5, 1.5)
-	love.graphics.print("" .. EX_BODY, 10, 30, 0, 1.5, 1.5)
+	love.graphics.print("" .. tostring(EX_PCALL) .. " " .. tostring(EX_CODE) .. " " .. tostring(https_status) .. " " .. tostring(https), 10, 10, 0, 1.5, 1.5)
+	love.graphics.print("" .. tostring(EX_BODY), 10, 30, 0, 1.5, 1.5)
 end
 
 function saveconfig()
