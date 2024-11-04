@@ -2620,40 +2620,35 @@ function mario:update(dt)
 			self:flag()
 		end
 		
-		if firestartx and self.x >= firestartx - 1 then
+		if not firestarted and ((firestartx and self.x >= firestartx - 1) or cc_ack("bowserfire")) then
 			firestarted = true
 		end
 		
-		if flyingfishstartx and self.x >= flyingfishstartx - 1 then
+		-- wasactive is asymmetric because we would like to purge it from RAM ASAP even if it doesn't necessarily have an effect
+		-- (whereas cc_ack should only be called when necessary)
+		-- and we need to make sure we don't accidentally slip back into `started` even when it should be false
+		if cc_wasactive("flyingfish") or (flyingfishendx and self.x >= flyingfishendx - 1) then
+			flyingfishstarted = false
+		elseif not flyingfishstarted and ((flyingfishstartx and self.x >= flyingfishstartx - 1) or cc_ack("flyingfish")) then
 			flyingfishstarted = true
 		end
 		
-		if flyingfishendx and self.x >= flyingfishendx - 1 then
-			flyingfishstarted = false
-		end
-		
-		if meteorstartx and self.x >= meteorstartx - 1 then
+		if cc_wasactive("meteorshower") or (meteorendx and self.x >= meteorendx - 1) then
+			meteorstarted = false
+		elseif not meteorstarted and ((meteorstartx and self.x >= meteorstartx - 1) or cc_ack("meteorshower")) then
 			meteorstarted = true
 		end
 		
-		if meteorendx and self.x >= meteorendx - 1 then
-			meteorstarted = false
-		end
-		
-		if bulletbillstartx and self.x >= bulletbillstartx - 1 then
+		if cc_wasactive("bulletbills") or (bulletbillendx and self.x >= bulletbillendx - 1) then
+			bulletbillstarted = false
+		elseif not bulletbillstarted and ((bulletbillstartx and self.x >= bulletbillstartx - 1) or cc_ack("bulletbills")) then
 			bulletbillstarted = true
 		end
 		
-		if bulletbillendx and self.x >= bulletbillendx - 1 then
-			bulletbillstarted = false
-		end
-		
-		if windstartx and self.x >= windstartx - 1 then
-			windstarted = true
-		end
-		
-		if windendx and self.x >= windendx - 1 then
+		if cc_wasactive("wind") or (windendx and self.x >= windendx - 1) then
 			windstarted = false
+		elseif not windstarted and ((windstartx and self.x >= windstartx - 1) or cc_ack("wind")) then
+			windstarted = true
 		end
 		
 		if lakitoendx and self.x >= lakitoendx then
