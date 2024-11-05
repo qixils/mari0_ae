@@ -119,17 +119,17 @@ function angrysun:update(dt)
 					self.movex2 = math.sin(v*math.pi*4+math.pi/2)*1.5-1.5
 					self.movey2 = math.cos(v*math.pi*4+math.pi/2)*1.5
 				end
-				
+
 			end
 		end
-		
+
 		--movement
-		
+
 		--stay on the same place even if the screen is moving
 		self.x = xscroll + self.movex + self.movex2 + 3
 		self.y = yscroll + self.movey + self.movey2 + self.starty
 	end
-		
+
 	--check if switch to passive
 	if angrysunend then
 		self.passive = true

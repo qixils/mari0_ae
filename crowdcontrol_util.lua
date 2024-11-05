@@ -45,6 +45,40 @@ ccentitycreators = {
         end
         table.insert(objects["koopa"], koopa:new(x - .5, y, type))
     end,
+	checkpoint = function(x, y)
+		-- TODO: needs to be persistent
+		if not map[x] then map[x] = {} end
+		map[x][y] = {} -- TOOD: IDK?
+		table.insert(checkpoints, x)
+		checkpointpoints[x] = y
+		objects["checkpointflag"][x] = checkpointflag:new(x, y, {}, #checkpoints)
+	end,
+	box = function(x, y)
+		local n = math.random(1, 10)
+		local t = nil
+		if n >= 9 then
+			t = "edgeless"
+		elseif n >= 6 then
+			t = "box2"
+		end
+		table.insert(objects["box"], box:new(x, y, t))
+	end,
+	upfire = function(x, y)
+		table.insert(objects["upfire"], upfire:new(x, y))
+	end,
+	amp = function(x, y)
+		table.insert(objects["amp"], amp:new(x, y, "0|amp"))
+	end,
+	fuzzy = function(x, y)
+		table.insert(objects["amp"], amp:new(x, y, "0|fuzzy"))
+	end,
+	angrysun = function()
+		if angrysunend then return false end
+		table.insert(objects["angrysun"], angrysun:new(0, 2))
+	end,
+	bowser = function(x, y)
+		table.insert(objects["bowser"], bowser:new(x, y))
+	end
 }
 
 --- Determines if the given string starts with the given substring.

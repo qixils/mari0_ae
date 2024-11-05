@@ -549,8 +549,11 @@ function game_update(dt)
 				if creator then
 					local target = math.random(players)
 					local player = objects["player"][target]
-					creator(player.x + math.random(7,15), player.y + 0.5 - math.random(10))
-					cc_start(request)
+					local success, result = pcall(creator, player.x + math.random(7,15), player.y + 0.5 - math.random(10))
+					-- Check if pcall was `success`ful and the function didn't return `false` (`nil` is okay)
+					if success and result ~= false then
+						cc_start(request)
+					end
 				end
 			end
 		end

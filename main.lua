@@ -1395,7 +1395,7 @@ function love.run() -- from https://love2d.org/wiki/love.run
 		-- Update dt, as we'll be passing it to update
 		love.timer.step()
 		dt = love.timer.getDelta()
-		dt = math.min((cc_ack("lowfps") and LOWDT) or MINDT, dt)
+		dt = math.min((cc_ack("lowfps") and LOWDT) or MINDT, dt) -- TODO: exclusivity with speed
 
 		-- Call update and draw
 		love.update(dt)

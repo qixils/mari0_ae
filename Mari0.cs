@@ -74,8 +74,16 @@ public class Mari0 : SimpleTCPPack<SimpleTCPServerConnector>
 		new("Huge Mario", "bigmario") { Price = 100, Duration = 15, Category = "Player", Description = "Turns Mario huge for a short time" },
 		new("Frames Per Minute", "lowfps") { Price = 200, Duration = 15, Category = "Level", Description = "Lowers the FPS (and physics accuracy!) drastically for a short time" },
 
-        new("Spawn Goomba", "spawn_goomba") { Price = 25, Category = "Enemies", Description = "Spawn an enemy on the screen!" },
-        new("Spawn Koopa", "spawn_koopa") { Price = 25, Category = "Enemies", Description = "Spawn an enemy on the screen!" },
+        new("Spawn Goomba", "spawn_goomba") { Price = 25, Category = "Enemies", Description = "Spawn an entity on the screen!" },
+        new("Spawn Koopa", "spawn_koopa") { Price = 25, Category = "Enemies", Description = "Spawn an entity on the screen!" },
+        // new("Spawn Checkpoint", "spawn_checkpoint") { Price = 50, Category = new("Enemies", "Level"), Description = "Spawn an entity on the screen!" },
+		new("Spawn Box", "spawn_box") { Price = 5, Category = "Enemies", Description = "Spawn an entity on the screen!" },
+		new("Spawn Lava Bubble", "spawn_upfire") { Price = 35, Category = "Enemies", Description = "Spawn an entity on the screen!" },
+        new("Spawn Amp", "spawn_amp") { Price = 20, Category = "Enemies", Description = "Spawn an entity on the screen!" },
+        new("Spawn Fuzzy", "spawn_fuzzy") { Price = 20, Category = "Enemies", Description = "Spawn an entity on the screen!" },
+        new("Spawn Angry Sun", "spawn_angrysun") { Price = 50, Category = "Enemies", Description = "Spawn an entity on the screen!" },
+        new("Spawn Bowser", "spawn_bowser") { Price = 100, Category = "Enemies", Description = "Spawn an entity on the screen!" },
+
 		// TODO: more
     };
 }
