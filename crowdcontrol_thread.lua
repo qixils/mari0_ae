@@ -1,6 +1,6 @@
 local socket = require("socket")
 local timer = require("love.timer")
-local json = require("json")
+local json = require("JSON")
 local address, port = "localhost", 28379
 local incoming = ""
 local outgoing = love.thread.getChannel("cc_outgoing")
