@@ -34,7 +34,9 @@ while true do
     if incoming ~= "" then
         local null = incoming:find("\0")
         if null then
-            local request = json:decode(incoming:sub(1, null-1))
+			local message = incoming:sub(1, null-1)
+			print("Received message", message)
+            local request = json:decode(message)
             if request ~= nil and request['type'] == 1 then -- if request to start
                 requests:push(request)
             end
