@@ -651,6 +651,29 @@ function game_update(dt)
 		elseif cc_wasactive("underwater") then
 			underwater = false
 		end
+		-- Huge Mario
+		if not bigmario and cc_ack("bigmario") then
+			bigmario = true
+			for i = 1, players do
+				local player = objects["player"][i]
+				player.size = 1
+				player.width = player.width*scalefactor
+				player.height = player.height*scalefactor
+				player.offsetX = player.offsetX*scalefactor
+				player.offsetY = player.offsetY*-scalefactor
+				player.y = player.y - scalefactor
+			end
+		elseif cc_wasactive("bigmario") then
+			bigmario = false
+			for i = 1, players do
+				local player = objects["player"][i]
+				-- TODO: restore powerup?
+				player.width = player.width/scalefactor
+				player.height = player.height/scalefactor
+				player.offsetX = player.offsetX/scalefactor
+				player.offsetY = player.offsetY/-scalefactor
+			end
+		end
 	end
 
 	--Portaldots

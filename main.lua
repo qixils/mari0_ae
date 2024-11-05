@@ -1326,11 +1326,13 @@ function love.run() -- from https://love2d.org/wiki/love.run
 	-- Main loop time.
 	while true do
 		---- Update Crowd Control request queue ----
+		-- Remove instant & checked effects so they aren't re-checked
 		for i, request in ipairs(old_requests) do
 			if not request.duration or request.waschecked then
 				table.remove(old_requests, i)
 			end
 		end
+		-- Ensure we don't add timed effects every tick, OOMing in the process
 		for i, request in ipairs(cc_requests) do
 			local skip = false
 			for j, oldrequest in ipairs(old_requests) do
@@ -1346,7 +1348,10 @@ function love.run() -- from https://love2d.org/wiki/love.run
 		-- (Do this first to ensure certain timed effects are not overwritten)
 		for i, request in ipairs(old_requests) do
 			if not request.started then
-				cc_send({id = request.id, type = 0, status = 3}) --retry
+				-- If the request wasn't started then let's tell the native client to retry it,
+				-- and remove it from the table so the game doesn't think it was activated.
+				cc_send({id = request.id, type = 0, status = 3})
+				table.remove(old_requests, i)
 			else
 				if request.duration then
 					-- Check if it has finished so we can inform the client
