@@ -72,6 +72,7 @@ public class Mari0 : SimpleTCPPack<SimpleTCPServerConnector>
 		new("Windy", "wind") { Price = 50, Duration = 15, Category = "Level", Description = "Spawns a gust of wind that pushes Mario for a short time" },
 		new("Bowser Fire", "bowserfire") { Price = 50, Duration = 15, Category = "Level", Description = "Spawns Bowser's fire from the edge of the screen for a short time" },
 		new("Huge Mario", "bigmario") { Price = 100, Duration = 15, Category = "Player", Description = "Turns Mario huge for a short time" },
+		new("Frames Per Minute", "lowfps") { Price = 200, Duration = 15, Category = "Level", Description = "Lowers the FPS (and physics accuracy!) drastically for a short time" },
 
         new("Spawn Goomba", "spawn_goomba") { Price = 25, Category = "Enemies", Description = "Spawn an enemy on the screen!" },
         new("Spawn Koopa", "spawn_koopa") { Price = 25, Category = "Enemies", Description = "Spawn an enemy on the screen!" },

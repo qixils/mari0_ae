@@ -1186,7 +1186,6 @@ function love.update(dt)
 	if music then
 		music:update()
 	end
-	dt = math.min(0.01666667, dt)
 	
 	--speed
 	if speed ~= speedtarget then
@@ -1396,6 +1395,7 @@ function love.run() -- from https://love2d.org/wiki/love.run
 		-- Update dt, as we'll be passing it to update
 		love.timer.step()
 		dt = love.timer.getDelta()
+		dt = math.min((cc_ack("lowfps") and LOWDT) or MINDT, dt)
 
 		-- Call update and draw
 		love.update(dt)
@@ -1407,7 +1407,7 @@ function love.run() -- from https://love2d.org/wiki/love.run
 			love.graphics.present()
 		end
 
-		love.timer.sleep(0.001)
+		love.timer.sleep((cc_ack("lowfps") and LOWDT) or 0.001)
 	end
 end
 

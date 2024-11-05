@@ -943,3 +943,6 @@ end
 function getDefaultPortalColors()
 	return {getDefaultPortalColor(1), getDefaultPortalColor(2)}
 end
+
+MINDT = 0.01666667
+LOWDT = 1/15
