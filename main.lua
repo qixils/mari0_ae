@@ -299,7 +299,7 @@ function love.load()
 		changescale(scale, fullscreen)
 	end
 
-	love.window.setTitle( "Mari0: AE" )
+	love.window.setTitle( "Mari0: Crowd Control" )
 	
 	love.window.setIcon(love.image.newImageData("graphics/icon.png"))
 	
