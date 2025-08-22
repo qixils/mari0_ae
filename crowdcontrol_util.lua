@@ -9,21 +9,22 @@ buttons_inverted = false
 toggled_lightsout = false
 gravity_flipped = false
 
--- COMPREHENSIVE LIST OF ALL SPAWNABLE ENTITIES FOR TESTING:
--- goomba, koopa, checkpoint, box, upfire, amp, fuzzy, angrysun, bowser,
--- magikoopa, thwomp, hammerbro, boo, chainchomp, cheepcheep, drybones,
--- fire, bomb, bulletbill, cannonball, castlefire, fishbone, flyingfish,
--- glados, grinder, icicle, kingbill, lakito, meteor, mole, muncher,
--- ninji, parabeetle, plant, plantcreeper, plantfire, poisonmush, pokey,
--- rocketturret, rockywrench, sidestepper, skewer, spike, splunkin, squid,
--- torpedoted, turret, barrel, bigbill, bigmole, boomboom, core,
--- fireball, ice, laser, lightbridge, portal, vine, yoshi, mushroom,
--- star, coin, cappy, mariohammer, mariotail, boomerang, gel, geldispenser,
--- faithplate, funnel, cubedispenser, snakeblock, platform, seesaw,
--- spring, smallspring, longfire, track, enemytool, tiletool, button,
--- pushbutton, door, clearpipe, donut, flipblock, miniblock, powblock,
--- seesawplatform, windleaf, rainboom, firework, bubble, delayer,
--- animationtrigger, regiontrigger, camerastop, screenboundary
+	-- COMPREHENSIVE LIST OF ALL SPAWNABLE ENTITIES FOR TESTING:
+	-- goomba, koopa, checkpoint, box, upfire, amp, fuzzy, angrysun, bowser,
+	-- magikoopa, thwomp, hammerbro, boo, chainchomp, cheepcheep, drybones,
+	-- fire, bomb, bulletbill, cannonball, castlefire, fishbone, flyingfish,
+	-- glados, grinder, icicle, kingbill, lakito, meteor, mole, muncher,
+	-- ninji, parabeetle, plant, plantcreeper, plantfire, poisonmush, pokey,
+	-- rocketturret, rockywrench, sidestepper, skewer, spike, splunkin, squid,
+	-- torpedoted, turret, barrel, bigbill, bigmole, boomboom, core,
+	-- fireball, ice, laser, lightbridge, portal, vine, yoshi, mushroom,
+	-- star, coin, cappy, mariohammer, mariotail, boomerang, gel, geldispenser,
+	-- faithplate, funnel, cubedispenser, snakeblock, platform, seesaw,
+	-- spring, smallspring, longfire, track, enemytool, tiletool, button,
+	-- pushbutton, door, clearpipe, donut, flipblock, miniblock, powblock,
+	-- seesawplatform, windleaf, rainboom, firework, bubble, delayer,
+	-- animationtrigger, regiontrigger, camerastop, screenboundary
+	-- GEL EFFECTS: gel_repulsion, gel_propulsion, gel_conversion, gel_adhesion
 
 ccentitycreators = {
     goomba = function(x, y)
@@ -408,9 +409,138 @@ ccentitycreators = {
 	camerastop = function(x, y)
 		table.insert(objects["camerastop"], camerastop:new(x, y))
 	end,
-	screenboundary = function(x, y)
-		table.insert(objects["screenboundary"], screenboundary:new(0))
-	end
+			screenboundary = function(x, y)
+			table.insert(objects["screenboundary"], screenboundary:new(0))
+		end,
+		-- GELOCALYPSE EFFECTS - Cover all surfaces with specific gels
+		gel_repulsion = function(x, y)
+			-- Cover all solid blocks with repulsion gel (bouncy)
+			if map and tilequads then
+				for mapx, row in pairs(map) do
+					if type(row) == "table" then
+						for mapy, tile in pairs(row) do
+							if type(tile) == "table" and tile[1] then
+								local tileID = tile[1]
+								if tilequads[tileID] and tilequads[tileID].collision then
+									-- Initialize gels table if it doesn't exist
+									if not tile["gels"] then
+										tile["gels"] = {}
+									end
+									
+									-- Only apply gel to exposed faces (not touching other solid tiles)
+									local topExposed = not map[mapx] or not map[mapx][mapy-1] or not map[mapx][mapy-1][1] or not tilequads[map[mapx][mapy-1][1]] or not tilequads[map[mapx][mapy-1][1]].collision
+									local bottomExposed = not map[mapx] or not map[mapx][mapy+1] or not map[mapx][mapy+1][1] or not tilequads[map[mapx][mapy+1][1]] or not tilequads[map[mapx][mapy+1][1]].collision
+									local leftExposed = not map[mapx-1] or not map[mapx-1][mapy] or not map[mapx-1][mapy][1] or not tilequads[map[mapx-1][mapy][1]] or not tilequads[map[mapx-1][mapy][1]].collision
+									local rightExposed = not map[mapx+1] or not map[mapx+1][mapy] or not map[mapx+1][mapy][1] or not tilequads[map[mapx+1][mapy][1]] or not tilequads[map[mapx+1][mapy][1]].collision
+									
+									-- Apply gel only to exposed faces
+									if topExposed then tile["gels"]["top"] = 1 end
+									if bottomExposed then tile["gels"]["bottom"] = 1 end
+									if leftExposed then tile["gels"]["left"] = 1 end
+									if rightExposed then tile["gels"]["right"] = 1 end
+								end
+							end
+						end
+					end
+				end
+			end
+		end,
+		gel_propulsion = function(x, y)
+			-- Cover all solid blocks with propulsion gel (speedy)
+			if map and tilequads then
+				for mapx, row in pairs(map) do
+					if type(row) == "table" then
+						for mapy, tile in pairs(row) do
+							if type(tile) == "table" and tile[1] then
+								local tileID = tile[1]
+								if tilequads[tileID] and tilequads[tileID].collision then
+									-- Initialize gels table if it doesn't exist
+									if not tile["gels"] then
+										tile["gels"] = {}
+									end
+									
+									-- Only apply gel to exposed faces (not touching other solid tiles)
+									local topExposed = not map[mapx] or not map[mapx][mapy-1] or not map[mapx][mapy-1][1] or not tilequads[map[mapx][mapy-1][1]] or not tilequads[map[mapx][mapy-1][1]].collision
+									local bottomExposed = not map[mapx] or not map[mapx][mapy+1] or not map[mapx][mapy+1][1] or not tilequads[map[mapx][mapy+1][1]] or not tilequads[map[mapx][mapy+1][1]].collision
+									local leftExposed = not map[mapx-1] or not map[mapx-1][mapy] or not map[mapx-1][mapy][1] or not tilequads[map[mapx-1][mapy][1]] or not tilequads[map[mapx-1][mapy][1]].collision
+									local rightExposed = not map[mapx+1] or not map[mapx+1][mapy] or not map[mapx+1][mapy][1] or not tilequads[map[mapx+1][mapy][1]] or not tilequads[map[mapx+1][mapy][1]].collision
+									
+									-- Apply gel only to exposed faces
+									if topExposed then tile["gels"]["top"] = 2 end
+									if bottomExposed then tile["gels"]["bottom"] = 2 end
+									if leftExposed then tile["gels"]["left"] = 2 end
+									if rightExposed then tile["gels"]["right"] = 2 end
+								end
+							end
+						end
+					end
+				end
+			end
+		end,
+		gel_conversion = function(x, y)
+			-- Cover all solid blocks with conversion gel (portal)
+			if map and tilequads then
+				for mapx, row in pairs(map) do
+					if type(row) == "table" then
+						for mapy, tile in pairs(row) do
+							if type(tile) == "table" and tile[1] then
+								local tileID = tile[1]
+								if tilequads[tileID] and tilequads[tileID].collision then
+									-- Initialize gels table if it doesn't exist
+									if not tile["gels"] then
+										tile["gels"] = {}
+									end
+									
+									-- Only apply gel to exposed faces (not touching other solid tiles)
+									local topExposed = not map[mapx] or not map[mapx][mapy-1] or not map[mapx][mapy-1][1] or not tilequads[map[mapx][mapy-1][1]] or not tilequads[map[mapx][mapy-1][1]].collision
+									local bottomExposed = not map[mapx] or not map[mapx][mapy+1] or not map[mapx][mapy+1][1] or not tilequads[map[mapx][mapy+1][1]] or not tilequads[map[mapx][mapy+1][1]].collision
+									local leftExposed = not map[mapx-1] or not map[mapx-1][mapy] or not map[mapx-1][mapy][1] or not tilequads[map[mapx-1][mapy][1]] or not tilequads[map[mapx-1][mapy][1]].collision
+									local rightExposed = not map[mapx+1] or not map[mapx+1][mapy] or not map[mapx+1][mapy][1] or not tilequads[map[mapx+1][mapy][1]] or not tilequads[map[mapx+1][mapy][1]].collision
+									
+									-- Apply gel only to exposed faces
+									if topExposed then tile["gels"]["top"] = 3 end
+									if bottomExposed then tile["gels"]["bottom"] = 3 end
+									if leftExposed then tile["gels"]["left"] = 3 end
+									if rightExposed then tile["gels"]["right"] = 3 end
+								end
+							end
+						end
+					end
+				end
+			end
+		end,
+		gel_adhesion = function(x, y)
+			-- Cover all solid blocks with adhesion gel (sticky)
+			if map and tilequads then
+				for mapx, row in pairs(map) do
+					if type(row) == "table" then
+						for mapy, tile in pairs(row) do
+							if type(tile) == "table" and tile[1] then
+								local tileID = tile[1]
+								if tilequads[tileID] and tilequads[tileID].collision then
+									-- Initialize gels table if it doesn't exist
+									if not tile["gels"] then
+										tile["gels"] = {}
+									end
+									
+									-- Only apply gel to exposed faces (not touching other solid tiles)
+									local topExposed = not map[mapx] or not map[mapx][mapy-1] or not map[mapx][mapy-1][1] or not tilequads[map[mapx][mapy-1][1]] or not tilequads[map[mapx][mapy-1][1]].collision
+									local bottomExposed = not map[mapx] or not map[mapx][mapy+1] or not map[mapx][mapy+1][1] or not tilequads[map[mapx][mapy+1][1]] or not tilequads[map[mapx][mapy+1][1]].collision
+									local leftExposed = not map[mapx-1] or not map[mapx-1][mapy] or not map[mapx-1][mapy][1] or not tilequads[map[mapx-1][mapy][1]] or not tilequads[map[mapx-1][mapy][1]].collision
+									local rightExposed = not map[mapx+1] or not map[mapx+1][mapy] or not map[mapx+1][mapy][1] or not tilequads[map[mapx+1][mapy][1]] or not tilequads[map[mapx+1][mapy][1]].collision
+									
+									-- Apply gel only to exposed faces
+									if topExposed then tile["gels"]["top"] = 4 end
+									if bottomExposed then tile["gels"]["bottom"] = 4 end
+									if leftExposed then tile["gels"]["left"] = 4 end
+									if rightExposed then tile["gels"]["right"] = 4 end
+								end
+							end
+						end
+					end
+				end
+			end
+		end
 }
 
 --- Determines if the given string starts with the given substring.
@@ -566,3 +696,4 @@ function cc_reload()
     end
     cc_load()
 end
+

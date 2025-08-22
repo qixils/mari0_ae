@@ -137,6 +137,10 @@ public class Mari0 : SimpleTCPPack<SimpleTCPServerConnector>
 		new("Spawn Star", "spawn_star") { Price = 50, Category = "Items", Description = "Shine bright with a super star!" },
 		new("Spawn Gel", "spawn_gel") { Price = 25, Category = "Items", Description = "Splash with portal gel!" },
 		new("Spawn Gel Dispenser", "spawn_geldispenser") { Price = 45, Category = "Items", Description = "Install a gel dispensing machine!" },
+		new("Gelocalypse: Repulsion", "gel_repulsion") { Price = 200, Duration = 20, Category = "Level", Description = "Cover ALL surfaces with bouncy repulsion gel!" },
+		new("Gelocalypse: Propulsion", "gel_propulsion") { Price = 200, Duration = 20, Category = "Level", Description = "Cover ALL surfaces with speedy propulsion gel!" },
+		new("Gelocalypse: Conversion", "gel_conversion") { Price = 200, Duration = 20, Category = "Level", Description = "Cover ALL surfaces with portal conversion gel!" },
+		new("Gelocalypse: Adhesion", "gel_adhesion") { Price = 200, Duration = 20, Category = "Level", Description = "Cover ALL surfaces with sticky adhesion gel!" },
 
 		// MECHANIC SPAWNING EFFECTS
 

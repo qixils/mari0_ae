@@ -557,6 +557,7 @@ function game_update(dt)
 		--            rainboom, firework, bubble, delayer, animationtrigger, regiontrigger, camerastop,
 		--            screenboundary, box, checkpoint
 		-- USAGE: Use "spawn_[entityname]" as the Crowd Control effect code
+		-- GEL EFFECTS: Use "gel_[geltype]" for gelocalypse effects
 		for i, request in ipairs(cc_requests) do
 			if string.startswith(request.code, "spawn_") then
 				local enemy = string.sub(request.code, 7)
@@ -565,6 +566,16 @@ function game_update(dt)
 					local target = math.random(players)
 					local player = objects["player"][target]
 					local success, result = pcall(creator, player.x + math.random(7,15), player.y + 0.5 - math.random(10))
+					-- Check if pcall was `success`ful and the function didn't return `false` (`nil` is okay)
+					if success and result ~= false then
+						cc_start(request)
+					end
+				end
+			elseif string.startswith(request.code, "gel_") then
+				local geltype = string.sub(request.code, 5)
+				local creator = ccentitycreators[request.code]
+				if creator then
+					local success, result = pcall(creator, 0, 0)
 					-- Check if pcall was `success`ful and the function didn't return `false` (`nil` is okay)
 					if success and result ~= false then
 						cc_start(request)
