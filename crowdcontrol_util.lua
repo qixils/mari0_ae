@@ -9,6 +9,22 @@ buttons_inverted = false
 toggled_lightsout = false
 gravity_flipped = false
 
+-- COMPREHENSIVE LIST OF ALL SPAWNABLE ENTITIES FOR TESTING:
+-- goomba, koopa, checkpoint, box, upfire, amp, fuzzy, angrysun, bowser,
+-- magikoopa, thwomp, hammerbro, boo, chainchomp, cheepcheep, drybones,
+-- fire, bomb, bulletbill, cannonball, castlefire, fishbone, flyingfish,
+-- glados, grinder, icicle, kingbill, lakito, meteor, mole, muncher,
+-- ninji, parabeetle, plant, plantcreeper, plantfire, poisonmush, pokey,
+-- rocketturret, rockywrench, sidestepper, skewer, spike, splunkin, squid,
+-- torpedoted, turret, barrel, bigbill, bigmole, boomboom, core,
+-- fireball, ice, laser, lightbridge, portal, vine, yoshi, mushroom,
+-- star, coin, cappy, mariohammer, mariotail, boomerang, gel, geldispenser,
+-- faithplate, funnel, cubedispenser, snakeblock, platform, seesaw,
+-- spring, smallspring, longfire, track, enemytool, tiletool, button,
+-- pushbutton, door, clearpipe, donut, flipblock, miniblock, powblock,
+-- seesawplatform, windleaf, rainboom, firework, bubble, delayer,
+-- animationtrigger, regiontrigger, camerastop, screenboundary
+
 ccentitycreators = {
     goomba = function(x, y)
         local n = math.random(1, 58)
@@ -78,6 +94,322 @@ ccentitycreators = {
 	end,
 	bowser = function(x, y)
 		table.insert(objects["bowser"], bowser:new(x, y))
+	end,
+	-- NEW ENEMIES AND ENTITIES
+	magikoopa = function(x, y)
+		table.insert(objects["magikoopa"], magikoopa:new(x, y))
+	end,
+	thwomp = function(x, y)
+		local types = {"down", "left", "right", "thwimp"}
+		local t = types[math.random(1, #types)]
+		table.insert(objects["thwomp"], thwomp:new(x, y, t))
+	end,
+	hammerbro = function(x, y)
+		table.insert(objects["hammerbro"], hammerbro:new(x, y))
+	end,
+	boo = function(x, y)
+		table.insert(objects["boo"], boo:new(x, y))
+	end,
+	chainchomp = function(x, y)
+		table.insert(objects["chainchomp"], chainchomp:new(x, y))
+	end,
+	cheepcheep = function(x, y)
+		local types = {"red", "white", "flying"}
+		local t = types[math.random(1, #types)]
+		table.insert(objects["cheepcheep"], cheepcheep:new(x, y, t))
+	end,
+	drybones = function(x, y)
+		table.insert(objects["drybones"], drybones:new(x, y))
+	end,
+	fire = function(x, y)
+		table.insert(objects["fire"], fire:new(x, y))
+	end,
+	bomb = function(x, y)
+		table.insert(objects["bomb"], bomb:new(x, y))
+	end,
+	bulletbill = function(x, y)
+		local dir = math.random(1, 2) == 1 and "left" or "right"
+		table.insert(objects["bulletbill"], bulletbill:new(x, y, dir))
+	end,
+	cannonball = function(x, y)
+		table.insert(objects["cannonball"], cannonball:new(x, y))
+	end,
+	castlefire = function(x, y)
+		table.insert(objects["castlefire"], castlefire:new(x, y))
+	end,
+	fishbone = function(x, y)
+		table.insert(objects["fishbone"], fishbone:new(x, y))
+	end,
+	flyingfish = function(x, y)
+		table.insert(objects["flyingfish"], flyingfish:new())
+	end,
+	glados = function(x, y)
+		table.insert(objects["glados"], glados:new(x, y))
+	end,
+	grinder = function(x, y)
+		table.insert(objects["grinder"], grinder:new(x, y))
+	end,
+	icicle = function(x, y)
+		local types = {"big", "small"}
+		local t = types[math.random(1, #types)]
+		table.insert(objects["icicle"], icicle:new(x, y, t))
+	end,
+	kingbill = function(x, y)
+		table.insert(objects["kingbill"], kingbill:new(x, y))
+	end,
+	lakito = function(x, y)
+		table.insert(objects["lakito"], lakito:new(x, y))
+	end,
+	meteor = function(x, y)
+		table.insert(objects["meteor"], meteor:new())
+	end,
+	mole = function(x, y)
+		local types = {"big", "small"}
+		local t = types[math.random(1, #types)]
+		table.insert(objects["mole"], mole:new(x, y, t))
+	end,
+	muncher = function(x, y)
+		table.insert(objects["muncher"], muncher:new(x, y))
+	end,
+	ninji = function(x, y)
+		table.insert(objects["ninji"], ninji:new(x, y))
+	end,
+	parabeetle = function(x, y)
+		table.insert(objects["parabeetle"], parabeetle:new(x, y))
+	end,
+	plant = function(x, y)
+		local types = {"down", "up", "red", "reddown"}
+		local t = types[math.random(1, #types)]
+		table.insert(objects["plant"], plant:new(x, y, t))
+	end,
+	plantcreeper = function(x, y)
+		table.insert(objects["plantcreeper"], plantcreeper:new(x, y))
+	end,
+	plantfire = function(x, y)
+		table.insert(objects["plantfire"], plantfire:new(x, y))
+	end,
+	poisonmush = function(x, y)
+		table.insert(objects["poisonmush"], poisonmush:new(x, y))
+	end,
+	pokey = function(x, y)
+		table.insert(objects["pokey"], pokey:new(x, y))
+	end,
+	rocketturret = function(x, y)
+		table.insert(objects["rocketturret"], rocketturret:new(x, y))
+	end,
+	rockywrench = function(x, y)
+		table.insert(objects["rockywrench"], rockywrench:new(x, y))
+	end,
+	sidestepper = function(x, y)
+		table.insert(objects["sidestepper"], sidestepper:new(x, y))
+	end,
+	skewer = function(x, y)
+		table.insert(objects["skewer"], skewer:new(x, y))
+	end,
+	spike = function(x, y)
+		table.insert(objects["spike"], spike:new(x, y))
+	end,
+	splunkin = function(x, y)
+		table.insert(objects["splunkin"], splunkin:new(x, y))
+	end,
+	squid = function(x, y)
+		local types = {"pink", "normal"}
+		local t = types[math.random(1, #types)]
+		table.insert(objects["squid"], squid:new(x, y, t))
+	end,
+	torpedoted = function(x, y)
+		table.insert(objects["torpedoted"], torpedoted:new(x, y))
+	end,
+	turret = function(x, y)
+		table.insert(objects["turret"], turret:new(x, y))
+	end,
+	barrel = function(x, y)
+		table.insert(objects["barrel"], barrel:new(x, y))
+	end,
+	bigbill = function(x, y)
+		table.insert(objects["bigbill"], bigbill:new(x, y))
+	end,
+	bigmole = function(x, y)
+		table.insert(objects["bigmole"], bigmole:new(x, y))
+	end,
+	boomboom = function(x, y)
+		table.insert(objects["boomboom"], boomboom:new(x, y))
+	end,
+	core = function(x, y)
+		table.insert(objects["core"], core:new(x, y))
+	end,
+	-- PROJECTILES AND ITEMS
+	fireball = function(x, y)
+		local dir = math.random(1, 2) == 1 and "left" or "right"
+		table.insert(objects["fireball"], fireball:new(x, y, dir, nil, "fireball"))
+	end,
+	iceball = function(x, y)
+		local dir = math.random(1, 2) == 1 and "left" or "right"
+		table.insert(objects["fireball"], fireball:new(x, y, dir, nil, "iceball"))
+	end,
+	superball = function(x, y)
+		local dir = math.random(1, 2) == 1 and "left" or "right"
+		table.insert(objects["fireball"], fireball:new(x, y, dir, nil, "superball"))
+	end,
+	ice = function(x, y)
+		table.insert(objects["ice"], ice:new(x, y, 1, 1, 1))
+	end,
+	laser = function(x, y)
+		local dirs = {"right", "left", "up", "down"}
+		local dir = dirs[math.random(1, #dirs)]
+		table.insert(objects["laser"], laser:new(x, y, dir, {1, 1}))
+	end,
+	lightbridge = function(x, y)
+		local dirs = {"right", "left", "up", "down"}
+		local dir = dirs[math.random(1, #dirs)]
+		table.insert(objects["lightbridge"], lightbridge:new(x, y, dir, {1, 1}))
+	end,
+	portal = function(x, y)
+		table.insert(objects["portal"], portal:new(x, y))
+	end,
+	vine = function(x, y)
+		table.insert(objects["vine"], vine:new(x, y, "start"))
+	end,
+	yoshi = function(x, y)
+		local colors = {1, 2, 3, 4}
+		local color = colors[math.random(1, #colors)]
+		table.insert(objects["yoshi"], yoshi:new(x, y, color))
+	end,
+	mushroom = function(x, y)
+		table.insert(objects["mushroom"], mushroom:new(x, y))
+	end,
+	star = function(x, y)
+		table.insert(objects["star"], star:new(x, y))
+	end,
+	coin = function(x, y)
+		table.insert(objects["coin"], coin:new(x, y))
+	end,
+	cappy = function(x, y)
+		table.insert(objects["cappy"], cappy:new(x, y))
+	end,
+	mariohammer = function(x, y)
+		local dir = math.random(1, 2) == 1 and "left" or "right"
+		table.insert(objects["mariohammer"], mariohammer:new(x, y, dir, nil))
+	end,
+	mariotail = function(x, y)
+		local dir = math.random(1, 2) == 1 and "left" or "right"
+		table.insert(objects["mariotail"], mariotail:new(x, y, dir, nil))
+	end,
+	boomerang = function(x, y)
+		local dir = math.random(1, 2) == 1 and "left" or "right"
+		table.insert(objects["boomerang"], boomerang:new(x, y, dir, nil))
+	end,
+	gel = function(x, y)
+		local types = {1, 2, 3, 4}
+		local t = types[math.random(1, #types)]
+		table.insert(objects["gel"], gel:new(x, y, t))
+	end,
+	geldispenser = function(x, y)
+		local dirs = {"down", "right", "left"}
+		local dir = dirs[math.random(1, #dirs)]
+		table.insert(objects["geldispenser"], geldispenser:new(x, y, 1, dir, {1, 1}))
+	end,
+	faithplate = function(x, y)
+		local dirs = {"up", "right", "left"}
+		local dir = dirs[math.random(1, #dirs)]
+		table.insert(objects["faithplate"], faithplate:new(x, y, dir, 1, {1, 1}))
+	end,
+	funnel = function(x, y)
+		local dirs = {"right", "down", "left", "up"}
+		local dir = dirs[math.random(1, #dirs)]
+		table.insert(objects["funnel"], funnel:new(x, y, dir, {1, 1}))
+	end,
+	cubedispenser = function(x, y)
+		table.insert(objects["cubedispenser"], cubedispenser:new(x, y, {1, 1}))
+	end,
+	snakeblock = function(x, y)
+		table.insert(objects["snakeblock"], snakeblock:new(x, y, {1, 1}))
+	end,
+	platform = function(x, y)
+		table.insert(objects["platform"], platform:new(x, y, {1, 1}))
+	end,
+	seesaw = function(x, y)
+		table.insert(objects["seesaw"], seesaw:new(x, y, {1, 1}))
+	end,
+	spring = function(x, y)
+		table.insert(objects["spring"], spring:new(x, y))
+	end,
+	smallspring = function(x, y)
+		table.insert(objects["smallspring"], smallspring:new(x, y))
+	end,
+	longfire = function(x, y)
+		table.insert(objects["longfire"], longfire:new(x, y, {1, 1}))
+	end,
+	track = function(x, y)
+		table.insert(objects["track"], track:new(x, y, {1, 1}, false))
+	end,
+	enemytool = function(x, y)
+		local enemies = {"goomba", "koopa", "bulletbill", "lakito", "angrysun"}
+		local enemy = enemies[math.random(1, #enemies)]
+		table.insert(objects["enemytool"], enemytool:new(x, y, {1, 1, enemy}))
+	end,
+	tiletool = function(x, y)
+		table.insert(objects["tiletool"], tiletool:new(x, y, {1, 1, 1}))
+	end,
+	button = function(x, y)
+		local types = {1, 2, 3}
+		local t = types[math.random(1, #types)]
+		table.insert(objects["button"], button:new(x, y, t, {1, 1}))
+	end,
+	pushbutton = function(x, y)
+		local dirs = {"left", "right"}
+		local dir = dirs[math.random(1, #dirs)]
+		table.insert(objects["pushbutton"], pushbutton:new(x, y, dir, {1, 1}))
+	end,
+	door = function(x, y)
+		local dirs = {"ver", "hor"}
+		local dir = dirs[math.random(1, #dirs)]
+		table.insert(objects["door"], door:new(x, y, {1, 1}, dir))
+	end,
+	clearpipe = function(x, y)
+		table.insert(objects["clearpipe"], clearpipe:new(x, y, {1, 1}))
+	end,
+	donut = function(x, y)
+		table.insert(objects["donut"], donut:new(x, y))
+	end,
+	flipblock = function(x, y)
+		table.insert(objects["flipblock"], flipblock:new(x, y))
+	end,
+	miniblock = function(x, y)
+		table.insert(objects["miniblock"], miniblock:new(x, y))
+	end,
+	powblock = function(x, y)
+		table.insert(objects["powblock"], powblock:new(x, y))
+	end,
+	seesawplatform = function(x, y)
+		table.insert(objects["seesawplatform"], seesawplatform:new(x, y, "left"))
+	end,
+	windleaf = function(x, y)
+		table.insert(objects["windleaf"], windleaf:new(x, y))
+	end,
+	rainboom = function(x, y)
+		table.insert(objects["rainboom"], rainboom:new(x, y))
+	end,
+	firework = function(x, y)
+		table.insert(objects["firework"], firework:new(x, y))
+	end,
+	bubble = function(x, y)
+		table.insert(objects["bubble"], bubble:new(x, y))
+	end,
+	delayer = function(x, y)
+		table.insert(objects["delayer"], delayer:new(x, y, {1, 1, 1}))
+	end,
+	animationtrigger = function(x, y)
+		table.insert(objects["animationtrigger"], animationtrigger:new(x, y, 1, {1, 1}))
+	end,
+	regiontrigger = function(x, y)
+		table.insert(objects["regiontrigger"], regiontrigger:new(x, y, 1, {1, 1}))
+	end,
+	camerastop = function(x, y)
+		table.insert(objects["camerastop"], camerastop:new(x, y))
+	end,
+	screenboundary = function(x, y)
+		table.insert(objects["screenboundary"], screenboundary:new(0))
 	end
 }
 

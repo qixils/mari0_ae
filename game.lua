@@ -542,6 +542,21 @@ function game_update(dt)
 		end
 		music.pitch = speed
 		-- Spawn Enemy
+		-- AVAILABLE SPAWNABLE ENTITIES FOR CROWD CONTROL:
+		-- ENEMIES: goomba, koopa, magikoopa, thwomp, hammerbro, boo, chainchomp, cheepcheep, drybones,
+		--          fire, bomb, bulletbill, cannonball, castlefire, fishbone, flyingfish, glados, grinder,
+		--          icicle, kingbill, lakito, meteor, mole, muncher, ninji, parabeetle, plant, plantcreeper,
+		--          plantfire, poisonmush, pokey, rocketturret, rockywrench, sidestepper, skewer, spike,
+		--          splunkin, squid, torpedoted, turret, barrel, bigbill, bigmole, boomboom, core, bowser,
+		--          angrysun, amp, fuzzy, upfire
+		-- PROJECTILES: fireball, iceball, superball, ice, laser
+		-- ITEMS: mushroom, star, coin, cappy, mariohammer, mariotail, boomerang, gel, geldispenser
+		-- MECHANICS: lightbridge, portal, vine, faithplate, funnel, cubedispenser, snakeblock, platform,
+		--            seesaw, spring, smallspring, longfire, track, enemytool, tiletool, button, pushbutton,
+		--            door, clearpipe, donut, flipblock, miniblock, powblock, seesawplatform, windleaf,
+		--            rainboom, firework, bubble, delayer, animationtrigger, regiontrigger, camerastop,
+		--            screenboundary, box, checkpoint
+		-- USAGE: Use "spawn_[entityname]" as the Crowd Control effect code
 		for i, request in ipairs(cc_requests) do
 			if string.startswith(request.code, "spawn_") then
 				local enemy = string.sub(request.code, 7)
