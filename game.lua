@@ -565,20 +565,39 @@ function game_update(dt)
 				if creator then
 					local target = math.random(players)
 					local player = objects["player"][target]
-					local success, result = pcall(creator, player.x + math.random(7,15), player.y + 0.5 - math.random(10))
+					local x = math.floor(player.x + math.random(6,10))
+					local y = math.floor(player.y - math.random(7))
+					local success, result = pcall(creator, x, y)
 					-- Check if pcall was `success`ful and the function didn't return `false` (`nil` is okay)
 					if success and result ~= false then
 						cc_start(request)
 					end
 				end
 			elseif string.startswith(request.code, "gel_") then
-				local geltype = string.sub(request.code, 5)
-				local creator = ccentitycreators[request.code]
-				if creator then
-					local success, result = pcall(creator, 0, 0)
-					-- Check if pcall was `success`ful and the function didn't return `false` (`nil` is okay)
-					if success and result ~= false then
-						cc_start(request)
+				local geltype = tonumber(string.sub(request.code, 5))
+				for mapx, row in pairs(map) do
+					for mapy, tile in pairs(row) do
+						local tileID = tile[1]
+						if tilequads[tileID] and tilequads[tileID].collision then
+							-- Initialize gels table if it doesn't exist
+							if not tile["gels"] then
+								tile["gels"] = {}
+							end
+							
+							-- Only apply gel to exposed faces (not touching other solid tiles)
+							local topExposed = math.random() < 0.75 and (not map[mapx] or not map[mapx][mapy-1] or not map[mapx][mapy-1][1] or not tilequads[map[mapx][mapy-1][1]] or not tilequads[map[mapx][mapy-1][1]].collision)
+							local bottomExposed = math.random() < 0.75 and (not map[mapx] or not map[mapx][mapy+1] or not map[mapx][mapy+1][1] or not tilequads[map[mapx][mapy+1][1]] or not tilequads[map[mapx][mapy+1][1]].collision)
+							local leftExposed = math.random() < 0.75 and (not map[mapx-1] or not map[mapx-1][mapy] or not map[mapx-1][mapy][1] or not tilequads[map[mapx-1][mapy][1]] or not tilequads[map[mapx-1][mapy][1]].collision)
+							local rightExposed = math.random() < 0.75 and (not map[mapx+1] or not map[mapx+1][mapy] or not map[mapx+1][mapy][1] or not tilequads[map[mapx+1][mapy][1]] or not tilequads[map[mapx+1][mapy][1]].collision)
+							
+							-- Apply gel only to exposed faces
+							if topExposed then tile["gels"]["top"] = geltype end
+							if bottomExposed then tile["gels"]["bottom"] = geltype end
+							if leftExposed then tile["gels"]["left"] = geltype end
+							if rightExposed then tile["gels"]["right"] = geltype end
+
+							if topExposed or bottomExposed or leftExposed or rightExposed then cc_start(request) end
+						end
 					end
 				end
 			end
@@ -2998,12 +3017,16 @@ function game_draw()
 		
 		--Minecraft
 		--black border
-		if objects["player"][mouseowner] and playertype == "minecraft" and not levelfinished then
+		local hasItems = false
+		for i = 1, 9 do
+			hasItems = hasItems or (inventory[i].t ~= nil)
+		end
+		if objects["player"][mouseowner] and (playertype == "minecraft" or hasItems) and not levelfinished then
 			local v = objects["player"][mouseowner]
 			local sourcex, sourcey = v.x+v.portalsourcex, v.y+v.portalsourcey
 			local cox, coy, side, tend, x, y = traceline(sourcex, sourcey, v.pointingangle)
 			
-			if cox then
+			if cox and playertype == "minecraft" then
 				local dist = math.sqrt((v.x+v.width/2 - x)^2 + (v.y+v.height/2 - y)^2)
 				if dist <= minecraftrange then
 					love.graphics.setColor(0, 0, 0, 170)

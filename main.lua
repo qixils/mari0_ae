@@ -298,6 +298,7 @@ function love.load()
 	else
 		changescale(scale, fullscreen)
 	end
+	gamefinished = true
 
 	love.window.setTitle( "Mari0: Crowd Control" )
 	
@@ -2186,6 +2187,8 @@ function love.keypressed(key, scancode, isrepeat, textinput)
 	
 	if key == "0" and HITBOXDEBUG then
 		HITBOXDEBUGANIMS = not HITBOXDEBUGANIMS
+	elseif key == "f8" then
+		DontPauseOnUnfocus = not DontPauseOnUnfocus
 	elseif key == "f9" then
 		cc_reload()
 	elseif key == "f10" then
@@ -2715,7 +2718,7 @@ function print_r (t, indent) --Not by me
 end
 
 function love.focus(f)
-	if (not f) and gamestate == "game"and (not editormode) and (not testlevel) and (not levelfinished) and (not everyonedead) and (not CLIENT) and (not SERVER) and (not dontPauseOnUnfocus) then
+	if (not f) and gamestate == "game"and (not editormode) and (not testlevel) and (not levelfinished) and (not everyonedead) and (not CLIENT) and (not SERVER) and (not DontPauseOnUnfocus) then
 		pausemenuopen = true
 		pausedaudio = love.audio.pause()
 	end

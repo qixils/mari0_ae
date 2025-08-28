@@ -4,9 +4,9 @@ local unwrap, angles
 local stopchasingdistance = 24
 
 function cheepcheep:init(x, y, color)
-	self.x = x-6/16
-	self.y = y-12/16
-	self.starty = y-12/16
+	self.x = math.floor(x-6/16)
+	self.y = math.floor(y-12/16)
+	self.starty = math.floor(y-12/16)
 	self.width = 12/16
 	self.height = 12/16
 	self.rotation = 0 --for portals

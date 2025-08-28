@@ -1,11 +1,12 @@
 bowser = class:new()
 
-function bowser:init(x, y, i, e)
+function bowser:init(x, y, i, e, forcefire)
 	--PHYSICS STUFF
 	self.x = x+4
 	self.y = y-27/16
 	self.level = i or marioworld
 	self.e = e or false
+	self.forcefire = forcefire or false
 	self.startx = x+12
 	self.starty = y
 	self.speedy = 0
@@ -145,7 +146,8 @@ function bowser:update(dt)
 			end
 		end
 		
-		if self.backwards == false and firestarted and firetimer > firedelay-0.5 then
+		-- todo: need to allow firetimer to update
+		if self.backwards == false and (firestarted or self.forcefire) and firetimer > firedelay-0.5 then
 			self.fireframe = 2
 			self.speedx = 0
 		else

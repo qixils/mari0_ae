@@ -9,28 +9,14 @@ buttons_inverted = false
 toggled_lightsout = false
 gravity_flipped = false
 
-	-- COMPREHENSIVE LIST OF ALL SPAWNABLE ENTITIES FOR TESTING:
-	-- goomba, koopa, checkpoint, box, upfire, amp, fuzzy, angrysun, bowser,
-	-- magikoopa, thwomp, hammerbro, boo, chainchomp, cheepcheep, drybones,
-	-- fire, bomb, bulletbill, cannonball, castlefire, fishbone, flyingfish,
-	-- glados, grinder, icicle, kingbill, lakito, meteor, mole, muncher,
-	-- ninji, parabeetle, plant, plantcreeper, plantfire, poisonmush, pokey,
-	-- rocketturret, rockywrench, sidestepper, skewer, spike, splunkin, squid,
-	-- torpedoted, turret, barrel, bigbill, bigmole, boomboom, core,
-	-- fireball, ice, laser, lightbridge, portal, vine, yoshi, mushroom,
-	-- star, coin, cappy, mariohammer, mariotail, boomerang, gel, geldispenser,
-	-- faithplate, funnel, cubedispenser, snakeblock, platform, seesaw,
-	-- spring, smallspring, longfire, track, enemytool, tiletool, button,
-	-- pushbutton, door, clearpipe, donut, flipblock, miniblock, powblock,
-	-- seesawplatform, windleaf, rainboom, firework, bubble, delayer,
-	-- animationtrigger, regiontrigger, camerastop, screenboundary
-	-- GEL EFFECTS: gel_repulsion, gel_propulsion, gel_conversion, gel_adhesion
-
 ccentitycreators = {
     goomba = function(x, y)
-        local n = math.random(1, 58)
+        local n = math.random(61)
         local type = nil
-        if n >= 55 then
+		if n >= 58 then
+			table.insert(objects["splunkin"], splunkin:new(x, y))
+			return true
+        elseif n >= 55 then
             type = "tinygoomba"
         elseif n >= 52 then
             type = "paragoomba"
@@ -41,10 +27,10 @@ ccentitycreators = {
         elseif n >= 41 then
             type = "goombrat"
         end
-        table.insert(objects["goomba"], goomba:new(x - .5, y, type))
+		table.insert(objects["goomba"], goomba:new(x - .5, y, type))
     end,
     koopa = function(x, y)
-        local n = math.random(1, 60)
+        local n = math.random(60)
         local type = nil
         -- red redflying flying2 flying beetle beetleshell downbeetle downspikey spikeyshell blue shell bigkoopa bigbeetle
         if n >= 56 then
@@ -71,14 +57,21 @@ ccentitycreators = {
 		objects["checkpointflag"][x] = checkpointflag:new(x, y, {}, #checkpoints)
 	end,
 	box = function(x, y)
-		local n = math.random(1, 10)
-		local t = nil
-		if n >= 9 then
-			t = "edgeless"
-		elseif n >= 6 then
-			t = "box2"
+		if math.random(2) == 1 then
+			local types = {"box", "box2", "edgeless"}
+			local t = types[math.random(#types)]
+			local spawned = box:new(x, y, t)
+			if math.random(5) == 1 then
+				local gels = {1, 2, 4}
+				local gel = gels[math.random(#gels)]
+				spawned:globalcollide("gel", { id = gel })
+			end
+			table.insert(objects["box"], spawned)
+		else
+			local types = {"curiosity", "cakemix", "anger", "morality"}
+			local t = types[math.random(#types)]
+			table.insert(objects["core"], core:new(x, y, t))
 		end
-		table.insert(objects["box"], box:new(x, y, t))
 	end,
 	upfire = function(x, y)
 		table.insert(objects["upfire"], upfire:new(x, y))
@@ -102,7 +95,7 @@ ccentitycreators = {
 	end,
 	thwomp = function(x, y)
 		local types = {"down", "left", "right", "thwimp"}
-		local t = types[math.random(1, #types)]
+		local t = types[math.random(#types)]
 		table.insert(objects["thwomp"], thwomp:new(x, y, t))
 	end,
 	hammerbro = function(x, y)
@@ -115,9 +108,7 @@ ccentitycreators = {
 		table.insert(objects["chainchomp"], chainchomp:new(x, y))
 	end,
 	cheepcheep = function(x, y)
-		local types = {"red", "white", "flying"}
-		local t = types[math.random(1, #types)]
-		table.insert(objects["cheepcheep"], cheepcheep:new(x, y, t))
+		table.insert(objects["cheepcheep"], cheepcheep:new(x, y, math.random(3)))
 	end,
 	drybones = function(x, y)
 		table.insert(objects["drybones"], drybones:new(x, y))
@@ -129,17 +120,16 @@ ccentitycreators = {
 		table.insert(objects["bomb"], bomb:new(x, y))
 	end,
 	bulletbill = function(x, y)
-		local dir = math.random(1, 2) == 1 and "left" or "right"
-		table.insert(objects["bulletbill"], bulletbill:new(x, y, dir))
+		table.insert(objects["bulletbill"], bulletbill:new(x, y, "left"))
 	end,
 	cannonball = function(x, y)
-		table.insert(objects["cannonball"], cannonball:new(x, y))
+		table.insert(objects["cannonball"], cannonball:new(x, y, "left"))
 	end,
 	castlefire = function(x, y)
 		table.insert(objects["castlefire"], castlefire:new(x, y))
 	end,
 	fishbone = function(x, y)
-		table.insert(objects["fishbone"], fishbone:new(x, y))
+		table.insert(objects["fishbone"], fishbone:new(x, y, 1))
 	end,
 	flyingfish = function(x, y)
 		table.insert(objects["flyingfish"], flyingfish:new())
@@ -152,11 +142,11 @@ ccentitycreators = {
 	end,
 	icicle = function(x, y)
 		local types = {"big", "small"}
-		local t = types[math.random(1, #types)]
+		local t = types[math.random(#types)]
 		table.insert(objects["icicle"], icicle:new(x, y, t))
 	end,
 	kingbill = function(x, y)
-		table.insert(objects["kingbill"], kingbill:new(x, y))
+		table.insert(objects["kingbill"], kingbill:new(x, y, nil, "left"))
 	end,
 	lakito = function(x, y)
 		table.insert(objects["lakito"], lakito:new(x, y))
@@ -166,7 +156,7 @@ ccentitycreators = {
 	end,
 	mole = function(x, y)
 		local types = {"big", "small"}
-		local t = types[math.random(1, #types)]
+		local t = types[math.random(#types)]
 		table.insert(objects["mole"], mole:new(x, y, t))
 	end,
 	muncher = function(x, y)
@@ -176,15 +166,19 @@ ccentitycreators = {
 		table.insert(objects["ninji"], ninji:new(x, y))
 	end,
 	parabeetle = function(x, y)
-		table.insert(objects["parabeetle"], parabeetle:new(x, y))
+		local types = {"parabeetle", "parabeetleright", "parabeetlegreen", "parabeetlegreenright"}
+		local t = types[math.random(#types)]
+		table.insert(objects["parabeetle"], parabeetle:new(x, y, t))
 	end,
 	plant = function(x, y)
-		local types = {"down", "up", "red", "reddown"}
-		local t = types[math.random(1, #types)]
-		table.insert(objects["plant"], plant:new(x, y, t))
+		local types = {"plant", "redplant", "dryplant", "fireplant"}
+		local t = types[math.random(#types)]
+		local dirs = {"up", "down", "left", "right"}
+		local dir = dirs[math.random(#dirs)]
+		table.insert(objects["plant"], plant:new(x, y, t, dir))
 	end,
 	plantcreeper = function(x, y)
-		table.insert(objects["plantcreeper"], plantcreeper:new(x, y))
+		table.insert(objects["plantcreeper"], plantcreeper:new(x, y, {}))
 	end,
 	plantfire = function(x, y)
 		table.insert(objects["plantfire"], plantfire:new(x, y))
@@ -205,21 +199,20 @@ ccentitycreators = {
 		table.insert(objects["sidestepper"], sidestepper:new(x, y))
 	end,
 	skewer = function(x, y)
-		table.insert(objects["skewer"], skewer:new(x, y))
+		local dirs = {"up", "down", "left", "right"}
+		local dir = dirs[math.random(#dirs)]
+		table.insert(objects["skewer"], skewer:new(x, y, dir, {}))
 	end,
 	spike = function(x, y)
 		table.insert(objects["spike"], spike:new(x, y))
 	end,
-	splunkin = function(x, y)
-		table.insert(objects["splunkin"], splunkin:new(x, y))
-	end,
 	squid = function(x, y)
 		local types = {"pink", "normal"}
-		local t = types[math.random(1, #types)]
+		local t = types[math.random(#types)]
 		table.insert(objects["squid"], squid:new(x, y, t))
 	end,
 	torpedoted = function(x, y)
-		table.insert(objects["torpedoted"], torpedoted:new(x, y))
+		table.insert(objects["torpedoted"], torpedoted:new(x, y, "left"))
 	end,
 	turret = function(x, y)
 		table.insert(objects["turret"], turret:new(x, y))
@@ -228,7 +221,7 @@ ccentitycreators = {
 		table.insert(objects["barrel"], barrel:new(x, y))
 	end,
 	bigbill = function(x, y)
-		table.insert(objects["bigbill"], bigbill:new(x, y))
+		table.insert(objects["bigbill"], bigbill:new(x, y, "left"))
 	end,
 	bigmole = function(x, y)
 		table.insert(objects["bigmole"], bigmole:new(x, y))
@@ -236,33 +229,38 @@ ccentitycreators = {
 	boomboom = function(x, y)
 		table.insert(objects["boomboom"], boomboom:new(x, y))
 	end,
-	core = function(x, y)
-		table.insert(objects["core"], core:new(x, y))
-	end,
 	-- PROJECTILES AND ITEMS
 	fireball = function(x, y)
-		local dir = math.random(1, 2) == 1 and "left" or "right"
-		table.insert(objects["fireball"], fireball:new(x, y, dir, nil, "fireball"))
+		local types = {"fireball", "iceball", "superball"}
+		local dirs = {"left", "right"}
+		for i = 1, 7 do
+			local t = types[math.random(#types)]
+			local dir = dirs[math.random(#dirs)]
+			local offsetx = x + math.random(-2, 2)
+			local offsety = y + math.random(-2, 2)
+			table.insert(objects["fireball"], fireball:new(offsetx, offsety, dir, nil, t))
+		end
 	end,
-	iceball = function(x, y)
-		local dir = math.random(1, 2) == 1 and "left" or "right"
-		table.insert(objects["fireball"], fireball:new(x, y, dir, nil, "iceball"))
-	end,
-	superball = function(x, y)
-		local dir = math.random(1, 2) == 1 and "left" or "right"
-		table.insert(objects["fireball"], fireball:new(x, y, dir, nil, "superball"))
+	brofireball = function(x, y)
+		local types = {"fire", "ice"}
+		for i = 1, 3 do
+			local t = types[math.random(#types)]
+			local offsetx = x + math.random(-2, 2)
+			local offsety = y + math.random(-2, 2)
+			table.insert(objects["fireball"], brofireball:new(offsetx, offsety, "left", t))
+		end
 	end,
 	ice = function(x, y)
 		table.insert(objects["ice"], ice:new(x, y, 1, 1, 1))
 	end,
 	laser = function(x, y)
 		local dirs = {"right", "left", "up", "down"}
-		local dir = dirs[math.random(1, #dirs)]
+		local dir = dirs[math.random(#dirs)]
 		table.insert(objects["laser"], laser:new(x, y, dir, {1, 1}))
 	end,
 	lightbridge = function(x, y)
 		local dirs = {"right", "left", "up", "down"}
-		local dir = dirs[math.random(1, #dirs)]
+		local dir = dirs[math.random(#dirs)]
 		table.insert(objects["lightbridge"], lightbridge:new(x, y, dir, {1, 1}))
 	end,
 	portal = function(x, y)
@@ -273,7 +271,7 @@ ccentitycreators = {
 	end,
 	yoshi = function(x, y)
 		local colors = {1, 2, 3, 4}
-		local color = colors[math.random(1, #colors)]
+		local color = colors[math.random(#colors)]
 		table.insert(objects["yoshi"], yoshi:new(x, y, color))
 	end,
 	mushroom = function(x, y)
@@ -289,35 +287,42 @@ ccentitycreators = {
 		table.insert(objects["cappy"], cappy:new(x, y))
 	end,
 	mariohammer = function(x, y)
-		local dir = math.random(1, 2) == 1 and "left" or "right"
+		local dir = math.random(2) == 1 and "left" or "right"
 		table.insert(objects["mariohammer"], mariohammer:new(x, y, dir, nil))
 	end,
 	mariotail = function(x, y)
-		local dir = math.random(1, 2) == 1 and "left" or "right"
+		local dir = math.random(2) == 1 and "left" or "right"
 		table.insert(objects["mariotail"], mariotail:new(x, y, dir, nil))
 	end,
 	boomerang = function(x, y)
-		local dir = math.random(1, 2) == 1 and "left" or "right"
+		local dir = math.random(2) == 1 and "left" or "right"
 		table.insert(objects["boomerang"], boomerang:new(x, y, dir, nil))
 	end,
 	gel = function(x, y)
-		local types = {1, 2, 3, 4}
-		local t = types[math.random(1, #types)]
-		table.insert(objects["gel"], gel:new(x, y, t))
+		local types = {1, 2, 4}
+		for i = 1, 5 do
+			local t = types[math.random(#types)]
+			local spawned = gel:new(x, y, t)
+			spawned.speedx = math.random(-10, 10)
+			spawned.speedy = math.random(-10, 10)
+			table.insert(objects["gel"], spawned)
+		end
 	end,
 	geldispenser = function(x, y)
+		local types = {1, 2, 4}
+		local t = types[math.random(#types)]
 		local dirs = {"down", "right", "left"}
-		local dir = dirs[math.random(1, #dirs)]
-		table.insert(objects["geldispenser"], geldispenser:new(x, y, 1, dir, {1, 1}))
+		local dir = dirs[math.random(#dirs)]
+		table.insert(objects["geldispenser"], geldispenser:new(x, y, t, dir, {1, 1}))
 	end,
 	faithplate = function(x, y)
 		local dirs = {"up", "right", "left"}
-		local dir = dirs[math.random(1, #dirs)]
+		local dir = dirs[math.random(#dirs)]
 		table.insert(objects["faithplate"], faithplate:new(x, y, dir, 1, {1, 1}))
 	end,
 	funnel = function(x, y)
 		local dirs = {"right", "down", "left", "up"}
-		local dir = dirs[math.random(1, #dirs)]
+		local dir = dirs[math.random(#dirs)]
 		table.insert(objects["funnel"], funnel:new(x, y, dir, {1, 1}))
 	end,
 	cubedispenser = function(x, y)
@@ -346,7 +351,7 @@ ccentitycreators = {
 	end,
 	enemytool = function(x, y)
 		local enemies = {"goomba", "koopa", "bulletbill", "lakito", "angrysun"}
-		local enemy = enemies[math.random(1, #enemies)]
+		local enemy = enemies[math.random(#enemies)]
 		table.insert(objects["enemytool"], enemytool:new(x, y, {1, 1, enemy}))
 	end,
 	tiletool = function(x, y)
@@ -354,30 +359,30 @@ ccentitycreators = {
 	end,
 	button = function(x, y)
 		local types = {1, 2, 3}
-		local t = types[math.random(1, #types)]
+		local t = types[math.random(#types)]
 		table.insert(objects["button"], button:new(x, y, t, {1, 1}))
 	end,
 	pushbutton = function(x, y)
 		local dirs = {"left", "right"}
-		local dir = dirs[math.random(1, #dirs)]
+		local dir = dirs[math.random(#dirs)]
 		table.insert(objects["pushbutton"], pushbutton:new(x, y, dir, {1, 1}))
 	end,
 	door = function(x, y)
 		local dirs = {"ver", "hor"}
-		local dir = dirs[math.random(1, #dirs)]
+		local dir = dirs[math.random(#dirs)]
 		table.insert(objects["door"], door:new(x, y, {1, 1}, dir))
 	end,
 	clearpipe = function(x, y)
 		table.insert(objects["clearpipe"], clearpipe:new(x, y, {1, 1}))
 	end,
 	donut = function(x, y)
-		table.insert(objects["donut"], donut:new(x, y))
+		table.insert(objects["donut"], donut:new(x, y, nil, false, "false"))
 	end,
 	flipblock = function(x, y)
 		table.insert(objects["flipblock"], flipblock:new(x, y))
 	end,
 	miniblock = function(x, y)
-		table.insert(objects["miniblock"], miniblock:new(x, y))
+		table.insert(miniblocks, miniblock:new(x-.5, y-.2, math.random(#tilequads)))
 	end,
 	powblock = function(x, y)
 		table.insert(objects["powblock"], powblock:new(x, y))
@@ -388,159 +393,6 @@ ccentitycreators = {
 	windleaf = function(x, y)
 		table.insert(objects["windleaf"], windleaf:new(x, y))
 	end,
-	rainboom = function(x, y)
-		table.insert(objects["rainboom"], rainboom:new(x, y))
-	end,
-	firework = function(x, y)
-		table.insert(objects["firework"], firework:new(x, y))
-	end,
-	bubble = function(x, y)
-		table.insert(objects["bubble"], bubble:new(x, y))
-	end,
-	delayer = function(x, y)
-		table.insert(objects["delayer"], delayer:new(x, y, {1, 1, 1}))
-	end,
-	animationtrigger = function(x, y)
-		table.insert(objects["animationtrigger"], animationtrigger:new(x, y, 1, {1, 1}))
-	end,
-	regiontrigger = function(x, y)
-		table.insert(objects["regiontrigger"], regiontrigger:new(x, y, 1, {1, 1}))
-	end,
-	camerastop = function(x, y)
-		table.insert(objects["camerastop"], camerastop:new(x, y))
-	end,
-			screenboundary = function(x, y)
-			table.insert(objects["screenboundary"], screenboundary:new(0))
-		end,
-		-- GELOCALYPSE EFFECTS - Cover all surfaces with specific gels
-		gel_repulsion = function(x, y)
-			-- Cover all solid blocks with repulsion gel (bouncy)
-			if map and tilequads then
-				for mapx, row in pairs(map) do
-					if type(row) == "table" then
-						for mapy, tile in pairs(row) do
-							if type(tile) == "table" and tile[1] then
-								local tileID = tile[1]
-								if tilequads[tileID] and tilequads[tileID].collision then
-									-- Initialize gels table if it doesn't exist
-									if not tile["gels"] then
-										tile["gels"] = {}
-									end
-									
-									-- Only apply gel to exposed faces (not touching other solid tiles)
-									local topExposed = not map[mapx] or not map[mapx][mapy-1] or not map[mapx][mapy-1][1] or not tilequads[map[mapx][mapy-1][1]] or not tilequads[map[mapx][mapy-1][1]].collision
-									local bottomExposed = not map[mapx] or not map[mapx][mapy+1] or not map[mapx][mapy+1][1] or not tilequads[map[mapx][mapy+1][1]] or not tilequads[map[mapx][mapy+1][1]].collision
-									local leftExposed = not map[mapx-1] or not map[mapx-1][mapy] or not map[mapx-1][mapy][1] or not tilequads[map[mapx-1][mapy][1]] or not tilequads[map[mapx-1][mapy][1]].collision
-									local rightExposed = not map[mapx+1] or not map[mapx+1][mapy] or not map[mapx+1][mapy][1] or not tilequads[map[mapx+1][mapy][1]] or not tilequads[map[mapx+1][mapy][1]].collision
-									
-									-- Apply gel only to exposed faces
-									if topExposed then tile["gels"]["top"] = 1 end
-									if bottomExposed then tile["gels"]["bottom"] = 1 end
-									if leftExposed then tile["gels"]["left"] = 1 end
-									if rightExposed then tile["gels"]["right"] = 1 end
-								end
-							end
-						end
-					end
-				end
-			end
-		end,
-		gel_propulsion = function(x, y)
-			-- Cover all solid blocks with propulsion gel (speedy)
-			if map and tilequads then
-				for mapx, row in pairs(map) do
-					if type(row) == "table" then
-						for mapy, tile in pairs(row) do
-							if type(tile) == "table" and tile[1] then
-								local tileID = tile[1]
-								if tilequads[tileID] and tilequads[tileID].collision then
-									-- Initialize gels table if it doesn't exist
-									if not tile["gels"] then
-										tile["gels"] = {}
-									end
-									
-									-- Only apply gel to exposed faces (not touching other solid tiles)
-									local topExposed = not map[mapx] or not map[mapx][mapy-1] or not map[mapx][mapy-1][1] or not tilequads[map[mapx][mapy-1][1]] or not tilequads[map[mapx][mapy-1][1]].collision
-									local bottomExposed = not map[mapx] or not map[mapx][mapy+1] or not map[mapx][mapy+1][1] or not tilequads[map[mapx][mapy+1][1]] or not tilequads[map[mapx][mapy+1][1]].collision
-									local leftExposed = not map[mapx-1] or not map[mapx-1][mapy] or not map[mapx-1][mapy][1] or not tilequads[map[mapx-1][mapy][1]] or not tilequads[map[mapx-1][mapy][1]].collision
-									local rightExposed = not map[mapx+1] or not map[mapx+1][mapy] or not map[mapx+1][mapy][1] or not tilequads[map[mapx+1][mapy][1]] or not tilequads[map[mapx+1][mapy][1]].collision
-									
-									-- Apply gel only to exposed faces
-									if topExposed then tile["gels"]["top"] = 2 end
-									if bottomExposed then tile["gels"]["bottom"] = 2 end
-									if leftExposed then tile["gels"]["left"] = 2 end
-									if rightExposed then tile["gels"]["right"] = 2 end
-								end
-							end
-						end
-					end
-				end
-			end
-		end,
-		gel_conversion = function(x, y)
-			-- Cover all solid blocks with conversion gel (portal)
-			if map and tilequads then
-				for mapx, row in pairs(map) do
-					if type(row) == "table" then
-						for mapy, tile in pairs(row) do
-							if type(tile) == "table" and tile[1] then
-								local tileID = tile[1]
-								if tilequads[tileID] and tilequads[tileID].collision then
-									-- Initialize gels table if it doesn't exist
-									if not tile["gels"] then
-										tile["gels"] = {}
-									end
-									
-									-- Only apply gel to exposed faces (not touching other solid tiles)
-									local topExposed = not map[mapx] or not map[mapx][mapy-1] or not map[mapx][mapy-1][1] or not tilequads[map[mapx][mapy-1][1]] or not tilequads[map[mapx][mapy-1][1]].collision
-									local bottomExposed = not map[mapx] or not map[mapx][mapy+1] or not map[mapx][mapy+1][1] or not tilequads[map[mapx][mapy+1][1]] or not tilequads[map[mapx][mapy+1][1]].collision
-									local leftExposed = not map[mapx-1] or not map[mapx-1][mapy] or not map[mapx-1][mapy][1] or not tilequads[map[mapx-1][mapy][1]] or not tilequads[map[mapx-1][mapy][1]].collision
-									local rightExposed = not map[mapx+1] or not map[mapx+1][mapy] or not map[mapx+1][mapy][1] or not tilequads[map[mapx+1][mapy][1]] or not tilequads[map[mapx+1][mapy][1]].collision
-									
-									-- Apply gel only to exposed faces
-									if topExposed then tile["gels"]["top"] = 3 end
-									if bottomExposed then tile["gels"]["bottom"] = 3 end
-									if leftExposed then tile["gels"]["left"] = 3 end
-									if rightExposed then tile["gels"]["right"] = 3 end
-								end
-							end
-						end
-					end
-				end
-			end
-		end,
-		gel_adhesion = function(x, y)
-			-- Cover all solid blocks with adhesion gel (sticky)
-			if map and tilequads then
-				for mapx, row in pairs(map) do
-					if type(row) == "table" then
-						for mapy, tile in pairs(row) do
-							if type(tile) == "table" and tile[1] then
-								local tileID = tile[1]
-								if tilequads[tileID] and tilequads[tileID].collision then
-									-- Initialize gels table if it doesn't exist
-									if not tile["gels"] then
-										tile["gels"] = {}
-									end
-									
-									-- Only apply gel to exposed faces (not touching other solid tiles)
-									local topExposed = not map[mapx] or not map[mapx][mapy-1] or not map[mapx][mapy-1][1] or not tilequads[map[mapx][mapy-1][1]] or not tilequads[map[mapx][mapy-1][1]].collision
-									local bottomExposed = not map[mapx] or not map[mapx][mapy+1] or not map[mapx][mapy+1][1] or not tilequads[map[mapx][mapy+1][1]] or not tilequads[map[mapx][mapy+1][1]].collision
-									local leftExposed = not map[mapx-1] or not map[mapx-1][mapy] or not map[mapx-1][mapy][1] or not tilequads[map[mapx-1][mapy][1]] or not tilequads[map[mapx-1][mapy][1]].collision
-									local rightExposed = not map[mapx+1] or not map[mapx+1][mapy] or not map[mapx+1][mapy][1] or not tilequads[map[mapx+1][mapy][1]] or not tilequads[map[mapx+1][mapy][1]].collision
-									
-									-- Apply gel only to exposed faces
-									if topExposed then tile["gels"]["top"] = 4 end
-									if bottomExposed then tile["gels"]["bottom"] = 4 end
-									if leftExposed then tile["gels"]["left"] = 4 end
-									if rightExposed then tile["gels"]["right"] = 4 end
-								end
-							end
-						end
-					end
-				end
-			end
-		end
 }
 
 --- Determines if the given string starts with the given substring.

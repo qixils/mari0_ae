@@ -62,9 +62,9 @@ function fireball:init(x, y, dir, v, t)
 		self.hp = 2
 
 		if dir == "right" then
-			self.speedx = iceballspeed+(v.speedx*.5)
+			self.speedx = iceballspeed+(((v and v.speedx) or 0)*.5)
 		else
-			self.speedx = -iceballspeed+(v.speedx*.5)
+			self.speedx = -iceballspeed+(((v and v.speedx) or 0)*.5)
 		end
 		self.gravity = 30
 	else
