@@ -767,7 +767,7 @@ gelcannonspeed = 30
 infinitetime = false
 infinitelives = false
 
-pausemenuoptions = {"resume", "suspend", "volume", "quit to", "quit to"}
+pausemenuoptions = {"resume", "save game", "volume", "quit to", "quit to"}
 pausemenuoptions2 = {"", "", "", "menu", "desktop"}
 
 guirepeatdelay = 0.07
@@ -919,7 +919,7 @@ defaultworlds = 8
 defaultlevels = 4
 defaultsublevels = 5
 
-onlinedlc = true --dlc went down :(. local dlc only now
+onlinedlc = true
 
 maxsublevelstable = {}
 for k = 0, maxsublevels do

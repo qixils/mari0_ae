@@ -109,9 +109,6 @@ function enemy:init(x, y, t, a, properties)
 		end
 	end
 
-	-- update qaud if quadno is changed, better than running the same check 10 times
-	local oldqaudno = (self.quadno or 1)
-
 	--right click menu
 	if self.rightclickmenu and self.a[3] then
 		local s = tostring(self.a[3])
@@ -205,7 +202,7 @@ function enemy:init(x, y, t, a, properties)
 						local name = v[1]
 						local value = v[2]
 						if (not self.casesensitive) and (name ~= "offsetX" and name ~= "offsetY" and name ~= "quadcenterX" and name ~= "quadcenterY") then
-							value = value:lower()
+							name = name:lower()
 						end
 						if type(value) == "table" then
 							self[name] = deepcopy(value)
@@ -221,9 +218,8 @@ function enemy:init(x, y, t, a, properties)
 		table.remove(self.a, 1)
 	end
 	
-	-- if quadno is changed in either rightclick
-	if oldqaudno ~= self.quadno then
-		self.quad = self.quadgroup[self.quadno]
+	if type(self.quadgroup) == "table" then
+		self.quad = self.quadgroup[self.quadno or 1]
 	end
 	
 	if self.customtimer then
@@ -2777,6 +2773,11 @@ function enemy:globalcollide(a, b, c, d, dir)
 	if self.killsenemies and ((self.killsenemiesonsides and (dir == "left" or dir == "right")) or (self.killsenemiesonbottom and dir == "floor") or (self.killsenemiesontop and dir == "ceil") or
 		(self.killsenemiesonleft and dir == "left") or (self.killsenemiesonright and dir == "right") or (self.killsenemiesonpassive and dir == "passive"))
 		and a == "enemy" and (not (b.resistsenemykill or b.resistseverything)) and (not b.killsenemies) then
+
+		if self.transforms and self:gettransformtrigger("enemykill") and (not self.justspawned) then
+			self:transform(self:gettransformsinto("enemykill"))
+		end
+		
 		return true
 	end
 	
@@ -2801,6 +2802,11 @@ function enemy:globalcollide(a, b, c, d, dir)
 						self.speedy = -(self.bounceforce or 10)
 					end
 					addpoints((firepoints[b.t] or 200), self.x, self.y)
+
+					if self.transforms and self:gettransformtrigger("enemykill") and (not self.justspawned) then
+						self:transform(self:gettransformsinto("enemykill"))
+					end
+					
 					return true
 				end
 			end

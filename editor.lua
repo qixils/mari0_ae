@@ -1654,7 +1654,7 @@ function editor_draw()
 						local tx, ty = rcp.x+rcp.path[i][1], rcp.y+rcp.path[i][2]
 						drawtrack(tx, ty, rcp.path[i][3], rcp.path[i][4])
 						--is object selected to be tracked? (d=default(entity),r=reverse,t=tile,tr=tile reverse)
-						if i ~= 1 and i ~= ismaptile(tx, ty) and (map[tx][ty][2] or rcp.path[i][5] == "t" or rcp.path[i][5] == "tr" or rcp.path[i][5] == "tf" or rcp.path[i][5] == "tfr") then
+						if i ~= 1 and ismaptile(tx, ty) and (map[tx][ty][2] or rcp.path[i][5] == "t" or rcp.path[i][5] == "tr" or rcp.path[i][5] == "tf" or rcp.path[i][5] == "tfr") then
 							local trackable = rcp.path[i][5] or "d"
 							if trackable ~= "" then
 								local dir = rcp.path[i][4]
@@ -8250,27 +8250,18 @@ function saveeditormetadata()
 	end
 	w, h = math.min(mapwidth, w), math.min(mapheight, h)
 	local imgdata = love.image.newImageData(w, h)
-	local pointer   = require("ffi").cast("uint8_t*", imgdata:getFFIPointer()) -- imageData has one byte per channel per pixel.
-	local bytecount = imgdata:getWidth() * imgdata:getHeight() -- pixel count * 4
-
-	local i = 0
 	for y = 1, h do
 		for x = 1, w do
 			local id = map[x][mapheight-h+y][1]
 			local r, g, b
-			if rgblist[id] and id ~= 0 and not tilequads[id].invisible then
+			if rgblist[id] and id ~= 0 and not tilequads[id].invisible  then
 				r, g, b = unpack(rgblist[id])
 			else
 				r, g, b = love.graphics.getBackgroundColor()
 			end
-			pointer[i]   = r
-			pointer[i+1] = g
-			pointer[i+2] = b
-			pointer[i+3] = 255
-			i = i + 4
+			imgdata:setPixel(x-1, y-1, r, g, b, 255)
 		end
 	end
-
 	local levelstring = marioworld .. "~" .. mariolevel .. "~" .. mariosublevel
 	imgdata:encode("png", mappackfolder .. "/" .. mappack .. "/editor/" .. levelstring .. ".png")
 	if not meta_data[levelstring] then

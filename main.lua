@@ -55,35 +55,13 @@
 if love._version_major ~= 11 then error("You have an outdated version of Love2d! Get 11.5 and retry.") end
 
 ----- COLOR MIGRATION helpers -----
-function clamp(x, lower, upper)
-    return math.min(math.max(x, lower), upper)
-end
-
-local function convertFromByte(x)
-    return clamp(math.floor(x + 0.5) / 255, 0, 1)
-end
-
-local colorCache = {}
-for i = 0, 255 do colorCache[i] = convertFromByte(i) end
-
-local function convertFromCachedByte(x)
-	x = clamp(x, 0, 255)
-	local cached = colorCache[x]
-	return (cached ~= nil and cached) or convertFromByte(x) -- fallback for decimals
-end
-
-local function convertFromCachedTable(table)
-	for i, v in ipairs(table) do
-		table[i] = v ~= nil and convertFromCachedByte(v) or nil
-	end
-	return table
-end
+FFIAVAILABLE = pcall(function () require("ffi") end)
 
 local function convertText(text)
 	if type(text) == "table" then
 		for i, v in ipairs(text) do
 			if type(v) == "table" then
-				text[i] = unpack(convertFromCachedTable(v))
+				text[i] = {love.math.colorFromBytes(unpack(v))}
 			end
 		end
 	end
@@ -93,31 +71,31 @@ end
 ----- COLOR MIGRATION for real -----
 
 local defaultSetColor = love.graphics.setColor
-function love.graphics.setColor(r, g, b, a, ...)
-	if type(r) == "table" then r, g, b, a = r[1], r[2], r[3], r[4] end
-    return defaultSetColor(convertFromCachedTable({r, g, b, a}), ...)
+function love.graphics.setColor(r, g, b, a)
+	if type(r) == "table" then r, g, b, a = unpack(r) end
+    return defaultSetColor(love.math.colorFromBytes(r, g, b, a))
 end
 
 local defaultGetColor = love.graphics.getColor
-function love.graphics.getColor(...)
-	return love.math.colorToBytes(defaultGetColor(...))
+function love.graphics.getColor()
+	return love.math.colorToBytes(defaultGetColor())
 end
 
 local defaultSetBackgroundColor = love.graphics.setBackgroundColor
-function love.graphics.setBackgroundColor(r, g, b, a, ...)
-	if type(r) == "table" then r, g, b, a = r[1], r[2], r[3], r[4] end
-    return defaultSetBackgroundColor(convertFromCachedTable({r, g, b, a}), ...)
+function love.graphics.setBackgroundColor(r, g, b, a)
+	if type(r) == "table" then r, g, b, a = unpack(r) end
+    return defaultSetBackgroundColor(love.math.colorFromBytes(r, g, b, a))
 end
 
 local defaultGetBackgroundColor = love.graphics.getBackgroundColor
-function love.graphics.getBackgroundColor(...)
-	return love.math.colorToBytes(defaultGetBackgroundColor(...))
+function love.graphics.getBackgroundColor()
+	return love.math.colorToBytes(defaultGetBackgroundColor())
 end
 
 local defaultClear = love.graphics.clear
 function love.graphics.clear(r, g, b, a, ...)
 	if r ~= nil and g ~= nil and b ~= nil then
-		r, g, b, a = unpack(convertFromCachedTable({r, g, b, a}))
+		r, g, b, a = love.math.colorFromBytes(r, g, b, a)
 	end
 	return defaultClear(r, g, b, a, ...)
 end
@@ -163,7 +141,7 @@ local SpriteBatch = debug.getregistry().SpriteBatch
 
 local defaultSpriteBatchSetColor = SpriteBatch.setColor
 function SpriteBatch:setColor(...)
-	return defaultSpriteBatchSetColor(self, unpack(convertFromCachedTable({...})))
+	return defaultSpriteBatchSetColor(self, love.math.colorFromBytes(...))
 end
 
 local defaultSpriteBatchGetColor = SpriteBatch.getColor
@@ -171,11 +149,11 @@ function SpriteBatch:getColor(...)
 	return love.math.colorToBytes(defaultSpriteBatchGetColor(self, ...))
 end
 
-local ImageData = debug.getregistry().ImageData
+local ImageData = debug.getregistry().ImageData -- TODO: use FFI by default? not sure if fetching the pointer constantly will actually be efficient
 
 local defaultImageDataSetPixel = ImageData.setPixel
 function ImageData:setPixel(x, y, ...)
-	return defaultImageDataSetPixel(self, x, y, unpack(convertFromCachedTable({...})))
+	return defaultImageDataSetPixel(self, x, y, love.math.colorFromBytes(...))
 end
 
 local defaultImageDataGetPixel = ImageData.getPixel
@@ -185,10 +163,14 @@ end
 
 local defaultImageDataMapPixel = ImageData.mapPixel
 function ImageData:mapPixel(pixelFunction, ...)
-	return defaultImageDataMapPixel(self, function(x, y, r, g, b, a) return unpack(convertFromCachedTable({pixelFunction(x, y, love.math.colorToBytes(r, g, b, a))})) end, ...)
+	return defaultImageDataMapPixel(self, function(x, y, r, g, b, a)
+		local nr, ng, nb, na = pixelFunction(x, y, love.math.colorToBytes(r, g, b, a))
+		if nr == nil then return r, g, b, a end
+		return love.math.colorFromBytes(nr, ng, nb, na)
+	end, ...)
 end
 
--- TODO: ParticleSystem, linear/gamma functions, points, sendColor, newMesh, [gs]etVertex
+-- TODO: ParticleSystem, linear/gamma functions, points, newMesh, [gs]etVertex
 
 ----- MAIN -----
 
@@ -200,9 +182,9 @@ if debugconsole then debuginputon = true; debuginput = "print()"; print("DEBUG O
 local debugGraph,fpsGraph,memGraph,drawGraph
 local debugGraphs = false
 
-VERSION = 13.2000
-VERSIONSTRING = "13.2 (8/10/24)"
-ANDROIDVERSION = 17
+VERSION = 13.2002
+VERSIONSTRING = "13.2 (10/26/2024)"
+ANDROIDVERSION = 18
 
 android = (love.system.getOS() == "Android" or love.system.getOS() == "iOS") --[DROID]
 androidtest = false--testing android on pc
@@ -465,9 +447,11 @@ function love.load()
 		soundenabled = true
 	end
 	love.filesystem.createDirectory("mappacks")
+	love.filesystem.createDirectory("saves")
 	
 	love.filesystem.createDirectory("alesans_entities")
 	love.filesystem.createDirectory("alesans_entities/mappacks")
+	love.filesystem.createDirectory("alesans_entities/saves")
 	love.filesystem.createDirectory("alesans_entities/onlinemappacks")
 	love.filesystem.createDirectory("alesans_entities/characters")
 	love.filesystem.createDirectory("alesans_entities/hats")
@@ -495,6 +479,10 @@ function love.load()
 		mappack = checkmappack
 		checkmappack = nil
 		saveconfig()
+	end
+
+	if love.filesystem.getInfo("suspend") then
+		convertoldsuspendfile()
 	end
 
 	loadingbardraw(1)
@@ -1722,6 +1710,7 @@ function loadconfig(nodefaultconfig)
 			end
 		elseif s2[1] == "modmappacks" then
 			mappackfolder = "alesans_entities/mappacks"
+			savesfolder = "alesans_entities/saves"
 		elseif s2[1] == "resizable" then
 			if s2[2] then
 				resizable = (s2[2] == "true")
@@ -1853,13 +1842,14 @@ function defaultconfig()
 	mappack = "smb"
 	vsync = false
 	mappackfolder = "mappacks"
+	savesfolder = "saves"
 	fourbythree = false
 	localnick = false
 	
 	reachedworlds = {}
 end
 
-function suspendgame()
+function writesuspendfile()
 	local st = {}
 	if marioworld == "M" then
 		marioworld = 8
@@ -1909,18 +1899,22 @@ function suspendgame()
 	st.mappackfolder = mappackfolder
 
 	local s = JSON:encode_pretty(st)
-	love.filesystem.write("suspend", s)
-	
+	love.filesystem.write(savesfolder .. "/" .. mappack .. ".suspend", s)
+end
+
+function suspendgame()
+	writesuspendfile()
 	love.audio.stop()
 	menu_load()
 end
 
 function continuegame()
-	if not love.filesystem.getInfo("suspend") then
+	savefile = savesfolder .. "/" .. mappack .. ".suspend"
+	if not love.filesystem.getInfo(savefile) then
 		return
 	end
 	
-	local s = love.filesystem.read("suspend")
+	local s = love.filesystem.read(savefile)
 	local st = JSON:decode(s)
 	
 	mariosizes = {}
@@ -1957,10 +1951,6 @@ function continuegame()
 	end
 	mappack = st.mappack
 	mappackfolder = st.mappackfolder
-	
-	if (not st.collectables) then	--save the game if collectables are involved
-		love.filesystem.remove("suspend")
-	end
 
 	loadbackground("1-1.txt")
 
@@ -2570,20 +2560,18 @@ end
 function newRecoloredImage(path, tablein, tableout)
 	local minalpha = 128
 	local imagedata = love.image.newImageData( path )
-
-	local pointer   = require("ffi").cast("uint8_t*", imagedata:getFFIPointer()) -- imageData has one byte per channel per pixel.
-	local bytecount = imagedata:getWidth() * imagedata:getHeight() -- pixel count * 4
-
-	for i = 0, 4*bytecount-1, 4 do
-		local r, g, b, a = pointer[i], pointer[i+1], pointer[i+2], pointer[i+3]
-
-		if a > minalpha then
-			for j, v in ipairs(tablein) do
-				if r == v[1] and g == v[2] and b == v[3] then
-					local nr, ng, nb = unpack(tableout[j])
-					pointer[i]   = nr
-					pointer[i+1] = ng
-					pointer[i+2] = nb
+	local width, height = imagedata:getWidth(), imagedata:getHeight()
+	
+	for y = 0, height-1 do
+		for x = 0, width-1 do
+			local oldr, oldg, oldb, olda = imagedata:getPixel(x, y)
+			
+			if olda > minalpha then
+				for i = 1, #tablein do
+					if oldr == tablein[i][1] and oldg == tablein[i][2] and oldb == tablein[i][3] then
+						local r, g, b = unpack(tableout[i])
+						imagedata:setPixel(x, y, r, g, b, olda)
+					end
 				end
 			end
 		end
@@ -3235,6 +3223,17 @@ function disablecheats()
 	infinitetime = false
 	infinitelives = false
 	darkmode = false
+end
+
+function convertoldsuspendfile()
+	local s = love.filesystem.read("suspend")
+	local st = JSON:decode(s)
+
+	-- *ahem* sus. [crowd cheering]
+	local suspendedmappackfolder = st.mappackfolder
+	local suspendedmappack = st.mappack
+	love.filesystem.write(suspendedmappackfolder:gsub("mappacks", "saves") .. "/" .. suspendedmappack .. ".suspend", s)
+	love.filesystem.remove("suspend")
 end
 
 --sausage (don't ask)
