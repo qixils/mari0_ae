@@ -1345,6 +1345,7 @@ function love.run() -- from https://love2d.org/wiki/love.run
 					-- Check if it has finished so we can inform the client
 					if (love.timer.getTime() - request.started) > (request.duration / 1000) then
 						cc_send({id = request.id, type = 0, status = 8, timeRemaining = 0}) --finished
+						table.remove(old_requests, i)
 					else
 						-- Else, persist it
 						table.insert(cc_requests, request)
