@@ -1368,7 +1368,11 @@ function love.run() -- from https://love2d.org/wiki/love.run
 		-- Get new requests
 		while cc_request_channel:peek() do
 			local request = cc_request_channel:demand()
-			table.insert(cc_requests, request)
+			if request == "unknown_error" then
+				cc_reload()
+			else
+				table.insert(cc_requests, request)
+			end
 		end
 
 		-- Process events.

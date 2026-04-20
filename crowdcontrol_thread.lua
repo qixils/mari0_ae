@@ -24,7 +24,7 @@ while true do
             crowdcontrol:close()
             return
         end
-        crowdcontrol:send(msg)
+        pcall(function() crowdcontrol:send(msg) end)
     end
 
     -- handle incoming
@@ -35,18 +35,21 @@ while true do
         local null = incoming:find("\0")
         if null then
 			local message = incoming:sub(1, null-1)
-			print("Received message", message)
-            local request = json:decode(message)
-            if request ~= nil and request['type'] == 1 then -- if request to start
-                requests:push(request)
-            end
             incoming = incoming:sub(null+1)
+			print("Received message", message)
+			pcall(function()
+				local request = json:decode(message)
+				if request ~= nil and request['type'] == 1 then -- if request to start
+					requests:push(request)
+				end
+			end)
         end
         timer.sleep(0.01)
     end
     if err == "closed" then
         print("Crowd Control connection closed")
         crowdcontrol:close()
+		requests:push("unknown_error")
         return
     end
 end
