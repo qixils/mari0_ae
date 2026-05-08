@@ -1379,21 +1379,16 @@ function love.run() -- from https://love2d.org/wiki/love.run
 				cc_reload()
 			elseif request.type == 0xFD then
 				local state
-				local message
 				if gamestate == "levelscreen" or gamestate == "sublevelscreen" or gamestate == "dclevelscreen" or gamestate == "intro" or levelfinished then
-					state = 12
-					message = "cutscene"
+					state = "cutscene"
 				elseif gamestate ~= "game" then
-					state = 14
-					message = "menu"
+					state = "menu"
 				elseif pausemenuopen then
-					state = 8
-					message = "paused"
+					state = "paused"
 				else
-					state = 1
-					message = "ready"
+					state = "ready"
 				end
-				cc_send({ id = request.id, type = 0xFD, state = state, message = message })
+				cc_send({ id = request.id, type = 0xFD, state = state, message = state })
 			else
 				table.insert(cc_requests, request)
 			end
