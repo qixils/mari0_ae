@@ -1317,6 +1317,7 @@ function love.run() -- from https://love2d.org/wiki/love.run
 		-- Remove instant & checked effects so they aren't re-checked
 		for i, request in ipairs(old_requests) do
 			if not request.duration or request.waschecked then
+				print("Removing old request " .. request.code)
 				table.remove(old_requests, i)
 			end
 		end
@@ -1329,7 +1330,10 @@ function love.run() -- from https://love2d.org/wiki/love.run
 					break
 				end
 			end
-			if not skip then table.insert(old_requests, request) end
+			if not skip then
+				print("Adding old request " .. request.code)
+				table.insert(old_requests, request)
+			end
 		end
 		cc_requests = {}
 		-- Check for timed effects and requests that were not acknowledged
@@ -1339,13 +1343,16 @@ function love.run() -- from https://love2d.org/wiki/love.run
 				-- If the request wasn't started then let's tell the native client to retry it,
 				-- and remove it from the table so the game doesn't think it was activated.
 				cc_send({id = request.id, type = 0, status = 3})
+				print("Removing non started request " .. request.code)
 				table.remove(old_requests, i)
 			else
 				if request.duration then
 					-- Check if it has finished so we can inform the client
 					if (love.timer.getTime() - request.started) > (request.duration / 1000) then
+						print("Removing timed request " .. request.code)
 						cc_send({id = request.id, type = 0, status = 8, timeRemaining = 0}) --finished
-						table.remove(old_requests, i)
+						-- we DON'T want to remove it, because the game needs to check the effect is now disabled and turn things off
+						-- table.remove(old_requests, i)
 					else
 						-- Else, persist it
 						table.insert(cc_requests, request)
@@ -1370,6 +1377,23 @@ function love.run() -- from https://love2d.org/wiki/love.run
 			local request = cc_request_channel:demand()
 			if request == "unknown_error" then
 				cc_reload()
+			elseif request.type == 0xFD then
+				local state
+				local message
+				if gamestate == "levelscreen" or gamestate == "sublevelscreen" or gamestate == "dclevelscreen" or gamestate == "intro" or levelfinished then
+					state = 12
+					message = "cutscene"
+				elseif gamestate ~= "game" then
+					state = 14
+					message = "menu"
+				elseif pausemenuopen then
+					state = 8
+					message = "paused"
+				else
+					state = 1
+					message = "ready"
+				end
+				cc_send({ id = request.id, type = 0xFD, state = state, message = message })
 			else
 				table.insert(cc_requests, request)
 			end
