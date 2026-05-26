@@ -1388,7 +1388,7 @@ function love.run() -- from https://love2d.org/wiki/love.run
 				else
 					state = "ready"
 				end
-				cc_send({ id = request.id, type = 0xFD, state = state, message = state })
+				cc_send({ id = 0, type = "gameUpdate", state = state, message = state })
 			else
 				table.insert(cc_requests, request)
 			end
