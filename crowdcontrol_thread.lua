@@ -24,6 +24,7 @@ while true do
             crowdcontrol:close()
             return
         end
+		print("Sending message", msg)
         pcall(function() crowdcontrol:send(msg) end)
     end
 
@@ -39,7 +40,7 @@ while true do
 			print("Received message", message)
 			pcall(function()
 				local request = json:decode(message)
-				if request ~= nil and request['type'] == 1 then -- if request to start
+				if request ~= nil then
 					requests:push(request)
 				end
 			end)
