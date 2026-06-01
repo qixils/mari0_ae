@@ -2620,7 +2620,9 @@ function mario:update(dt)
 			self:flag()
 		end
 		
-		if not firestarted and ((firestartx and self.x >= firestartx - 1) or cc_ack("bowserfire")) then
+		if cc_wasactive("bowserfire") and not (firestartx and self.x >= firestartx - 1) then
+			firestarted = false
+		elseif not firestarted and ((firestartx and self.x >= firestartx - 1) or cc_ack("bowserfire")) then
 			firestarted = true
 		end
 		

@@ -1350,7 +1350,10 @@ function love.run() -- from https://love2d.org/wiki/love.run
 					-- Check if it has finished so we can inform the client
 					if (love.timer.getTime() - request.started) > (request.duration / 1000) then
 						print("Removing timed request " .. request.code)
-						cc_send({id = request.id, type = 0, status = 8, timeRemaining = 0}) --finished
+						if not request.sent_finished then
+							cc_send({id = request.id, type = 0, status = 8, timeRemaining = 0}) --finished
+							request.sent_finished = true
+						end
 						-- we DON'T want to remove it, because the game needs to check the effect is now disabled and turn things off
 						-- table.remove(old_requests, i)
 					else
