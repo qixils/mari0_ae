@@ -946,3 +946,4 @@ end
 
 MINDT = 0.01666667
 LOWDT = 1/15
+CC_FINISHED_GRACE = 10 -- seconds a finished timed effect is kept for cleanup checks before being dropped

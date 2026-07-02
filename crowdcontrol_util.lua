@@ -526,10 +526,42 @@ function cc_wasactive(effect)
     return false
 end
 
---- Checks if the Crowd Control server is currently active.
+--- Determines the game state to report to the Crowd Control client.
+--- "ready" is only reported when effects can actually be acknowledged:
+--- in a level, unpaused, with at least one alive player (including groundfreeze stuns).
+---@return string state "ready", "paused", "menu" or "cutscene"
+function cc_state()
+    if gamestate == "levelscreen" or gamestate == "sublevelscreen" or gamestate == "dclevelscreen" or gamestate == "intro" or levelfinished then
+        return "cutscene"
+    elseif gamestate ~= "game" then
+        return "menu"
+    elseif pausemenuopen then
+        return "paused"
+    elseif everyonedead or noupdate then
+        -- gameplay is on hold (death animation, pipe/vine transitions, ...)
+        return "cutscene"
+    end
+    -- effects can only be acknowledged while somebody is alive in active gameplay
+    if objects and objects["player"] then
+        for i = 1, players do
+            local player = objects["player"][i]
+            if player and not player.dead then
+                -- groundfreeze disables controls but the level is still simulating
+                if player.controlsenabled or player.groundfreeze then
+                    return "ready"
+                end
+            end
+        end
+    end
+    return "cutscene"
+end
+
+--- Checks if the Crowd Control server is currently connected.
+--- (The thread keeps running while it retries a failed connection, so also check its reported status.)
 ---@return boolean
 function cc_isactive()
-    return cc_thread and cc_thread:isRunning()
+    return cc_thread ~= nil and cc_thread:isRunning()
+        and love.thread.getChannel("cc_status"):peek() == "connected"
 end
 
 --- Initializes the Crowd Control server.
@@ -540,12 +572,17 @@ end
 
 --- Reloads the Crowd Control server.
 function cc_reload()
-    if cc_isactive() then
+    -- check isRunning directly (not cc_isactive) so a thread stuck retrying a
+    -- failed connection is also told to shut down before we start a new one
+    if cc_thread and cc_thread:isRunning() then
         outgoing:push("close")
         cc_thread:wait()
     elseif cc_thread and cc_thread:getError() then
         print("Previous thread closed due to: " .. cc_thread:getError())
     end
+    -- Drop stale outgoing messages (responses for the dead connection, or a
+    -- "close" the old thread never popped) so they don't hit the new thread
+    outgoing:clear()
     cc_load()
 end
 

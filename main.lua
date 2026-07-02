@@ -1315,12 +1315,16 @@ function love.run() -- from https://love2d.org/wiki/love.run
 	while true do
 		---- Update Crowd Control request queue ----
 		-- Remove instant & checked effects so they aren't re-checked
+		-- (rebuild the table instead of table.remove mid-loop, which skips the next entry)
+		local keptrequests = {}
 		for i, request in ipairs(old_requests) do
-			if not request.duration or request.waschecked then
+			if request.duration and not request.waschecked then
+				table.insert(keptrequests, request)
+			else
 				print("Removing old request " .. request.code)
-				table.remove(old_requests, i)
 			end
 		end
+		old_requests = keptrequests
 		-- Ensure we don't add timed effects every tick, OOMing in the process
 		for i, request in ipairs(cc_requests) do
 			local skip = false
@@ -1338,29 +1342,19 @@ function love.run() -- from https://love2d.org/wiki/love.run
 		cc_requests = {}
 		-- Check for timed effects and requests that were not acknowledged
 		-- (Do this first to ensure certain timed effects are not overwritten)
+		local ccready = cc_state() == "ready"
+		keptrequests = {}
 		for i, request in ipairs(old_requests) do
+			local remove = false
 			if not request.started then
 				-- If the request wasn't started then let's tell the native client to retry it,
 				-- and remove it from the table so the game doesn't think it was activated.
 				cc_send({id = request.id, type = 0, status = 3})
 				print("Removing non started request " .. request.code)
-				table.remove(old_requests, i)
+				remove = true
 			else
-				if request.duration then
-					-- Check if it has finished so we can inform the client
-					if (love.timer.getTime() - request.started) > (request.duration / 1000) then
-						print("Removing timed request " .. request.code)
-						if not request.sent_finished then
-							cc_send({id = request.id, type = 0, status = 8, timeRemaining = 0}) --finished
-							request.sent_finished = true
-						end
-						-- we DON'T want to remove it, because the game needs to check the effect is now disabled and turn things off
-						-- table.remove(old_requests, i)
-					else
-						-- Else, persist it
-						table.insert(cc_requests, request)
-					end
-				end
+				-- Send the response first, so a freshly started effect reports success
+				-- before any paused/finished message from the same frame
 				if request.response then
 					-- Send custom response
 					local response = request.response
@@ -1373,24 +1367,62 @@ function love.run() -- from https://love2d.org/wiki/love.run
 					cc_send({id = request.id, type = 0, status = 0}) --success
 				end
 				request.responded = true
+				if request.duration then
+					local remaining = request.duration - math.floor((love.timer.getTime() - request.started) * 1000)
+					if request.paused_at then
+						-- Effect timer is frozen; resume it once the game is ready again
+						if ccready then
+							request.started = request.started + (love.timer.getTime() - request.paused_at)
+							request.paused_at = nil
+							remaining = request.duration - math.floor((love.timer.getTime() - request.started) * 1000)
+							print("Resuming timed request " .. request.code)
+							cc_send({id = request.id, type = 0, status = 7, timeRemaining = math.max(0, remaining)}) --resumed
+						end
+						-- Keep the effect active (but frozen) while paused
+						table.insert(cc_requests, request)
+					elseif remaining <= 0 then
+						-- It has finished, inform the client
+						if not request.sent_finished then
+							print("Finished timed request " .. request.code)
+							cc_send({id = request.id, type = 0, status = 8, timeRemaining = 0}) --finished
+							request.sent_finished = true
+						end
+						-- we DON'T want to remove it right away, because the game needs to check the
+						-- effect is now disabled and turn things off. But if nothing checks it within
+						-- the grace period, drop it so old_requests doesn't grow forever.
+						-- (The grace timer only ticks while the game is ready, since that's the only
+						-- time the cleanup checks can actually run.)
+						if ccready then
+							request.cleanupgrace = (request.cleanupgrace or 0) + dt
+							if request.cleanupgrace > CC_FINISHED_GRACE then
+								print("Removing timed request " .. request.code)
+								remove = true
+							end
+						end
+					elseif not ccready then
+						-- The game can't run the effect right now; freeze its timer and tell the client
+						request.paused_at = love.timer.getTime()
+						print("Pausing timed request " .. request.code)
+						cc_send({id = request.id, type = 0, status = 6, timeRemaining = remaining}) --paused
+						table.insert(cc_requests, request)
+					else
+						-- Else, persist it
+						table.insert(cc_requests, request)
+					end
+				end
+			end
+			if not remove then
+				table.insert(keptrequests, request)
 			end
 		end
+		old_requests = keptrequests
 		-- Get new requests
 		while cc_request_channel:peek() do
 			local request = cc_request_channel:demand()
 			if request == "unknown_error" then
 				cc_reload()
 			elseif request.type == 0xFD then
-				local state
-				if gamestate == "levelscreen" or gamestate == "sublevelscreen" or gamestate == "dclevelscreen" or gamestate == "intro" or levelfinished then
-					state = "cutscene"
-				elseif gamestate ~= "game" then
-					state = "menu"
-				elseif pausemenuopen then
-					state = "paused"
-				else
-					state = "ready"
-				end
+				local state = cc_state()
 				cc_send({ id = request.id, type = 0xFD, state = state, message = state })
 			elseif request.type == 1 then
 				table.insert(cc_requests, request)

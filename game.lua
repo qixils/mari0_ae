@@ -505,21 +505,6 @@ function game_update(dt)
 				objects["player"][i]:die("killscript")
 			end
 		end
-		-- Stun Player
-		local request = cc_get("stun_player", false)
-		if request then
-			for i = 1, players do
-				local player = objects["player"][i]
-				if (not player.vine) and (not player.fence) and (not player.clearpipe) then
-					cc_start(request)
-					duration = request.duration or 5000
-					player.groundfreeze = duration / 1000
-					player.speedx = 0
-					player.animationstate = "idle"
-					player:setquad() 
-				end
-			end
-		end
 		-- Flip Gravity
 		if cc_ack("flip_gravity") ~= gravity_flipped then
 			gravity_flipped = not gravity_flipped
@@ -726,6 +711,32 @@ function game_update(dt)
 				player.height = player.height/scalefactor
 				player.offsetX = player.offsetX/scalefactor
 				player.offsetY = player.offsetY/-scalefactor
+			end
+		end
+	end
+	-- Stun Player (outside `playing` so cleanup runs while controls are disabled)
+	local request = cc_get("stun_player", false)
+	if request and not request.stunapplied then
+		request.stunapplied = true
+		cc_start(request)
+		local duration = request.duration or 5000
+		for i = 1, players do
+			local player = objects["player"][i]
+			if (not player.vine) and (not player.fence) and (not player.clearpipe) then
+				player.cc_stun = true
+				player.groundfreeze = duration / 1000
+				player.speedx = 0
+				player.animationstate = "idle"
+				player:setquad()
+			end
+		end
+	elseif cc_wasactive("stun_player") then
+		for i = 1, players do
+			local player = objects["player"][i]
+			if player.cc_stun then
+				player.cc_stun = false
+				player.groundfreeze = false
+				player.controlsenabled = true
 			end
 		end
 	end
